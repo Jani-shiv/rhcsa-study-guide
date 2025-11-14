@@ -1,15 +1,52 @@
-# 🎓 RHCSA Study Guide - DevOps ni Diary
-
 <div align="center">
 
-[![GitHub stars](https://img.shields.io/github/stars/Jani-shiv/rhcsa-study-guide?style=social)](https://github.com/Jani-shiv/rhcsa-study-guide/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/Jani-shiv/rhcsa-study-guide?style=social)](https://github.com/Jani-shiv/rhcsa-study-guide/network/members)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+# 🎓 RHCSA Study Guide - DevOps ni Diary
 
-**Interactive web-based study guide for Red Hat Certified System Administrator (RHCSA) EX200 exam preparation**
+### 📺 **[Subscribe to DevOps ni Diary YouTube Channel](https://youtube.com/@DevOpsniDiary?sub_confirmation=1)** 📺
 
-[📖 Read the Guide](https://jani-shiv.github.io/rhcsa-study-guide/) • [📺 Watch on YouTube](https://youtube.com/@DevOpsniDiary) • [🐛 Report Bug](https://github.com/Jani-shiv/rhcsa-study-guide/issues) • [💡 Request Feature](https://github.com/Jani-shiv/rhcsa-study-guide/issues)
+[![YouTube Channel](https://img.shields.io/badge/YouTube-DevOps_ni_Diary-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/@DevOpsniDiary)
+[![YouTube Subscribers](https://img.shields.io/youtube/channel/subscribers/UCDevOpsniDiary?style=for-the-badge&logo=youtube&label=Subscribe)](https://youtube.com/@DevOpsniDiary?sub_confirmation=1)
+
+[![GitHub stars](https://img.shields.io/github/stars/Jani-shiv/rhcsa-study-guide?style=for-the-badge&logo=github)](https://github.com/Jani-shiv/rhcsa-study-guide/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Jani-shiv/rhcsa-study-guide?style=for-the-badge&logo=github)](https://github.com/Jani-shiv/rhcsa-study-guide/network/members)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
+
+### **🚀 Interactive web-based study guide for Red Hat Certified System Administrator (RHCSA) EX200 exam preparation**
+
+<p align="center">
+  <a href="https://jani-shiv.github.io/rhcsa-study-guide/">
+    <img src="https://img.shields.io/badge/📖_Read_the_Guide-4285F4?style=for-the-badge&logoColor=white" alt="Read Guide"/>
+  </a>
+  <a href="https://youtube.com/@DevOpsniDiary">
+    <img src="https://img.shields.io/badge/📺_Watch_Videos-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"/>
+  </a>
+  <a href="https://github.com/Jani-shiv/rhcsa-study-guide/issues">
+    <img src="https://img.shields.io/badge/🐛_Report_Bug-orange?style=for-the-badge" alt="Report Bug"/>
+  </a>
+  <a href="https://github.com/Jani-shiv/rhcsa-study-guide/issues">
+    <img src="https://img.shields.io/badge/💡_Request_Feature-blue?style=for-the-badge" alt="Feature Request"/>
+  </a>
+</p>
+
+---
+
+### 🎬 **Watch Full RHCSA Course on YouTube!**
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://youtube.com/@DevOpsniDiary">
+        <img src="https://img.shields.io/badge/▶️_Watch_Now-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=282828" alt="Watch on YouTube" height="50"/>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://youtube.com/@DevOpsniDiary?sub_confirmation=1">
+        <img src="https://img.shields.io/badge/🔔_Subscribe-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=282828" alt="Subscribe" height="50"/>
+      </a>
+    </td>
+  </tr>
+</table>
 
 </div>
 
