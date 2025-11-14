@@ -1,0 +1,577 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 6: Tune System Performance - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html" class="active">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 6</span>
+                    <span class="meta-badge">⏱️ 45 min read</span>
+                    <span class="meta-badge">📚 Intermediate</span>
+                </div>
+                <h1>Tune System Performance</h1>
+                <p class="chapter-intro">
+                    Master system performance monitoring and tuning. Learn to use performance analysis tools, manage process priorities, 
+                    and configure tuned profiles for optimal system performance.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#monitoring">Performance Monitoring Tools</a></li>
+                    <li><a href="#processes">Process Management & Priority</a></li>
+                    <li><a href="#nice">Nice and Renice</a></li>
+                    <li><a href="#tuned">Tuned Profiles</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction</h2>
+                <p>
+                    System performance tuning involves monitoring resource usage, adjusting process priorities, and applying 
+                    performance profiles to optimize system behavior for specific workloads. RHEL provides powerful tools to 
+                    monitor CPU, memory, disk, and network usage, plus the <code>tuned</code> daemon for automated performance tuning.
+                </p>
+                <p>In this chapter, you'll learn to:</p>
+                <ul>
+                    <li>Monitor system performance with top, ps, uptime, and other tools</li>
+                    <li>Adjust process priorities using nice and renice</li>
+                    <li>Manage tuned profiles for different workload types</li>
+                    <li>Identify performance bottlenecks</li>
+                    <li>Optimize system settings for specific use cases (desktop, server, virtual machine, etc.)</li>
+                </ul>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Note</div>
+                    <p>Performance tuning is about finding the right balance for your specific workload. 
+                    There's no one-size-fits-all solution.</p>
+                </div>
+            </section>
+
+            <section id="monitoring" class="content-section">
+                <h2>📊 Performance Monitoring Tools</h2>
+
+                <h3>top - Real-Time Process Viewer</h3>
+                <p>The <code>top</code> command provides a dynamic real-time view of running processes:</p>
+                <pre><code># Launch top
+top
+
+# Sample output:
+top - 14:23:15 up  3:42,  2 users,  load average: 0.52, 0.58, 0.59
+Tasks: 234 total,   1 running, 233 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  5.3 us,  2.1 sy,  0.0 ni, 92.2 id,  0.3 wa,  0.0 hi,  0.1 si,  0.0 st
+MiB Mem :   3947.8 total,    234.5 free,   2456.7 used,   1256.6 buff/cache
+MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   1234.3 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 1234 student   20   0 1234567  89012   3456 S   2.3   2.2   0:45.67 firefox
+ 5678 root      20   0  123456  12345   6789 S   1.0   0.3   1:23.45 httpd</code></pre>
+
+                <h4>Understanding top Output</h4>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Field</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>load average</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1, 5, and 15-minute load averages (processes waiting for CPU)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>us (user)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Time spent running user processes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>sy (system)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Time spent in kernel space</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>id (idle)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">CPU idle time</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>wa (I/O wait)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Time waiting for I/O operations (disk)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>PR</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Priority (lower is higher priority)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>NI</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Nice value (-20 to 19)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>VIRT</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Virtual memory used (total)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>RES</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Resident memory (physical RAM)</td>
+                    </tr>
+                </table>
+
+                <h4>Interactive Commands in top</h4>
+                <pre><code># While top is running:
+k       # Kill a process (enter PID)
+r       # Renice a process (change priority)
+M       # Sort by memory usage
+P       # Sort by CPU usage (default)
+1       # Toggle individual CPU cores display
+h       # Help screen
+q       # Quit
+
+# Start top with specific options
+top -u student      # Show only student's processes
+top -d 5            # Update every 5 seconds (default is 3)
+top -n 3            # Run 3 iterations then exit
+top -b > top.log    # Batch mode for logging</code></pre>
+
+                <h3>uptime - System Load</h3>
+                <pre><code># Check how long system has been running and load average
+uptime
+14:23:15 up 3:42, 2 users, load average: 0.52, 0.58, 0.59
+
+# Interpreting load average:
+# - Numbers represent 1, 5, and 15-minute averages
+# - On 4-core system: load of 4.0 = 100% utilization
+# - Load > number of cores = system overloaded</code></pre>
+
+                <h3>free - Memory Usage</h3>
+                <pre><code># Display memory usage
+free
+
+# Human-readable format
+free -h
+              total        used        free      shared  buff/cache   available
+Mem:          3.9Gi       2.4Gi       234Mi       156Mi       1.2Gi       1.2Gi
+Swap:         2.0Gi          0B       2.0Gi
+
+# Key fields:
+# available: estimate of memory available for starting new applications
+# buff/cache: memory used for caching (can be reclaimed if needed)</code></pre>
+
+                <h3>ps - Process Status</h3>
+                <pre><code># View all processes with full details
+ps aux
+
+# View processes in tree format
+ps auxf
+
+# View processes for specific user
+ps -u student
+
+# Custom output format
+ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head -10
+
+# Find specific process
+ps aux | grep httpd</code></pre>
+
+                <h3>vmstat - Virtual Memory Statistics</h3>
+                <pre><code># Display system statistics
+vmstat
+
+# Update every 2 seconds, 5 times
+vmstat 2 5
+
+# Sample output:
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 1  0      0 234567  12345 678901    0    0   123   456  789 1234  5  2 92  1  0</code></pre>
+            </section>
+
+            <section id="processes" class="content-section">
+                <h2>⚙️ Process Management & Priority</h2>
+
+                <p>Linux uses a priority system to determine which processes get CPU time. Understanding and adjusting process priorities 
+                is crucial for performance tuning.</p>
+
+                <h3>Priority and Nice Values</h3>
+                <p>Each process has two related values:</p>
+                <ul>
+                    <li><strong>Priority (PR):</strong> Actual priority used by kernel (calculated value)</li>
+                    <li><strong>Nice (NI):</strong> User-controllable value that influences priority</li>
+                </ul>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Nice Value</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Priority</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Who Can Set</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">-20 (highest priority)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Most CPU time</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Root only</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">0 (default)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Normal priority</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Everyone</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">19 (lowest priority)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Least CPU time</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Everyone</td>
+                    </tr>
+                </table>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Understanding "Nice"</div>
+                    <p>The term "nice" reflects the concept of being "nice" to other users. A higher nice value means 
+                    the process is being nicer by using less CPU priority.</p>
+                </div>
+            </section>
+
+            <section id="nice" class="content-section">
+                <h2>🎚️ Nice and Renice Commands</h2>
+
+                <h3>nice - Start Process with Different Priority</h3>
+                <p>Use <code>nice</code> to start a new process with a specific nice value:</p>
+                <pre><code># Start process with default nice (0)
+./my_program
+
+# Start process with nice value of 10 (lower priority)
+nice -n 10 ./my_program
+
+# Start with nice value of -10 (higher priority, requires root)
+sudo nice -n -10 ./important_program
+
+# Start background process with low priority
+nice -n 15 ./backup_script.sh &
+
+# Check the nice value
+ps -o pid,ni,cmd -p $(pgrep my_program)</code></pre>
+
+                <h3>renice - Change Priority of Running Process</h3>
+                <p>Use <code>renice</code> to change the priority of an already running process:</p>
+                <pre><code># Renice by PID
+renice -n 5 -p 1234
+
+# Renice all processes for a user (requires root)
+sudo renice -n 10 -u student
+
+# Renice all processes in a group
+sudo renice -n 5 -g developers
+
+# Lower priority of CPU-intensive process (nice to others)
+renice -n 19 -p $(pgrep heavy_computation)
+
+# Increase priority (requires root)
+sudo renice -n -5 -p 1234
+
+# Verify the change
+ps -o pid,ni,cmd -p 1234</code></pre>
+
+                <h3>Practical Examples</h3>
+                <pre><code># Run backup with low priority so it doesn't slow down system
+nice -n 19 tar -czf /backups/home.tar.gz /home &
+
+# Run database maintenance with slightly elevated priority
+sudo nice -n -5 /usr/bin/mysql_optimize
+
+# Lower priority of someone's runaway process
+sudo renice -n 15 -p $(pgrep -u problematic_user)
+
+# Start compilation with low priority
+nice -n 10 make -j4</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Best Practices</div>
+                    <ul>
+                        <li>Use nice for batch jobs and backups (nice 10-19)</li>
+                        <li>Never use nice -20 unless absolutely necessary</li>
+                        <li>Regular users can only increase nice values (lower priority)</li>
+                        <li>Only root can decrease nice values (higher priority)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="tuned" class="content-section">
+                <h2>🔧 Tuned Profiles</h2>
+
+                <p>
+                    <code>tuned</code> is a daemon that monitors system usage and adjusts settings to optimize performance 
+                    for different workload types. It provides pre-configured profiles for common scenarios.
+                </p>
+
+                <h3>Installing and Starting Tuned</h3>
+                <pre><code># Install tuned (usually pre-installed)
+sudo dnf install tuned
+
+# Start and enable tuned service
+sudo systemctl start tuned
+sudo systemctl enable tuned
+
+# Check tuned status
+sudo systemctl status tuned</code></pre>
+
+                <h3>Working with Tuned Profiles</h3>
+                <pre><code># List all available profiles
+tuned-adm list
+
+# Sample output:
+Available profiles:
+- balanced
+- desktop
+- latency-performance
+- network-latency
+- network-throughput
+- powersave
+- throughput-performance
+- virtual-guest
+- virtual-host
+Current active profile: balanced
+
+# Check current active profile
+tuned-adm active
+
+# Get recommended profile for your system
+tuned-adm recommend
+
+# Switch to a different profile
+sudo tuned-adm profile throughput-performance
+
+# Switch to profile optimized for virtual guest
+sudo tuned-adm profile virtual-guest
+
+# Turn off tuned (not recommended)
+sudo tuned-adm off</code></pre>
+
+                <h3>Common Tuned Profiles</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Profile</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Use Case</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Optimizations</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>balanced</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Default, good compromise</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Balance between performance and power saving</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>throughput-performance</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Servers, maximum throughput</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Maximum performance, no power saving</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>latency-performance</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Low-latency requirements</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Minimize latency at cost of power</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>virtual-guest</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Virtual machines (guest)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Optimized for VMs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>virtual-host</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Hypervisor hosts</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Optimized for running VMs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>desktop</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Desktop/laptop systems</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Responsive, some power saving</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>powersave</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Battery-powered devices</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Maximum power savings</td>
+                    </tr>
+                </table>
+
+                <h3>Verifying Tuned Profile</h3>
+                <pre><code># Check which profile is active
+tuned-adm active
+Current active profile: throughput-performance
+
+# Verify profile was applied correctly
+tuned-adm verify
+Verification succeeded, current system settings match the preset profile.
+
+# If verification fails, it means manual changes conflict with profile
+# Reapply the profile:
+sudo tuned-adm profile throughput-performance</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Optimizing a Database Server</h4>
+                    <ol>
+                        <li>Check current profile:
+                            <pre><code>tuned-adm active</code></pre>
+                        </li>
+                        <li>Get system recommendation:
+                            <pre><code>tuned-adm recommend</code></pre>
+                        </li>
+                        <li>Apply throughput-performance profile:
+                            <pre><code>sudo tuned-adm profile throughput-performance</code></pre>
+                        </li>
+                        <li>Verify the change:
+                            <pre><code>tuned-adm active
+tuned-adm verify</code></pre>
+                        </li>
+                        <li>Monitor database performance improvements</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What does a load average of 4.0 mean on a 4-core system?</h4>
+                        <ul class="quiz-options">
+                            <li>A) System is idle</li>
+                            <li>B) System is at 100% CPU utilization</li>
+                            <li>C) System is overloaded</li>
+                            <li>D) System has 4 processes running</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) System is at 100% CPU utilization</strong><br>
+                            Load average represents processes waiting for CPU. On a 4-core system, a load of 4.0 means 
+                            all cores are fully utilized. Load > number of cores indicates overloading.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: Which nice value gives a process the HIGHEST priority?</h4>
+                        <ul class="quiz-options">
+                            <li>A) 19</li>
+                            <li>B) 0</li>
+                            <li>C) -20</li>
+                            <li>D) 10</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) -20</strong><br>
+                            Nice values range from -20 (highest priority) to 19 (lowest priority). Only root can set 
+                            negative nice values. Lower nice values = higher priority.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: How do you permanently change a running process's priority?</h4>
+                        <ul class="quiz-options">
+                            <li>A) nice -n 10 -p 1234</li>
+                            <li>B) renice -n 10 -p 1234</li>
+                            <li>C) top then press 'r'</li>
+                            <li>D) Both B and C</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: D) Both B and C</strong><br>
+                            renice changes the priority of a running process. You can also use top's interactive 'r' command. 
+                            nice is only for starting new processes, not changing existing ones.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Which tuned profile is best for a virtual machine guest?</h4>
+                        <ul class="quiz-options">
+                            <li>A) balanced</li>
+                            <li>B) throughput-performance</li>
+                            <li>C) virtual-guest</li>
+                            <li>D) virtual-host</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) virtual-guest</strong><br>
+                            The virtual-guest profile is specifically optimized for virtual machine guests. 
+                            virtual-host is for hypervisor hosts. Apply with: sudo tuned-adm profile virtual-guest
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: What command shows the active tuned profile?</h4>
+                        <ul class="quiz-options">
+                            <li>A) tuned-adm status</li>
+                            <li>B) tuned-adm active</li>
+                            <li>C) systemctl status tuned</li>
+                            <li>D) tuned-adm list</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) tuned-adm active</strong><br>
+                            tuned-adm active shows the currently active profile. tuned-adm list shows all available profiles. 
+                            tuned-adm recommend suggests the best profile for your system.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter5.html" class="nav-button prev">Chapter 5: SELinux</a>
+                <a href="chapter7.html" class="nav-button next">Chapter 7: Schedule Tasks</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

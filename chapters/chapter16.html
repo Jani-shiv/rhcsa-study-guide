@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 16: Run Containers - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html" class="active">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 16</span>
+                    <span class="meta-badge">⏱️ 55 min read</span>
+                    <span class="meta-badge">📚 Advanced</span>
+                </div>
+                <h1>Run Containers (Podman)</h1>
+                <p class="chapter-intro">
+                    Master container management with Podman. Learn to find, pull, run, and manage containers as a 
+                    rootless user. Configure persistent storage and systemd integration.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction to Podman</a></li>
+                    <li><a href="#images">Managing Images</a></li>
+                    <li><a href="#containers">Running Containers</a></li>
+                    <li><a href="#storage">Persistent Storage</a></li>
+                    <li><a href="#systemd">Systemd Integration</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction to Podman</h2>
+                <p>
+                    Podman is a daemonless container engine for OCI containers. It's Docker-compatible but 
+                    runs rootless by default, making it more secure.
+                </p>
+
+                <h3>Podman vs Docker</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Feature</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Podman</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Docker</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Daemon</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">No daemon required</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Requires dockerd</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Root</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Rootless by default</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Requires root</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Systemd</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Native integration</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Third-party tools</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Pods</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Native pod support</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Requires compose/swarm</td>
+                    </tr>
+                </table>
+
+                <h3>Installing Podman</h3>
+                <pre><code># Install podman
+sudo dnf install -y podman
+
+# Install additional tools
+sudo dnf install -y podman-docker  # Docker compatibility
+sudo dnf install -y buildah         # Image building
+sudo dnf install -y skopeo          # Image operations
+
+# Verify installation
+podman --version
+podman info</code></pre>
+
+                <h3>Registry Configuration</h3>
+                <pre><code># View configured registries
+cat /etc/containers/registries.conf
+
+# Common registries
+# registry.access.redhat.com (Red Hat)
+# docker.io (Docker Hub)
+# quay.io (Red Hat Quay)
+
+# Search for images
+podman search nginx
+podman search --limit 5 httpd
+
+# Search specific registry
+podman search quay.io/nginx</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Rootless Containers</div>
+                    <p>Podman runs as regular user without root privileges. User containers store in 
+                    <code>~/.local/share/containers</code>. Root containers (sudo podman) store in 
+                    <code>/var/lib/containers</code>. They're completely separate!</p>
+                </div>
+            </section>
+
+            <section id="images" class="content-section">
+                <h2>💿 Managing Images</h2>
+
+                <p>
+                    Container images are read-only templates used to create containers.
+                </p>
+
+                <h3>Pulling Images</h3>
+                <pre><code># Pull latest image
+podman pull nginx
+podman pull docker.io/library/nginx
+
+# Pull specific tag
+podman pull nginx:1.24
+podman pull registry.access.redhat.com/ubi9/ubi:latest
+
+# Pull from specific registry
+podman pull quay.io/podman/hello
+
+# Verify pulled image
+podman images</code></pre>
+
+                <h3>Listing and Inspecting Images</h3>
+                <pre><code># List all images
+podman images
+
+# List with specific format
+podman images --format "{{.Repository}}:{{.Tag}}"
+
+# Show image details
+podman inspect nginx
+
+# Show image history (layers)
+podman history nginx
+
+# Show image size
+podman images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"</code></pre>
+
+                <h3>Removing Images</h3>
+                <pre><code># Remove specific image
+podman rmi nginx
+
+# Remove by image ID
+podman rmi 12345678
+
+# Remove all unused images
+podman image prune
+
+# Remove all images (dangerous!)
+podman rmi --all</code></pre>
+
+                <h3>Tagging Images</h3>
+                <pre><code># Tag an image
+podman tag nginx:latest mynginx:v1
+
+# Tag for private registry
+podman tag nginx localhost:5000/mynginx:v1
+
+# List all tags
+podman images</code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Image Names</div>
+                    <p>Full format: <code>registry/namespace/repository:tag</code><br>
+                    Example: <code>quay.io/podman/hello:latest</code><br>
+                    Default registry: docker.io<br>
+                    Default tag: latest</p>
+                </div>
+            </section>
+
+            <section id="containers" class="content-section">
+                <h2>🐳 Running Containers</h2>
+
+                <h3>Basic Container Operations</h3>
+                <pre><code># Run container (interactive)
+podman run -it ubi9 /bin/bash
+
+# Run container (detached/background)
+podman run -d nginx
+
+# Run with custom name
+podman run -d --name webserver nginx
+
+# Run with port mapping
+podman run -d -p 8080:80 --name web nginx
+
+# Run with environment variables
+podman run -d -e MYSQL_ROOT_PASSWORD=secret mysql
+
+# Run with auto-remove (delete after exit)
+podman run --rm -it ubi9 /bin/bash</code></pre>
+
+                <h3>Managing Running Containers</h3>
+                <pre><code># List running containers
+podman ps
+
+# List all containers (including stopped)
+podman ps -a
+
+# Show container details
+podman inspect webserver
+
+# Show container logs
+podman logs webserver
+podman logs -f webserver  # Follow logs
+
+# Show container processes
+podman top webserver
+
+# Show container resource usage
+podman stats webserver</code></pre>
+
+                <h3>Container Lifecycle</h3>
+                <pre><code># Stop container
+podman stop webserver
+
+# Start stopped container
+podman start webserver
+
+# Restart container
+podman restart webserver
+
+# Kill container (force stop)
+podman kill webserver
+
+# Pause container
+podman pause webserver
+
+# Unpause container
+podman unpause webserver
+
+# Remove container
+podman rm webserver
+
+# Remove running container (force)
+podman rm -f webserver</code></pre>
+
+                <h3>Executing Commands in Containers</h3>
+                <pre><code># Execute command in running container
+podman exec webserver ls /usr/share/nginx/html
+
+# Interactive shell in running container
+podman exec -it webserver /bin/bash
+
+# Execute as specific user
+podman exec -u nginx webserver whoami
+
+# Execute with environment variable
+podman exec -e VAR=value webserver env</code></pre>
+
+                <h3>Port Mapping</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Option</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Example</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>-p HOST:CONTAINER</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Map host port to container</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">-p 8080:80</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>-p IP:HOST:CONTAINER</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Bind to specific IP</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">-p 127.0.0.1:8080:80</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>-p CONTAINER</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Random host port</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">-p 80</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>-P</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Publish all exposed ports</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">-P</td>
+                    </tr>
+                </table>
+
+                <div class="procedure">
+                    <h4>Procedure: Run Nginx Web Server</h4>
+                    <ol>
+                        <li>Pull nginx image:
+                            <pre><code>podman pull nginx</code></pre>
+                        </li>
+                        <li>Run container with port mapping:
+                            <pre><code>podman run -d --name webserver -p 8080:80 nginx</code></pre>
+                        </li>
+                        <li>Verify container is running:
+                            <pre><code>podman ps</code></pre>
+                        </li>
+                        <li>Check logs:
+                            <pre><code>podman logs webserver</code></pre>
+                        </li>
+                        <li>Test web server:
+                            <pre><code>curl http://localhost:8080</code></pre>
+                        </li>
+                        <li>Stop and remove:
+                            <pre><code>podman stop webserver
+podman rm webserver</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="storage" class="content-section">
+                <h2>💾 Persistent Storage</h2>
+
+                <p>
+                    By default, container storage is ephemeral. Use volumes or bind mounts for persistence.
+                </p>
+
+                <h3>Volume Types</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Type</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Use Case</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Bind Mount</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Host directory → container</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Development, config files</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Volume</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Podman-managed storage</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Databases, persistent data</td>
+                    </tr>
+                </table>
+
+                <h3>Bind Mounts</h3>
+                <pre><code># Create host directory
+mkdir -p ~/web-content
+
+# Run with bind mount
+podman run -d --name web \
+  -v ~/web-content:/usr/share/nginx/html:Z \
+  -p 8080:80 nginx
+
+# :Z sets SELinux context (critical on RHEL!)
+# Without :Z, SELinux blocks access
+
+# Read-only bind mount
+podman run -d --name web \
+  -v ~/web-content:/usr/share/nginx/html:ro,Z \
+  nginx
+
+# Multiple mounts
+podman run -d --name web \
+  -v ~/web-content:/usr/share/nginx/html:Z \
+  -v ~/web-logs:/var/log/nginx:Z \
+  nginx</code></pre>
+
+                <h3>Named Volumes</h3>
+                <pre><code># Create named volume
+podman volume create mysql-data
+
+# List volumes
+podman volume ls
+
+# Inspect volume
+podman volume inspect mysql-data
+
+# Run with named volume
+podman run -d --name db \
+  -v mysql-data:/var/lib/mysql \
+  -e MYSQL_ROOT_PASSWORD=secret \
+  mysql
+
+# Remove volume
+podman volume rm mysql-data
+
+# Remove all unused volumes
+podman volume prune</code></pre>
+
+                <h3>SELinux Context for Volumes</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Option</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>:z</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Shared content (multiple containers)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>:Z</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Private content (single container)</td>
+                    </tr>
+                </table>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ SELinux and Volumes</div>
+                    <p>On RHEL systems with SELinux enforcing, ALWAYS use <code>:Z</code> or <code>:z</code> 
+                    when mounting host directories! Without it, containers can't access the files. 
+                    Use <code>:Z</code> for single-container volumes, <code>:z</code> for shared.</p>
+                </div>
+
+                <div class="procedure">
+                    <h4>Procedure: Persistent Web Content</h4>
+                    <ol>
+                        <li>Create content directory:
+                            <pre><code>mkdir -p ~/webdata
+echo "&lt;h1&gt;Hello Podman&lt;/h1&gt;" > ~/webdata/index.html</code></pre>
+                        </li>
+                        <li>Run nginx with bind mount:
+                            <pre><code>podman run -d --name myweb \
+  -v ~/webdata:/usr/share/nginx/html:Z \
+  -p 8080:80 nginx</code></pre>
+                        </li>
+                        <li>Test content:
+                            <pre><code>curl http://localhost:8080</code></pre>
+                        </li>
+                        <li>Update content (container sees changes):
+                            <pre><code>echo "&lt;h1&gt;Updated!&lt;/h1&gt;" > ~/webdata/index.html
+curl http://localhost:8080</code></pre>
+                        </li>
+                        <li>Remove container (data persists):
+                            <pre><code>podman rm -f myweb
+ls ~/webdata  # Files still there!</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="systemd" class="content-section">
+                <h2>⚙️ Systemd Integration</h2>
+
+                <p>
+                    Integrate containers with systemd for automatic startup and management.
+                </p>
+
+                <h3>Generate Systemd Unit</h3>
+                <pre><code># Run a container first
+podman run -d --name webserver -p 8080:80 nginx
+
+# Generate systemd unit file
+podman generate systemd --name webserver --files --new
+
+# This creates: container-webserver.service
+
+# Move to user systemd directory
+mkdir -p ~/.config/systemd/user
+mv container-webserver.service ~/.config/systemd/user/
+
+# Reload systemd
+systemctl --user daemon-reload
+
+# Enable at login
+systemctl --user enable container-webserver.service
+
+# Start service
+systemctl --user start container-webserver.service
+
+# Check status
+systemctl --user status container-webserver.service</code></pre>
+
+                <h3>Generate Options</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Option</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>--new</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Create new container on start (not reuse)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>--files</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Write to files (not stdout)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>--name</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Use container name</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>--restart-policy</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">always, on-failure, no</td>
+                    </tr>
+                </table>
+
+                <h3>Enable Linger (Rootless)</h3>
+                <pre><code># Allow user containers to start without login
+sudo loginctl enable-linger $(whoami)
+
+# Check linger status
+loginctl show-user $(whoami) | grep Linger
+
+# Now user containers start at boot, even if user not logged in</code></pre>
+
+                <h3>System vs User Containers</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Aspect</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">System (Root)</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">User (Rootless)</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Command</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">sudo podman</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">podman</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Systemd</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">systemctl (root)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">systemctl --user</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Unit Path</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/etc/systemd/system/</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">~/.config/systemd/user/</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Ports</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Can use 1-1024</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Must use 1024+</td>
+                    </tr>
+                </table>
+
+                <div class="procedure">
+                    <h4>Procedure: Container as Systemd Service</h4>
+                    <ol>
+                        <li>Create and test container:
+                            <pre><code>podman run -d --name myapp -p 8080:80 nginx</code></pre>
+                        </li>
+                        <li>Generate systemd unit:
+                            <pre><code>cd ~
+podman generate systemd --name myapp --files --new</code></pre>
+                        </li>
+                        <li>Stop and remove original container:
+                            <pre><code>podman stop myapp
+podman rm myapp</code></pre>
+                        </li>
+                        <li>Install systemd unit:
+                            <pre><code>mkdir -p ~/.config/systemd/user
+mv container-myapp.service ~/.config/systemd/user/
+systemctl --user daemon-reload</code></pre>
+                        </li>
+                        <li>Enable linger (start at boot):
+                            <pre><code>sudo loginctl enable-linger $(whoami)</code></pre>
+                        </li>
+                        <li>Enable and start service:
+                            <pre><code>systemctl --user enable --now container-myapp.service</code></pre>
+                        </li>
+                        <li>Verify:
+                            <pre><code>systemctl --user status container-myapp.service
+curl http://localhost:8080</code></pre>
+                        </li>
+                        <li>Test persistence (reboot and check):
+                            <pre><code>sudo reboot
+# After reboot
+systemctl --user status container-myapp.service</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: How do you run a container in the background?</h4>
+                        <ul class="quiz-options">
+                            <li>A) podman run -b nginx</li>
+                            <li>B) podman run -d nginx</li>
+                            <li>C) podman run --background nginx</li>
+                            <li>D) podman start nginx</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) podman run -d nginx</strong><br>
+                            <code>-d</code> (detached) runs container in background. Returns container ID. 
+                            Use <code>podman ps</code> to see running containers. <code>-it</code> runs 
+                            interactive terminal (foreground).
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What's the critical SELinux option for bind mounts?</h4>
+                        <ul class="quiz-options">
+                            <li>A) -v /host:/container</li>
+                            <li>B) -v /host:/container:Z</li>
+                            <li>C) -v /host:/container:selinux</li>
+                            <li>D) -v /host:/container:secure</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) -v /host:/container:Z</strong><br>
+                            <code>:Z</code> sets SELinux context for private use. Without it, SELinux blocks 
+                            access. Use <code>:z</code> (lowercase) for shared volumes. This is CRITICAL on 
+                            RHEL with SELinux enforcing!
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: How to map host port 8080 to container port 80?</h4>
+                        <ul class="quiz-options">
+                            <li>A) -p 80:8080</li>
+                            <li>B) -p 8080:80</li>
+                            <li>C) --port 8080:80</li>
+                            <li>D) --expose 8080:80</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) -p 8080:80</strong><br>
+                            Format: <code>-p HOST:CONTAINER</code>. Access via <code>http://host:8080</code> 
+                            which forwards to container port 80. Rootless users must use ports 1024+ on host.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Command to generate systemd unit file?</h4>
+                        <ul class="quiz-options">
+                            <li>A) podman systemd --name myapp --files</li>
+                            <li>B) podman generate systemd --name myapp --files --new</li>
+                            <li>C) podman create-service myapp</li>
+                            <li>D) systemctl generate myapp</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B)</strong><br>
+                            <code>podman generate systemd --name myapp --files --new</code>. 
+                            <code>--new</code> creates new container on start. <code>--files</code> writes 
+                            to file. Move to <code>~/.config/systemd/user/</code> then 
+                            <code>systemctl --user daemon-reload</code>.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Enable rootless containers at boot?</h4>
+                        <ul class="quiz-options">
+                            <li>A) systemctl --user enable container-name</li>
+                            <li>B) sudo loginctl enable-linger $USER</li>
+                            <li>C) podman enable container-name</li>
+                            <li>D) Both A and B</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: D) Both A and B</strong><br>
+                            Need both: <code>systemctl --user enable container-name</code> (enable service) 
+                            AND <code>sudo loginctl enable-linger $USER</code> (allow user services without login). 
+                            Without linger, containers only run when user logged in.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 6: Where are rootless container images stored?</h4>
+                        <ul class="quiz-options">
+                            <li>A) /var/lib/containers</li>
+                            <li>B) ~/.local/share/containers</li>
+                            <li>C) ~/podman/images</li>
+                            <li>D) /home/containers</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) ~/.local/share/containers</strong><br>
+                            Rootless (user) containers: <code>~/.local/share/containers</code>. 
+                            Root containers: <code>/var/lib/containers</code>. They're completely separate! 
+                            User and root can have same image name without conflict.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter15.html" class="nav-button prev">Chapter 15: Network Security</a>
+                <a href="chapter17.html" class="nav-button next">Chapter 17: Comprehensive Review</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

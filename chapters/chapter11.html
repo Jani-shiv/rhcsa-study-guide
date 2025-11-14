@@ -1,0 +1,685 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 11: Manage Services & Boot Process - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html" class="active">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 11</span>
+                    <span class="meta-badge">⏱️ 65 min read</span>
+                    <span class="meta-badge">📚 Advanced</span>
+                </div>
+                <h1>Manage Services & Boot Process</h1>
+                <p class="chapter-intro">
+                    Master systemd service management and boot process control. Learn to start, stop, enable services, 
+                    understand systemd targets, troubleshoot boot issues, and reset the root password.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction to systemd</a></li>
+                    <li><a href="#services">Managing Services</a></li>
+                    <li><a href="#targets">Systemd Targets</a></li>
+                    <li><a href="#boot">Boot Process</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting Boot</a></li>
+                    <li><a href="#root-password">Reset Root Password</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction to systemd</h2>
+                <p>
+                    systemd is the init system and service manager for RHEL 9. It replaces the older SysV init 
+                    system and provides parallel service startup, dependency management, and advanced logging.
+                </p>
+
+                <h3>systemd Features</h3>
+                <ul>
+                    <li><strong>Parallel Startup:</strong> Start services concurrently for faster boot</li>
+                    <li><strong>Service Dependencies:</strong> Automatically handle service relationships</li>
+                    <li><strong>Socket Activation:</strong> Start services on-demand when accessed</li>
+                    <li><strong>Targets:</strong> Group services like runlevels (multi-user, graphical)</li>
+                    <li><strong>Journal Logging:</strong> Integrated logging with journalctl</li>
+                    <li><strong>Resource Control:</strong> Limit CPU, memory, I/O per service</li>
+                </ul>
+
+                <h3>systemd Components</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Component</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>systemctl</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Control systemd services and system</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>journalctl</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Query systemd journal logs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>systemd-analyze</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Analyze boot performance</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Unit Files</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Service configuration files (.service, .target, .mount)</td>
+                    </tr>
+                </table>
+
+                <h3>Unit Types</h3>
+                <pre><code># Common unit types:
+.service    # Services (sshd, httpd)
+.target     # Groups of units (multi-user.target)
+.mount      # Mount points
+.socket     # IPC sockets
+.timer      # Scheduled tasks
+.path       # File/directory monitoring
+.device     # Hardware devices</code></pre>
+            </section>
+
+            <section id="services" class="content-section">
+                <h2>⚙️ Managing Services</h2>
+
+                <h3>Basic Service Commands</h3>
+                <pre><code># Start a service
+sudo systemctl start httpd
+
+# Stop a service
+sudo systemctl stop httpd
+
+# Restart a service
+sudo systemctl restart httpd
+
+# Reload configuration (without restart)
+sudo systemctl reload httpd
+
+# Restart if running, start if stopped
+sudo systemctl try-restart httpd
+
+# Reload config, or restart if reload not supported
+sudo systemctl reload-or-restart httpd</code></pre>
+
+                <h3>Service Status</h3>
+                <pre><code># Check service status
+systemctl status httpd
+
+# Output example:
+● httpd.service - The Apache HTTP Server
+     Loaded: loaded (/usr/lib/systemd/system/httpd.service; enabled; preset: disabled)
+     Active: active (running) since Mon 2025-01-13 10:30:15 EST; 2h 15min ago
+       Docs: man:httpd.service(8)
+   Main PID: 1234 (httpd)
+     Status: "Total requests: 150; Idle/Busy workers 100/0"
+      Tasks: 213 (limit: 11123)
+     Memory: 25.1M
+        CPU: 3.456s
+     CGroup: /system.slice/httpd.service
+             ├─1234 /usr/sbin/httpd -DFOREGROUND
+             └─1235 /usr/sbin/httpd -DFOREGROUND
+
+# Quick status (just active/inactive)
+systemctl is-active httpd
+
+# Check if enabled
+systemctl is-enabled httpd
+
+# Check if failed
+systemctl is-failed httpd</code></pre>
+
+                <h3>Enable/Disable Services</h3>
+                <pre><code># Enable service (start at boot)
+sudo systemctl enable httpd
+# Creates symlink in /etc/systemd/system/multi-user.target.wants/
+
+# Disable service (don't start at boot)
+sudo systemctl disable httpd
+
+# Enable and start now
+sudo systemctl enable --now httpd
+
+# Disable and stop now
+sudo systemctl disable --now httpd
+
+# Mask service (prevent starting completely)
+sudo systemctl mask httpd
+
+# Unmask service
+sudo systemctl unmask httpd</code></pre>
+
+                <h3>Listing Services</h3>
+                <pre><code># List all loaded units
+systemctl list-units
+
+# List all services
+systemctl list-units --type=service
+
+# List all services (including inactive)
+systemctl list-units --type=service --all
+
+# List enabled services
+systemctl list-unit-files --state=enabled
+
+# List failed services
+systemctl --failed
+
+# Show service dependencies
+systemctl list-dependencies httpd</code></pre>
+
+                <h3>Viewing Service Configuration</h3>
+                <pre><code># Show unit file
+systemctl cat httpd
+
+# Edit unit file (creates override)
+sudo systemctl edit httpd
+# Creates: /etc/systemd/system/httpd.service.d/override.conf
+
+# Edit full unit file
+sudo systemctl edit --full httpd
+
+# Show all properties
+systemctl show httpd
+
+# Show specific property
+systemctl show httpd -p ActiveState</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Installing and Enabling Apache</h4>
+                    <ol>
+                        <li>Install Apache:
+                            <pre><code>sudo dnf install -y httpd</code></pre>
+                        </li>
+                        <li>Start the service:
+                            <pre><code>sudo systemctl start httpd</code></pre>
+                        </li>
+                        <li>Enable at boot:
+                            <pre><code>sudo systemctl enable httpd</code></pre>
+                        </li>
+                        <li>Verify status:
+                            <pre><code>systemctl status httpd
+systemctl is-enabled httpd</code></pre>
+                        </li>
+                        <li>Test (if firewall open):
+                            <pre><code>curl http://localhost</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Enable vs Start</div>
+                    <p><strong>enable:</strong> Service starts automatically at boot<br>
+                    <strong>start:</strong> Service starts now (but won't persist reboot)<br>
+                    <strong>enable --now:</strong> Both enable and start in one command</p>
+                </div>
+            </section>
+
+            <section id="targets" class="content-section">
+                <h2>🎯 Systemd Targets</h2>
+
+                <p>
+                    Targets are groups of units that define system states, similar to old SysV runlevels.
+                </p>
+
+                <h3>Common Targets</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Target</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Runlevel</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">poweroff.target</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">0</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Shut down system</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">rescue.target</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Single-user mode (root shell)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">multi-user.target</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">3</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Multi-user, no GUI</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">graphical.target</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">5</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Multi-user with GUI</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">reboot.target</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">6</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Reboot system</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">emergency.target</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">-</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Minimal shell (before rescue)</td>
+                    </tr>
+                </table>
+
+                <h3>Managing Targets</h3>
+                <pre><code># Show default target
+systemctl get-default
+
+# Set default target
+sudo systemctl set-default multi-user.target
+sudo systemctl set-default graphical.target
+
+# Switch to target immediately
+sudo systemctl isolate multi-user.target
+sudo systemctl isolate graphical.target
+
+# List available targets
+systemctl list-units --type=target
+
+# Show target dependencies
+systemctl list-dependencies graphical.target</code></pre>
+
+                <h3>System State Commands</h3>
+                <pre><code># Reboot system
+sudo systemctl reboot
+
+# Power off system
+sudo systemctl poweroff
+
+# Halt system
+sudo systemctl halt
+
+# Suspend (sleep)
+sudo systemctl suspend
+
+# Hibernate
+sudo systemctl hibernate
+
+# Enter rescue mode
+sudo systemctl rescue
+
+# Enter emergency mode
+sudo systemctl emergency</code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Rescue vs Emergency</div>
+                    <p><strong>rescue.target:</strong> Mounts filesystems, minimal services, prompts for root password<br>
+                    <strong>emergency.target:</strong> Root filesystem mounted read-only, no services, single-user shell</p>
+                </div>
+            </section>
+
+            <section id="boot" class="content-section">
+                <h2>🚀 Boot Process</h2>
+
+                <h3>RHEL 9 Boot Sequence</h3>
+                <ol>
+                    <li><strong>UEFI/BIOS:</strong> Hardware initialization, POST</li>
+                    <li><strong>Bootloader (GRUB2):</strong> Load kernel and initramfs</li>
+                    <li><strong>Kernel:</strong> Initialize hardware, mount root filesystem</li>
+                    <li><strong>systemd:</strong> First process (PID 1), start services</li>
+                    <li><strong>Default Target:</strong> Reach multi-user.target or graphical.target</li>
+                    <li><strong>Login Prompt:</strong> System ready</li>
+                </ol>
+
+                <h3>Analyzing Boot Performance</h3>
+                <pre><code># Show boot time
+systemd-analyze
+
+# Output:
+Startup finished in 1.234s (kernel) + 5.678s (initrd) + 15.432s (userspace) = 22.344s
+graphical.target reached after 15.123s in userspace
+
+# Show service startup times
+systemd-analyze blame
+
+# Output (slowest first):
+5.234s NetworkManager-wait-online.service
+2.123s kdump.service
+1.456s firewalld.service
+
+# Critical chain (what blocked boot)
+systemd-analyze critical-chain
+
+# Visualize boot (create SVG)
+systemd-analyze plot > boot.svg</code></pre>
+
+                <h3>GRUB2 Boot Menu</h3>
+                <pre><code># GRUB2 configuration
+/boot/grub2/grub.cfg        # Main config (DO NOT EDIT)
+/etc/default/grub           # User settings
+/etc/grub.d/                # Config scripts
+
+# Modify GRUB settings
+sudo vi /etc/default/grub
+
+# Example settings:
+GRUB_TIMEOUT=5
+GRUB_CMDLINE_LINUX="rhgb quiet"
+
+# Regenerate GRUB config
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+
+# For UEFI systems:
+sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg</code></pre>
+
+                <h3>Kernel Command Line</h3>
+                <pre><code># View current kernel parameters
+cat /proc/cmdline
+
+# Common kernel parameters:
+rhgb               # Red Hat Graphical Boot (splash screen)
+quiet              # Minimal boot messages
+systemd.unit=      # Boot to specific target
+rd.break           # Break into initramfs shell
+init=/bin/bash     # Boot to bash (dangerous!)
+selinux=0          # Disable SELinux temporarily</code></pre>
+            </section>
+
+            <section id="troubleshooting" class="content-section">
+                <h2>🔧 Troubleshooting Boot Issues</h2>
+
+                <h3>Boot to Rescue Mode</h3>
+                <ol>
+                    <li>Reboot the system</li>
+                    <li>Press <kbd>e</kbd> at GRUB menu</li>
+                    <li>Find line starting with <code>linux</code> or <code>linux16</code></li>
+                    <li>Append to end: <code>systemd.unit=rescue.target</code></li>
+                    <li>Press <kbd>Ctrl+x</kbd> to boot</li>
+                    <li>Enter root password</li>
+                </ol>
+
+                <h3>Boot to Emergency Mode</h3>
+                <ol>
+                    <li>Same as rescue, but append: <code>systemd.unit=emergency.target</code></li>
+                    <li>Root filesystem mounted read-only</li>
+                    <li>Remount read-write: <code>mount -o remount,rw /</code></li>
+                </ol>
+
+                <h3>Break into initramfs</h3>
+                <pre><code># At GRUB, add to kernel line:
+rd.break
+
+# You'll get a shell before root is mounted
+# Root is at /sysroot (read-only)
+
+# Remount read-write
+mount -o remount,rw /sysroot
+
+# Chroot into system
+chroot /sysroot
+
+# Make changes, then:
+exit
+reboot -f</code></pre>
+
+                <h3>Common Boot Problems</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Problem</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Solution</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Bad /etc/fstab entry</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Boot to emergency, fix fstab</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Forgotten root password</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">rd.break, reset password</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Service fails at boot</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Disable service, check logs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SELinux prevents boot</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Add selinux=0 to kernel line</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section id="root-password" class="content-section">
+                <h2>🔑 Reset Root Password</h2>
+
+                <div class="procedure">
+                    <h4>Procedure: Reset Root Password (RHCSA Exam Critical!)</h4>
+                    <ol>
+                        <li>Reboot the system</li>
+                        <li>At GRUB menu, press <kbd>e</kbd> to edit</li>
+                        <li>Find line starting with <code>linux</code></li>
+                        <li>Add <code>rd.break</code> to end of line:
+                            <pre><code>linux ($root)/vmlinuz-... root=UUID=... rhgb quiet rd.break</code></pre>
+                        </li>
+                        <li>Press <kbd>Ctrl+x</kbd> to boot</li>
+                        <li>You'll get a <code>switch_root:/#</code> prompt</li>
+                        <li>Remount /sysroot as read-write:
+                            <pre><code>mount -o remount,rw /sysroot</code></pre>
+                        </li>
+                        <li>Chroot into system:
+                            <pre><code>chroot /sysroot</code></pre>
+                        </li>
+                        <li>Change root password:
+                            <pre><code>passwd root
+# Enter new password twice</code></pre>
+                        </li>
+                        <li><strong>Critical for SELinux:</strong> Relabel on next boot:
+                            <pre><code>touch /.autorelabel</code></pre>
+                        </li>
+                        <li>Exit chroot and reboot:
+                            <pre><code>exit
+reboot -f</code></pre>
+                        </li>
+                        <li>System will relabel (may take time), then boot normally</li>
+                    </ol>
+                </div>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ Critical: Don't Forget .autorelabel</div>
+                    <p>If you don't create <code>/.autorelabel</code>, SELinux will prevent login after password change! 
+                    The system will relabel files on next boot. This is REQUIRED for exam success!</p>
+                </div>
+
+                <h3>Alternative: Boot with init=/bin/bash</h3>
+                <pre><code># At GRUB, replace 'rhgb quiet' with:
+init=/bin/bash
+
+# System boots directly to bash (no systemd)
+# Root filesystem is read-only
+
+# Remount read-write
+mount -o remount,rw /
+
+# Change password
+passwd root
+
+# Create autorelabel
+touch /.autorelabel
+
+# Sync and reboot
+sync
+reboot -f</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Security Consideration</div>
+                    <p>Physical access = root access. Protect GRUB with password or use BIOS/UEFI password 
+                    to prevent unauthorized password resets. Also consider full disk encryption.</p>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What command enables httpd to start at boot?</h4>
+                        <ul class="quiz-options">
+                            <li>A) systemctl start httpd</li>
+                            <li>B) systemctl enable httpd</li>
+                            <li>C) systemctl activate httpd</li>
+                            <li>D) systemctl boot httpd</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) systemctl enable httpd</strong><br>
+                            <code>enable</code> creates symlink in target.wants directory for automatic startup. 
+                            <code>start</code> only starts now (doesn't persist reboot). Use <code>enable --now</code> 
+                            to both enable and start immediately.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: Which target is equivalent to runlevel 3 (multi-user, no GUI)?</h4>
+                        <ul class="quiz-options">
+                            <li>A) graphical.target</li>
+                            <li>B) multi-user.target</li>
+                            <li>C) rescue.target</li>
+                            <li>D) default.target</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) multi-user.target</strong><br>
+                            multi-user.target = runlevel 3 (text mode). graphical.target = runlevel 5 (GUI). 
+                            rescue.target = runlevel 1 (single user). Set default: 
+                            <code>systemctl set-default multi-user.target</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: What's the CRITICAL step when resetting root password with rd.break?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Run passwd root</li>
+                            <li>B) Mount -o remount,rw /sysroot</li>
+                            <li>C) touch /.autorelabel</li>
+                            <li>D) chroot /sysroot</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) touch /.autorelabel</strong><br>
+                            All steps are required, but <code>touch /.autorelabel</code> is CRITICAL for SELinux systems. 
+                            Without it, SELinux prevents login after password change. System will relabel on next boot. 
+                            This is a common exam mistake!
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: How do you prevent a service from starting (even manually)?</h4>
+                        <ul class="quiz-options">
+                            <li>A) systemctl disable httpd</li>
+                            <li>B) systemctl stop httpd</li>
+                            <li>C) systemctl mask httpd</li>
+                            <li>D) systemctl isolate httpd</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) systemctl mask httpd</strong><br>
+                            <code>mask</code> creates symlink to /dev/null, preventing start completely (even manually). 
+                            <code>disable</code> only prevents automatic boot start. <code>unmask</code> reverses masking. 
+                            Useful for conflicting services.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Which mode provides minimal shell before mounting filesystems?</h4>
+                        <ul class="quiz-options">
+                            <li>A) rescue.target</li>
+                            <li>B) emergency.target</li>
+                            <li>C) multi-user.target</li>
+                            <li>D) rd.break</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) emergency.target</strong><br>
+                            emergency.target: root filesystem read-only, minimal shell, no services. 
+                            rescue.target: filesystems mounted, basic services, root password prompt. 
+                            rd.break: interrupts before switching to real root, gives initramfs shell.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 6: What command shows which services delayed boot the most?</h4>
+                        <ul class="quiz-options">
+                            <li>A) systemctl --failed</li>
+                            <li>B) systemd-analyze blame</li>
+                            <li>C) journalctl -b</li>
+                            <li>D) systemctl list-units</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) systemd-analyze blame</strong><br>
+                            <code>systemd-analyze blame</code> lists services by startup time (slowest first). 
+                            <code>systemd-analyze</code> shows total boot time. <code>systemd-analyze critical-chain</code> 
+                            shows dependency chain that blocked boot.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter10.html" class="nav-button prev">Chapter 10: Storage Stack (LVM)</a>
+                <a href="chapter12.html" class="nav-button next">Chapter 12: System Logs</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

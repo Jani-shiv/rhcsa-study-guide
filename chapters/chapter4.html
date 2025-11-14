@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Control Access to Files - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html" class="active">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 4</span>
+                    <span class="meta-badge">⏱️ 50 min read</span>
+                    <span class="meta-badge">📚 Intermediate</span>
+                </div>
+                <h1>Control Access to Files</h1>
+                <p class="chapter-intro">
+                    Master Linux file permissions and ownership. Learn to use chmod, chown, umask, and Access Control Lists (ACLs) 
+                    to secure files and implement granular access control policies.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#permissions">File Permissions</a></li>
+                    <li><a href="#ownership">File Ownership</a></li>
+                    <li><a href="#special-perms">Special Permissions</a></li>
+                    <li><a href="#umask">Default Permissions with umask</a></li>
+                    <li><a href="#acls">Access Control Lists</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction</h2>
+                <p>
+                    File permissions are the foundation of Linux security. Every file and directory has an owner, 
+                    a group, and a set of permissions that determine who can read, write, or execute it. Understanding 
+                    and managing these permissions is critical for maintaining system security and proper access control.
+                </p>
+                <p>In this chapter, you'll learn to:</p>
+                <ul>
+                    <li>Interpret and modify file permissions using symbolic and octal notation</li>
+                    <li>Change file and directory ownership with chown and chgrp</li>
+                    <li>Apply special permissions (SUID, SGID, sticky bit) for advanced scenarios</li>
+                    <li>Set default permissions using umask</li>
+                    <li>Implement fine-grained access control with Access Control Lists (ACLs)</li>
+                    <li>Troubleshoot permission-related issues</li>
+                </ul>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Note</div>
+                    <p>File permissions work in conjunction with SELinux on RHEL systems. Both must be correctly 
+                    configured for proper access control.</p>
+                </div>
+            </section>
+
+            <section id="permissions" class="content-section">
+                <h2>🔒 File Permissions</h2>
+                
+                <h3>Understanding Permission Types</h3>
+                <p>Linux uses three types of permissions applied to three categories of users:</p>
+                
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Permission</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Symbol</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Octal</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">On Files</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">On Directories</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Read</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>r</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">4</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">View file contents</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">List directory contents</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Write</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>w</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">2</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Modify file contents</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Create/delete files in directory</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Execute</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>x</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Run file as program</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Enter directory (cd)</td>
+                    </tr>
+                </table>
+
+                <h3>Reading Permission Strings</h3>
+                <p>When you run <code>ls -l</code>, you see permission information:</p>
+                <pre><code>-rwxr-xr--. 1 student developers 1234 Nov 14 10:30 script.sh
+│││││││││││
+│││││││││└└─ Other permissions (r--)
+││││││└┴┴─── Group permissions (r-x)
+│││└┴┴───── Owner permissions (rwx)
+│└───────── File type indicator
+└────────── SELinux context present (dot)</code></pre>
+
+                <h4>File Type Indicators</h4>
+                <ul>
+                    <li><code>-</code> Regular file</li>
+                    <li><code>d</code> Directory</li>
+                    <li><code>l</code> Symbolic link</li>
+                    <li><code>c</code> Character device</li>
+                    <li><code>b</code> Block device</li>
+                    <li><code>s</code> Socket</li>
+                    <li><code>p</code> Named pipe (FIFO)</li>
+                </ul>
+
+                <h3>chmod - Change Mode (Permissions)</h3>
+                
+                <h4>Symbolic Method</h4>
+                <p>Use letters to modify permissions:</p>
+                <pre><code># Add execute permission for owner (user)
+chmod u+x file.sh
+
+# Remove write permission for group
+chmod g-w file.txt
+
+# Set exact permissions for others
+chmod o=r file.txt
+
+# Add read permission for all (user, group, other)
+chmod a+r file.txt
+
+# Multiple changes at once
+chmod u+x,g-w,o-r file.sh
+
+# Recursive change
+chmod -R u+w directory/</code></pre>
+
+                <p>Symbolic notation syntax:</p>
+                <ul>
+                    <li><strong>Who:</strong> <code>u</code> (user/owner), <code>g</code> (group), <code>o</code> (others), <code>a</code> (all)</li>
+                    <li><strong>Operator:</strong> <code>+</code> (add), <code>-</code> (remove), <code>=</code> (set exactly)</li>
+                    <li><strong>Permission:</strong> <code>r</code> (read), <code>w</code> (write), <code>x</code> (execute)</li>
+                </ul>
+
+                <h4>Octal (Numeric) Method</h4>
+                <p>Use three-digit numbers where each digit represents owner, group, and others:</p>
+                <pre><code># Common permission sets
+chmod 755 script.sh    # rwxr-xr-x (owner: full, group/others: read+execute)
+chmod 644 file.txt     # rw-r--r-- (owner: read+write, others: read-only)
+chmod 600 secret.txt   # rw------- (owner: read+write, others: no access)
+chmod 777 public/      # rwxrwxrwx (all permissions for everyone - DANGEROUS!)
+chmod 700 private/     # rwx------ (owner: full access, others: no access)
+chmod 640 config.conf  # rw-r----- (owner: read+write, group: read, others: none)</code></pre>
+
+                <h4>Calculating Octal Values</h4>
+                <pre><code># Each permission has a value:
+# r (read)    = 4
+# w (write)   = 2
+# x (execute) = 1
+
+# Add them together for each user category:
+# rwx = 4+2+1 = 7
+# rw- = 4+2+0 = 6
+# r-x = 4+0+1 = 5
+# r-- = 4+0+0 = 4
+# -wx = 0+2+1 = 3
+# -w- = 0+2+0 = 2
+# --x = 0+0+1 = 1
+# --- = 0+0+0 = 0</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Tip</div>
+                    <p>Use symbolic notation when making incremental changes (<code>chmod g+w</code>). 
+                    Use octal notation when setting complete permission sets (<code>chmod 644</code>).</p>
+                </div>
+
+                <h3>Common Permission Scenarios</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Octal</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Symbolic</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Use Case</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>755</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>rwxr-xr-x</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Executable scripts, directories</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>644</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>rw-r--r--</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Regular files, text files</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>600</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>rw-------</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Private files, SSH keys</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>700</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>rwx------</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Private scripts, .ssh directory</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>775</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>rwxrwxr-x</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Shared team directories</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section id="ownership" class="content-section">
+                <h2>👤 File Ownership</h2>
+
+                <p>Every file and directory has two types of owners:</p>
+                <ul>
+                    <li><strong>User (Owner):</strong> The user who owns the file</li>
+                    <li><strong>Group:</strong> The group that owns the file</li>
+                </ul>
+
+                <h3>chown - Change Owner</h3>
+                <pre><code># Change owner only
+sudo chown john file.txt
+
+# Change owner and group
+sudo chown john:developers file.txt
+
+# Change group only (using colon)
+sudo chown :developers file.txt
+
+# Recursive ownership change
+sudo chown -R john:developers directory/
+
+# Use reference file for ownership
+sudo chown --reference=template.txt newfile.txt
+
+# Verbose output
+sudo chown -v john file.txt
+
+# Change from specific owner to new owner
+sudo chown --from=alice:users john:developers file.txt</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Warning</div>
+                    <p>Only root can change file ownership. Regular users cannot give away their files to other users. 
+                    This prevents security issues and quota circumvention.</p>
+                </div>
+
+                <h3>chgrp - Change Group</h3>
+                <pre><code># Change group
+sudo chgrp developers file.txt
+
+# Recursive group change
+sudo chgrp -R developers project/
+
+# Verbose output
+sudo chgrp -v developers *.txt
+
+# Use reference file
+sudo chgrp --reference=template.txt newfile.txt</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Setting Up a Shared Project Directory</h4>
+                    <ol>
+                        <li>Create the directory:
+                            <pre><code>sudo mkdir /shared/projects</code></pre>
+                        </li>
+                        <li>Create a group for the team:
+                            <pre><code>sudo groupadd developers</code></pre>
+                        </li>
+                        <li>Add users to the group:
+                            <pre><code>sudo usermod -aG developers alice
+sudo usermod -aG developers bob
+sudo usermod -aG developers charlie</code></pre>
+                        </li>
+                        <li>Set group ownership:
+                            <pre><code>sudo chgrp developers /shared/projects</code></pre>
+                        </li>
+                        <li>Set appropriate permissions:
+                            <pre><code>sudo chmod 2775 /shared/projects</code></pre>
+                        </li>
+                        <li>Verify the configuration:
+                            <pre><code>ls -ld /shared/projects
+# Should show: drwxrwsr-x. 2 root developers ...</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="special-perms" class="content-section">
+                <h2>⭐ Special Permissions</h2>
+
+                <p>Beyond basic read, write, and execute permissions, Linux supports three special permission bits:</p>
+
+                <h3>1. SUID (Set User ID) - Bit 4</h3>
+                <p>When set on an executable file, the program runs with the privileges of the file's owner, not the user who executes it.</p>
+
+                <pre><code># Set SUID using symbolic notation
+sudo chmod u+s /usr/local/bin/program
+
+# Set SUID using octal notation (4 prefix)
+sudo chmod 4755 /usr/local/bin/program
+
+# Example: passwd command uses SUID
+ls -l /usr/bin/passwd
+-rwsr-xr-x. 1 root root 27856 /usr/bin/passwd
+#   ↑ Notice the 's' instead of 'x'</code></pre>
+
+                <p><strong>Use cases:</strong></p>
+                <ul>
+                    <li><code>passwd</code> - Allows users to change their password (requires root to modify /etc/shadow)</li>
+                    <li><code>ping</code> - Requires root privileges to create raw network sockets</li>
+                    <li><code>sudo</code> - Executes commands as root</li>
+                </ul>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ Security Warning</div>
+                    <p>SUID on executables owned by root is a significant security risk if the program is vulnerable. 
+                    Regularly audit SUID files:</p>
+                    <pre><code>sudo find / -perm -4000 -type f -ls 2>/dev/null</code></pre>
+                </div>
+
+                <h3>2. SGID (Set Group ID) - Bit 2</h3>
+                <p><strong>On executable files:</strong> Process runs with the group privileges of the file's group.</p>
+                <p><strong>On directories:</strong> New files inherit the directory's group ownership (not the creator's primary group).</p>
+
+                <pre><code># Set SGID on directory (most common use)
+sudo chmod g+s /shared/projects
+sudo chmod 2775 /shared/projects
+
+# Set SGID on executable
+sudo chmod g+s /usr/local/bin/tool
+
+# Verify SGID on directory
+ls -ld /shared/projects
+drwxrwsr-x. 2 root developers 4096 /shared/projects
+#      ↑ Notice the 's' in group execute position</code></pre>
+
+                <p><strong>Why use SGID on directories:</strong></p>
+                <ul>
+                    <li>Ensures all files in shared directory have consistent group ownership</li>
+                    <li>Team members can collaborate without permission issues</li>
+                    <li>New files automatically belong to the project group</li>
+                </ul>
+
+                <h3>3. Sticky Bit - Bit 1</h3>
+                <p>When set on a directory, only the file owner, directory owner, or root can delete or rename files within that directory.</p>
+
+                <pre><code># Set sticky bit using symbolic notation
+sudo chmod o+t /shared/public
+
+# Set sticky bit using octal notation (1 prefix)
+sudo chmod 1777 /shared/public
+
+# Example: /tmp directory uses sticky bit
+ls -ld /tmp
+drwxrwxrwt. 15 root root 4096 /tmp
+#        ↑ Notice the 't' in other execute position</code></pre>
+
+                <p><strong>Use cases:</strong></p>
+                <ul>
+                    <li><code>/tmp</code> - Users can create files but cannot delete others' files</li>
+                    <li><code>/var/tmp</code> - Same protection as /tmp</li>
+                    <li>Shared upload directories where users should not delete each other's files</li>
+                </ul>
+
+                <h3>Special Permissions Summary</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Permission</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Symbolic</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Octal</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Display</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Effect</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SUID</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>u+s</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">4</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">s or S in owner execute</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Run as file owner</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SGID</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>g+s</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">2</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">s or S in group execute</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Run as file group / inherit group</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Sticky</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>o+t</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">t or T in other execute</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Restrict deletion</td>
+                    </tr>
+                </table>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Note on Uppercase vs Lowercase</div>
+                    <p><strong>Lowercase (s, t):</strong> Special permission + execute permission is set<br>
+                    <strong>Uppercase (S, T):</strong> Special permission set but execute permission is NOT set</p>
+                    <pre><code>-rwSr--r--  # SUID set, but owner has no execute permission (unusual)
+drwxrwsrwx  # SGID set with execute permission (normal)</code></pre>
+                </div>
+            </section>
+
+            <section id="umask" class="content-section">
+                <h2>🎭 Default Permissions with umask</h2>
+
+                <p>
+                    The <code>umask</code> (user file-creation mode mask) determines the default permissions for newly created 
+                    files and directories. It works by subtracting permissions from the system's default maximum permissions.
+                </p>
+
+                <h3>How umask Works</h3>
+                <pre><code># System default maximum permissions:
+# Files:       666 (rw-rw-rw-)  - no execute by default
+# Directories: 777 (rwxrwxrwx)  - full permissions
+
+# With umask 0022:
+# Files:       666 - 022 = 644 (rw-r--r--)
+# Directories: 777 - 022 = 755 (rwxr-xr-x)</code></pre>
+
+                <h3>Viewing and Setting umask</h3>
+                <pre><code># View current umask (octal)
+umask
+0022
+
+# View current umask (symbolic)
+umask -S
+u=rwx,g=rx,o=rx
+
+# Set umask temporarily (current session only)
+umask 0027
+
+# Set umask using symbolic notation
+umask u=rwx,g=rx,o=</code></pre>
+
+                <h3>Common umask Values</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">umask</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Files Created</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Directories Created</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Use Case</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>0022</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">644 (rw-r--r--)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">755 (rwxr-xr-x)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Default for most users</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>0002</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">664 (rw-rw-r--)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">775 (rwxrwxr-x)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Group collaboration</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>0077</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">600 (rw-------)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">700 (rwx------)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Maximum privacy</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>0027</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">640 (rw-r-----)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">750 (rwxr-x---)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Secure group sharing</td>
+                    </tr>
+                </table>
+
+                <h3>Making umask Permanent</h3>
+                <p>To make umask settings permanent, add them to shell configuration files:</p>
+
+                <pre><code># For individual user (add to ~/.bashrc or ~/.bash_profile)
+echo "umask 0027" >> ~/.bashrc
+
+# For all users (add to /etc/bashrc or /etc/profile)
+sudo vi /etc/bashrc
+# Add: umask 0027
+
+# Reload configuration
+source ~/.bashrc</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Tip</div>
+                    <p>Root typically has a more restrictive umask (0022 or 0027) than regular users to enhance security.</p>
+                </div>
+            </section>
+
+            <section id="acls" class="content-section">
+                <h2>🎯 Access Control Lists (ACLs)</h2>
+                
+                <p>
+                    Access Control Lists (ACLs) provide fine-grained access control beyond the traditional 
+                    user/group/other permission model. ACLs allow you to grant permissions to specific users 
+                    or groups without changing the file's owner or group.
+                </p>
+
+                <h3>When to Use ACLs</h3>
+                <ul>
+                    <li>Need to give specific users access without adding them to groups</li>
+                    <li>Multiple groups need different levels of access to the same file</li>
+                    <li>Complex permission scenarios beyond owner/group/other</li>
+                    <li>Temporary access grants to specific users</li>
+                </ul>
+
+                <h3>Viewing ACLs - getfacl</h3>
+                <pre><code># View ACLs on a file
+getfacl file.txt
+
+# Sample output:
+# file: file.txt
+# owner: student
+# group: developers
+user::rw-              # Owner permissions
+user:john:r--          # Specific user 'john' has read
+user:alice:rw-         # Specific user 'alice' has read+write
+group::r--             # Owning group permissions
+group:managers:r--     # Specific group 'managers' has read
+mask::rw-              # Maximum effective permissions
+other::---             # Other users permissions
+
+# View ACLs for directory and contents
+getfacl -R /project
+
+# View only files with ACLs
+ls -la
+-rw-r--r--+ 1 student developers 1234 Nov 14 10:30 file.txt
+#        ↑ Plus sign indicates ACL is set</code></pre>
+
+                <h3>Setting ACLs - setfacl</h3>
+                
+                <h4>Grant Permissions</h4>
+                <pre><code># Give user 'john' read access
+setfacl -m u:john:r file.txt
+
+# Give user 'alice' read+write access
+setfacl -m u:alice:rw file.txt
+
+# Give group 'managers' read+execute on directory
+setfacl -m g:managers:rx /project
+
+# Multiple ACL entries at once
+setfacl -m u:john:rw,u:jane:r,g:team:rx file.txt
+
+# Recursive ACL application
+setfacl -R -m u:john:rx /project</code></pre>
+
+                <h4>Remove Permissions</h4>
+                <pre><code># Remove specific user ACL
+setfacl -x u:john file.txt
+
+# Remove specific group ACL
+setfacl -x g:managers file.txt
+
+# Remove all ACLs (restore to basic permissions)
+setfacl -b file.txt
+
+# Remove all ACLs recursively
+setfacl -R -b /project</code></pre>
+
+                <h3>Default ACLs</h3>
+                <p>Default ACLs apply to directories and are inherited by newly created files and subdirectories:</p>
+
+                <pre><code># Set default ACL for new files in directory
+setfacl -d -m g:developers:rwx /project
+
+# Set default ACL for specific user
+setfacl -d -m u:john:rx /project
+
+# View default ACLs
+getfacl /project
+# Will show entries like: default:user:john:r-x
+
+# Set both current and default ACLs
+setfacl -m d:g:developers:rwx,g:developers:rwx /project</code></pre>
+
+                <h3>ACL Mask</h3>
+                <p>The mask defines the maximum effective permissions for named users and groups:</p>
+
+                <pre><code># Set mask to limit permissions
+setfacl -m m::rx file.txt
+
+# Even if a user has rwx in their ACL entry,
+# the mask limits them to r-x maximum
+
+# View effective permissions
+getfacl file.txt
+user:john:rwx      #effective:r-x
+#         ↑ ACL     ↑ Limited by mask
+
+# Recalculate mask automatically
+setfacl -m m::rwx file.txt</code></pre>
+
+                <h3>Copying and Backing Up ACLs</h3>
+                <pre><code># Copy ACLs from one file to another
+getfacl file1.txt | setfacl --set-file=- file2.txt
+
+# Backup ACLs to file
+getfacl -R /project > project_acls.txt
+
+# Restore ACLs from backup
+setfacl --restore=project_acls.txt
+
+# Preserve ACLs when copying files
+cp -a --preserve=all source.txt dest.txt
+# or
+cp --preserve=mode,ownership,timestamps,xattr source.txt dest.txt</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Implementing ACLs for Project Directory</h4>
+                    <ol>
+                        <li>Create project directory:
+                            <pre><code>sudo mkdir /project/webapp
+sudo chown root:developers /project/webapp
+sudo chmod 750 /project/webapp</code></pre>
+                        </li>
+                        <li>Add specific user access:
+                            <pre><code># Give manager read access
+sudo setfacl -m u:manager:rx /project/webapp
+
+# Give auditor read-only access
+sudo setfacl -m u:auditor:r /project/webapp</code></pre>
+                        </li>
+                        <li>Add specific group access:
+                            <pre><code># Give QA team read+execute
+sudo setfacl -m g:qa_team:rx /project/webapp</code></pre>
+                        </li>
+                        <li>Set default ACLs for new files:
+                            <pre><code># Developers get full access on new files
+sudo setfacl -d -m g:developers:rwx /project/webapp
+
+# Manager gets read on new files
+sudo setfacl -d -m u:manager:rx /project/webapp</code></pre>
+                        </li>
+                        <li>Verify configuration:
+                            <pre><code>getfacl /project/webapp
+
+# Expected output shows both current and default ACLs</code></pre>
+                        </li>
+                        <li>Test by creating a new file:
+                            <pre><code>sudo -u developer touch /project/webapp/test.txt
+getfacl /project/webapp/test.txt
+# Should show inherited ACLs from parent directory</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>ACL Examples for Common Scenarios</h3>
+                <pre><code># Scenario 1: Give temp contractor access for 1 month
+setfacl -m u:contractor:rx /data
+# (Remove after project: setfacl -x u:contractor /data)
+
+# Scenario 2: Multiple teams need different access
+setfacl -m g:dev_team:rwx,g:qa_team:rx,g:managers:r /project
+
+# Scenario 3: Shared directory where everyone can write but not delete others' files
+chmod 1777 /shared/dropbox
+setfacl -m d:u::rwx,d:g::rwx,d:o::rwx /shared/dropbox
+
+# Scenario 4: Log directory readable by specific users
+setfacl -m u:alice:r,u:bob:r /var/log/application.log</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Important Considerations</div>
+                    <ul>
+                        <li>ACLs are stored as extended attributes - ensure filesystem supports them (most modern filesystems do)</li>
+                        <li>Backup tools must preserve ACLs (use <code>tar --acls</code> or <code>rsync -A</code>)</li>
+                        <li>The <code>+</code> sign in <code>ls -l</code> output indicates ACLs are present</li>
+                        <li>ACLs work in addition to SELinux, not instead of it</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What permissions does chmod 755 set?</h4>
+                        <ul class="quiz-options">
+                            <li>A) rwxr-xr-x (owner: full, group: r-x, other: r-x)</li>
+                            <li>B) rw-r--r-- (owner: rw, group: r, other: r)</li>
+                            <li>C) rwxrwxrwx (full access for all)</li>
+                            <li>D) r-xr-xr-x (read+execute for all)</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A) rwxr-xr-x</strong><br>
+                            7=rwx (4+2+1), 5=r-x (4+0+1), 5=r-x (4+0+1). Owner has full control (read, write, execute), 
+                            while group and others can read and execute but cannot write.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What does the sticky bit do on a directory?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Makes files read-only</li>
+                            <li>B) Only file owners can delete their own files</li>
+                            <li>C) Prevents directory from being deleted</li>
+                            <li>D) Makes all files executable</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Only file owners can delete their own files</strong><br>
+                            The sticky bit prevents users from deleting or renaming files they don't own, even if they 
+                            have write permission on the directory. This is why /tmp uses the sticky bit (1777).
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: How do you give user 'john' read access to a file using ACLs?</h4>
+                        <ul class="quiz-options">
+                            <li>A) chmod u+r:john file.txt</li>
+                            <li>B) setfacl -m u:john:r file.txt</li>
+                            <li>C) chown john:r file.txt</li>
+                            <li>D) acl john read file.txt</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) setfacl -m u:john:r file.txt</strong><br>
+                            setfacl with -m (modify) is the correct command for setting ACL permissions. 
+                            The syntax is: setfacl -m u:username:permissions file
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What is the effect of umask 0027?</h4>
+                        <ul class="quiz-options">
+                            <li>A) New files: 640, Directories: 750</li>
+                            <li>B) New files: 644, Directories: 755</li>
+                            <li>C) New files: 600, Directories: 700</li>
+                            <li>D) New files: 666, Directories: 777</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A) New files: 640, Directories: 750</strong><br>
+                            With umask 0027: Files are created as 666-027=640 (rw-r-----), 
+                            Directories as 777-027=750 (rwxr-x---). This provides good security while 
+                            allowing group read access.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: What does SGID on a directory do?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Makes directory executable</li>
+                            <li>B) New files inherit the directory's group ownership</li>
+                            <li>C) Only root can access the directory</li>
+                            <li>D) Encrypts all files in the directory</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) New files inherit the directory's group ownership</strong><br>
+                            SGID on directories ensures that new files are created with the directory's group ownership 
+                            rather than the creator's primary group. This is essential for shared project directories 
+                            where team members need consistent group ownership (chmod 2775 /shared/project).
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter3.html" class="nav-button prev">Chapter 3: Users & Groups</a>
+                <a href="chapter5.html" class="nav-button next">Chapter 5: SELinux</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

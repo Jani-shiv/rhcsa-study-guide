@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Complete RHCSA (RH199) Study Guide - DevOps ni Diary">
+    <title>RHCSA Study Guide - DevOps ni Diary</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Master RHCSA Certification</h1>
+            <p class="hero-subtitle">Complete study guide for Red Hat Certified System Administrator (RHEL 9.3)</p>
+            <p class="hero-description">Comprehensive learning resource covering all 17 chapters of RH199 curriculum</p>
+            <div class="hero-buttons">
+                <a href="#chapters" class="btn btn-primary">Start Learning</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="btn btn-secondary">Watch Videos</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                </div>
+                <div class="terminal-body">
+                    <p><span class="prompt">[root@rhel9 ~]#</span> systemctl status sshd</p>
+                    <p class="terminal-output">● sshd.service - OpenSSH server daemon</p>
+                    <p class="terminal-output">   Loaded: loaded (/usr/lib/systemd/system/sshd.service)</p>
+                    <p class="terminal-output">   Active: <span class="text-success">active (running)</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About RHCSA Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">What is RHCSA?</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="about-icon">📜</div>
+                    <h3>Industry Recognition</h3>
+                    <p>Red Hat Certified System Administrator (RHCSA) is a performance-based certification that validates your ability to manage Red Hat Enterprise Linux systems.</p>
+                </div>
+                <div class="about-card">
+                    <div class="about-icon">💼</div>
+                    <h3>Career Advancement</h3>
+                    <p>RHCSA certification is highly valued by employers worldwide and opens doors to advanced Linux administration roles and DevOps positions.</p>
+                </div>
+                <div class="about-card">
+                    <div class="about-icon">🎯</div>
+                    <h3>Practical Skills</h3>
+                    <p>Focus on real-world tasks including user management, storage configuration, network setup, SELinux, and system troubleshooting.</p>
+                </div>
+                <div class="about-card">
+                    <div class="about-icon">🚀</div>
+                    <h3>RHEL 9.3</h3>
+                    <p>This guide covers the latest RHEL 9.3 version, ensuring you learn the most current tools, features, and best practices.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapters Section -->
+    <section id="chapters" class="chapters-section">
+        <div class="container">
+            <h2 class="section-title">Course Chapters</h2>
+            <p class="section-description">Navigate through all 17 comprehensive chapters covering the complete RHCSA curriculum</p>
+            
+            <div class="chapters-grid" id="chaptersGrid">
+                <a href="chapters/chapter1.html" class="chapter-card">
+                    <div class="chapter-number">01</div>
+                    <h3 class="chapter-title">Access Systems and Get Support</h3>
+                    <p class="chapter-description">Learn to access and interact with Linux systems using local and remote terminals</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">SSH</span>
+                        <span class="topic-tag">Terminal</span>
+                        <span class="topic-tag">Documentation</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter2.html" class="chapter-card">
+                    <div class="chapter-number">02</div>
+                    <h3 class="chapter-title">Manage Files from the Command Line</h3>
+                    <p class="chapter-description">Master file system navigation and file manipulation using command-line tools</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">ls</span>
+                        <span class="topic-tag">cp/mv</span>
+                        <span class="topic-tag">File Operations</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter3.html" class="chapter-card">
+                    <div class="chapter-number">03</div>
+                    <h3 class="chapter-title">Manage Local Users and Groups</h3>
+                    <p class="chapter-description">Create and manage user accounts and groups with proper permissions</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">useradd</span>
+                        <span class="topic-tag">groupadd</span>
+                        <span class="topic-tag">passwd</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter4.html" class="chapter-card">
+                    <div class="chapter-number">04</div>
+                    <h3 class="chapter-title">Control Access to Files</h3>
+                    <p class="chapter-description">Configure file permissions and ownership for secure access control</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">chmod</span>
+                        <span class="topic-tag">chown</span>
+                        <span class="topic-tag">ACLs</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter5.html" class="chapter-card">
+                    <div class="chapter-number">05</div>
+                    <h3 class="chapter-title">Manage SELinux Security</h3>
+                    <p class="chapter-description">Understand and configure SELinux for enhanced system security</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">setenforce</span>
+                        <span class="topic-tag">contexts</span>
+                        <span class="topic-tag">booleans</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter6.html" class="chapter-card">
+                    <div class="chapter-number">06</div>
+                    <h3 class="chapter-title">Tune System Performance</h3>
+                    <p class="chapter-description">Monitor and optimize system performance using tuning profiles</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">tuned</span>
+                        <span class="topic-tag">nice</span>
+                        <span class="topic-tag">performance</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter7.html" class="chapter-card">
+                    <div class="chapter-number">07</div>
+                    <h3 class="chapter-title">Schedule Future Tasks</h3>
+                    <p class="chapter-description">Automate tasks using cron and systemd timers</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">cron</span>
+                        <span class="topic-tag">at</span>
+                        <span class="topic-tag">systemd timers</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter8.html" class="chapter-card">
+                    <div class="chapter-number">08</div>
+                    <h3 class="chapter-title">Install and Update Software Packages</h3>
+                    <p class="chapter-description">Manage software using DNF package manager and AppStream modules</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">dnf</span>
+                        <span class="topic-tag">rpm</span>
+                        <span class="topic-tag">modules</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter9.html" class="chapter-card">
+                    <div class="chapter-number">09</div>
+                    <h3 class="chapter-title">Manage Basic Storage</h3>
+                    <p class="chapter-description">Create and manage partitions, file systems, and swap space</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">fdisk</span>
+                        <span class="topic-tag">mkfs</span>
+                        <span class="topic-tag">mount</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter10.html" class="chapter-card">
+                    <div class="chapter-number">10</div>
+                    <h3 class="chapter-title">Manage Storage Stack</h3>
+                    <p class="chapter-description">Configure advanced storage with LVM and Stratis</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">LVM</span>
+                        <span class="topic-tag">Stratis</span>
+                        <span class="topic-tag">VDO</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter11.html" class="chapter-card">
+                    <div class="chapter-number">11</div>
+                    <h3 class="chapter-title">Control Services and Boot Process</h3>
+                    <p class="chapter-description">Manage systemd services and understand the boot process</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">systemctl</span>
+                        <span class="topic-tag">targets</span>
+                        <span class="topic-tag">GRUB</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter12.html" class="chapter-card">
+                    <div class="chapter-number">12</div>
+                    <h3 class="chapter-title">Analyze and Store Logs</h3>
+                    <p class="chapter-description">Monitor system logs using journalctl and rsyslog</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">journalctl</span>
+                        <span class="topic-tag">rsyslog</span>
+                        <span class="topic-tag">logging</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter13.html" class="chapter-card">
+                    <div class="chapter-number">13</div>
+                    <h3 class="chapter-title">Manage Networking</h3>
+                    <p class="chapter-description">Configure network interfaces and hostname resolution</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">nmcli</span>
+                        <span class="topic-tag">ip</span>
+                        <span class="topic-tag">DNS</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter14.html" class="chapter-card">
+                    <div class="chapter-number">14</div>
+                    <h3 class="chapter-title">Access Network-Attached Storage</h3>
+                    <p class="chapter-description">Mount and configure NFS and SMB network shares</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">NFS</span>
+                        <span class="topic-tag">SMB</span>
+                        <span class="topic-tag">autofs</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter15.html" class="chapter-card">
+                    <div class="chapter-number">15</div>
+                    <h3 class="chapter-title">Manage Network Security</h3>
+                    <p class="chapter-description">Configure firewall rules and secure network services</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">firewalld</span>
+                        <span class="topic-tag">zones</span>
+                        <span class="topic-tag">security</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter16.html" class="chapter-card">
+                    <div class="chapter-number">16</div>
+                    <h3 class="chapter-title">Run Containers</h3>
+                    <p class="chapter-description">Deploy and manage containers using Podman</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">Podman</span>
+                        <span class="topic-tag">containers</span>
+                        <span class="topic-tag">images</span>
+                    </div>
+                </a>
+
+                <a href="chapters/chapter17.html" class="chapter-card">
+                    <div class="chapter-number">17</div>
+                    <h3 class="chapter-title">Comprehensive Review</h3>
+                    <p class="chapter-description">Practice scenarios and exam preparation</p>
+                    <div class="chapter-topics">
+                        <span class="topic-tag">Review</span>
+                        <span class="topic-tag">Practice</span>
+                        <span class="topic-tag">Exam Prep</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title">Why This Study Guide?</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">📚</div>
+                    <h3>Comprehensive Content</h3>
+                    <p>Every topic from the official RH199 curriculum explained in detail</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💻</div>
+                    <h3>Practical Examples</h3>
+                    <p>Real-world commands and scenarios you'll use in production</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✅</div>
+                    <h3>Practice Questions</h3>
+                    <p>Test your knowledge with quizzes after each chapter</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎥</div>
+                    <h3>Video Tutorials</h3>
+                    <p>Complementary video content on DevOps ni Diary YouTube channel</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Study anywhere on any device with responsive design</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🌙</div>
+                    <h3>Dark Mode</h3>
+                    <p>Easy on the eyes with beautiful dark theme option</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification and Linux system administration.</p>
+                    <div class="social-links">
+                        <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="social-link" aria-label="YouTube">
+                            <span>📺 YouTube</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#about">About RHCSA</a></li>
+                        <li><a href="#chapters">All Chapters</a></li>
+                        <li><a href="chapters/chapter1.html">Start Learning</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://www.redhat.com/en/services/certification/rhcsa" target="_blank">Official RHCSA</a></li>
+                        <li><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9" target="_blank">RHEL 9 Docs</a></li>
+                        <li><a href="https://youtube.com/@DevOpsniDiary" target="_blank">Video Tutorials</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>About This Guide</h4>
+                    <p class="footer-text">Created with ❤️ for aspiring Linux administrators. All content is based on RHEL 9.3 and RH199 curriculum.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

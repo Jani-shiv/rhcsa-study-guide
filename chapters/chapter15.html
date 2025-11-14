@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 15: Manage Network Security - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html" class="active">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 15</span>
+                    <span class="meta-badge">⏱️ 50 min read</span>
+                    <span class="meta-badge">📚 Advanced</span>
+                </div>
+                <h1>Manage Network Security (Firewalld)</h1>
+                <p class="chapter-intro">
+                    Master firewall configuration with firewalld. Learn to manage zones, services, ports, and rich rules 
+                    for network security. Configure permanent and runtime firewall rules.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction to Firewalld</a></li>
+                    <li><a href="#zones">Firewall Zones</a></li>
+                    <li><a href="#services">Managing Services</a></li>
+                    <li><a href="#ports">Managing Ports</a></li>
+                    <li><a href="#rich-rules">Rich Rules</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction to Firewalld</h2>
+                <p>
+                    Firewalld is the dynamic firewall manager for RHEL 9. It uses zones to define trust levels 
+                    and manages firewall rules without requiring restart.
+                </p>
+
+                <h3>Firewalld Components</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Component</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>firewalld</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Dynamic firewall daemon</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>firewall-cmd</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Command-line tool</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Zones</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Trust level containers for rules</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Services</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Predefined port/protocol combinations</td>
+                    </tr>
+                </table>
+
+                <h3>Managing Firewalld Service</h3>
+                <pre><code># Start firewalld
+sudo systemctl start firewalld
+
+# Enable at boot
+sudo systemctl enable --now firewalld
+
+# Check status
+sudo systemctl status firewalld
+sudo firewall-cmd --state
+
+# Reload firewall (apply permanent rules)
+sudo firewall-cmd --reload
+
+# Stop firewalld (dangerous in production!)
+sudo systemctl stop firewalld</code></pre>
+
+                <h3>Runtime vs Permanent Rules</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Type</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Command</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Runtime</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Immediate, lost on reload/reboot</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">firewall-cmd (no option)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Permanent</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Saved, requires reload</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">firewall-cmd --permanent</td>
+                    </tr>
+                </table>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Best Practice</div>
+                    <p>Always add rules both runtime and permanent, or use <code>--permanent</code> then 
+                    <code>--reload</code>:<br>
+                    <code>sudo firewall-cmd --permanent --add-service=http</code><br>
+                    <code>sudo firewall-cmd --reload</code></p>
+                </div>
+            </section>
+
+            <section id="zones" class="content-section">
+                <h2>🛡️ Firewall Zones</h2>
+
+                <p>
+                    Zones define trust levels for network connections. Each interface is assigned to one zone.
+                </p>
+
+                <h3>Predefined Zones</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Zone</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Trust Level</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Default Behavior</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>drop</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">None</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Drop all incoming, no reply</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>block</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">None</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Reject incoming (sends ICMP reply)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>public</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Low</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Default zone, allow SSH & cockpit</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>external</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Low</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">For masquerading (NAT)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>work</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Medium</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Trust coworkers</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>home</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Medium-High</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Trust home network</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>internal</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">High</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Internal network</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>trusted</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Full</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Allow all traffic</td>
+                    </tr>
+                </table>
+
+                <h3>Managing Zones</h3>
+                <pre><code># List all zones
+sudo firewall-cmd --get-zones
+
+# Show default zone
+sudo firewall-cmd --get-default-zone
+
+# Set default zone
+sudo firewall-cmd --set-default-zone=public
+
+# Show active zones (with interfaces)
+sudo firewall-cmd --get-active-zones
+
+# Show all settings for a zone
+sudo firewall-cmd --zone=public --list-all
+
+# Show all zones with details
+sudo firewall-cmd --list-all-zones</code></pre>
+
+                <h3>Assigning Interfaces to Zones</h3>
+                <pre><code># Change interface zone (runtime)
+sudo firewall-cmd --zone=work --change-interface=ens33
+
+# Permanent interface assignment
+sudo firewall-cmd --permanent --zone=work --change-interface=ens33
+sudo firewall-cmd --reload
+
+# Or use nmcli
+sudo nmcli con mod ens33 connection.zone work
+sudo nmcli con up ens33
+
+# Show which zone an interface is in
+sudo firewall-cmd --get-zone-of-interface=ens33</code></pre>
+            </section>
+
+            <section id="services" class="content-section">
+                <h2>🔧 Managing Services</h2>
+
+                <p>
+                    Services are predefined sets of ports/protocols for common applications.
+                </p>
+
+                <h3>Listing Services</h3>
+                <pre><code># List all available services
+sudo firewall-cmd --get-services
+
+# List services in default zone
+sudo firewall-cmd --list-services
+
+# List services in specific zone
+sudo firewall-cmd --zone=public --list-services
+
+# Show service details
+sudo firewall-cmd --info-service=http
+sudo firewall-cmd --info-service=ssh</code></pre>
+
+                <h3>Adding/Removing Services</h3>
+                <pre><code># Add service (runtime only)
+sudo firewall-cmd --add-service=http
+
+# Add service (permanent, requires reload)
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --reload
+
+# Add service to specific zone
+sudo firewall-cmd --zone=public --add-service=https
+
+# Add multiple services
+sudo firewall-cmd --permanent --add-service={http,https,smtp}
+sudo firewall-cmd --reload
+
+# Remove service
+sudo firewall-cmd --remove-service=http
+sudo firewall-cmd --permanent --remove-service=http
+sudo firewall-cmd --reload</code></pre>
+
+                <h3>Common Services</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Service</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Port</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Protocol</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ssh</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">22</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">TCP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">http</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">80</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">TCP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">https</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">443</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">TCP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">nfs</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">2049</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">TCP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">mysql</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">3306</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">TCP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">smtp</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">25</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">TCP</td>
+                    </tr>
+                </table>
+
+                <div class="procedure">
+                    <h4>Procedure: Allow HTTP/HTTPS Traffic</h4>
+                    <ol>
+                        <li>Check current services:
+                            <pre><code>sudo firewall-cmd --list-services</code></pre>
+                        </li>
+                        <li>Add HTTP and HTTPS (permanent):
+                            <pre><code>sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https</code></pre>
+                        </li>
+                        <li>Reload firewall:
+                            <pre><code>sudo firewall-cmd --reload</code></pre>
+                        </li>
+                        <li>Verify:
+                            <pre><code>sudo firewall-cmd --list-services</code></pre>
+                        </li>
+                        <li>Test access:
+                            <pre><code>curl http://localhost
+curl https://localhost</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="ports" class="content-section">
+                <h2>🔌 Managing Ports</h2>
+
+                <p>
+                    For custom applications or non-standard ports, manage individual ports.
+                </p>
+
+                <h3>Adding/Removing Ports</h3>
+                <pre><code># Add port (runtime)
+sudo firewall-cmd --add-port=8080/tcp
+
+# Add port (permanent)
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --reload
+
+# Add multiple ports
+sudo firewall-cmd --permanent --add-port={8080/tcp,8443/tcp,3000/tcp}
+sudo firewall-cmd --reload
+
+# Add port range
+sudo firewall-cmd --permanent --add-port=5000-5010/tcp
+sudo firewall-cmd --reload
+
+# Add UDP port
+sudo firewall-cmd --permanent --add-port=53/udp
+sudo firewall-cmd --reload
+
+# Remove port
+sudo firewall-cmd --remove-port=8080/tcp
+sudo firewall-cmd --permanent --remove-port=8080/tcp
+sudo firewall-cmd --reload</code></pre>
+
+                <h3>Listing Ports</h3>
+                <pre><code># List open ports in default zone
+sudo firewall-cmd --list-ports
+
+# List ports in specific zone
+sudo firewall-cmd --zone=public --list-ports
+
+# Show everything (services and ports)
+sudo firewall-cmd --list-all</code></pre>
+
+                <h3>Port vs Service</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Method</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">When to Use</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Service</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Standard services (http, ssh, nfs) - cleaner, easier to manage</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Port</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Custom apps, non-standard ports (8080, 3000, etc.)</td>
+                    </tr>
+                </table>
+
+                <div class="procedure">
+                    <h4>Procedure: Open Custom Application Port</h4>
+                    <ol>
+                        <li>Identify required port (e.g., NodeJS on 3000):
+                            <pre><code>ss -tulpn | grep 3000</code></pre>
+                        </li>
+                        <li>Add port permanently:
+                            <pre><code>sudo firewall-cmd --permanent --add-port=3000/tcp</code></pre>
+                        </li>
+                        <li>Reload firewall:
+                            <pre><code>sudo firewall-cmd --reload</code></pre>
+                        </li>
+                        <li>Verify port is open:
+                            <pre><code>sudo firewall-cmd --list-ports</code></pre>
+                        </li>
+                        <li>Test from another machine:
+                            <pre><code>telnet server-ip 3000
+# or
+curl http://server-ip:3000</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="rich-rules" class="content-section">
+                <h2>📜 Rich Rules</h2>
+
+                <p>
+                    Rich rules provide advanced firewall rules with source filtering, logging, and complex conditions.
+                </p>
+
+                <h3>Rich Rule Syntax</h3>
+                <pre><code># Basic format:
+rule family="ipv4" source address="IP/MASK" [service|port] [accept|reject|drop]
+
+# Example: Allow SSH from specific IP
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="192.168.1.100" service name="ssh" accept'
+
+# Reload
+sudo firewall-cmd --reload</code></pre>
+
+                <h3>Rich Rule Examples</h3>
+                <pre><code># Allow HTTP from specific subnet
+sudo firewall-cmd --permanent --add-rich-rule='
+  rule family="ipv4"
+  source address="192.168.1.0/24"
+  service name="http"
+  accept'
+
+# Block specific IP
+sudo firewall-cmd --permanent --add-rich-rule='
+  rule family="ipv4"
+  source address="10.0.0.50"
+  reject'
+
+# Allow port from IP with logging
+sudo firewall-cmd --permanent --add-rich-rule='
+  rule family="ipv4"
+  source address="192.168.1.10"
+  port port="3306" protocol="tcp"
+  log prefix="MySQL Access: " level="info"
+  accept'
+
+# Rate limit SSH connections
+sudo firewall-cmd --permanent --add-rich-rule='
+  rule service name="ssh"
+  limit value="5/m"
+  accept'
+
+# Forward port (port forwarding)
+sudo firewall-cmd --permanent --add-rich-rule='
+  rule family="ipv4"
+  forward-port port="8080" protocol="tcp" to-port="80"'</code></pre>
+
+                <h3>Managing Rich Rules</h3>
+                <pre><code># List rich rules
+sudo firewall-cmd --list-rich-rules
+
+# List in specific zone
+sudo firewall-cmd --zone=public --list-rich-rules
+
+# Remove rich rule
+sudo firewall-cmd --permanent --remove-rich-rule='
+  rule family="ipv4"
+  source address="192.168.1.100"
+  service name="ssh"
+  accept'
+
+# Reload after changes
+sudo firewall-cmd --reload</code></pre>
+
+                <h3>Source-Based Filtering</h3>
+                <pre><code># Add source to zone (trust specific IP)
+sudo firewall-cmd --permanent --zone=trusted --add-source=192.168.1.0/24
+sudo firewall-cmd --reload
+
+# Remove source
+sudo firewall-cmd --permanent --zone=trusted --remove-source=192.168.1.0/24
+
+# List sources in zone
+sudo firewall-cmd --zone=trusted --list-sources</code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Rich Rule Use Cases</div>
+                    <p>• Allow service only from specific IPs/subnets<br>
+                    • Block malicious IPs<br>
+                    • Log specific traffic<br>
+                    • Rate limit connections<br>
+                    • Port forwarding<br>
+                    • Time-based rules (advanced)</p>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: How do you make a firewall rule permanent?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Use --permanent flag then --reload</li>
+                            <li>B) Rules are permanent by default</li>
+                            <li>C) Run firewall-cmd --save</li>
+                            <li>D) Restart firewalld</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A) Use --permanent flag then --reload</strong><br>
+                            <code>sudo firewall-cmd --permanent --add-service=http</code> then 
+                            <code>sudo firewall-cmd --reload</code>. Without --permanent, rules are runtime only 
+                            (lost on reload/reboot). Reload activates permanent rules.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What's the default firewall zone in RHEL 9?</h4>
+                        <ul class="quiz-options">
+                            <li>A) trusted</li>
+                            <li>B) home</li>
+                            <li>C) public</li>
+                            <li>D) work</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) public</strong><br>
+                            The public zone is the default, allowing only SSH and cockpit by default. 
+                            Check with: <code>firewall-cmd --get-default-zone</code>. Change with: 
+                            <code>firewall-cmd --set-default-zone=home</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: What command opens HTTP and HTTPS permanently?</h4>
+                        <ul class="quiz-options">
+                            <li>A) firewall-cmd --add-service=http,https</li>
+                            <li>B) firewall-cmd --permanent --add-service={http,https}</li>
+                            <li>C) firewall-cmd --add-port=80,443/tcp</li>
+                            <li>D) firewall-cmd --open http https</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B)</strong><br>
+                            <code>sudo firewall-cmd --permanent --add-service={http,https}</code> then 
+                            <code>sudo firewall-cmd --reload</code>. The braces allow multiple services. 
+                            Option A works but isn't permanent. Prefer services over ports for standard apps.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: How do you open a custom port 8080/tcp?</h4>
+                        <ul class="quiz-options">
+                            <li>A) firewall-cmd --permanent --add-port=8080/tcp</li>
+                            <li>B) firewall-cmd --permanent --add-service=8080</li>
+                            <li>C) firewall-cmd --permanent --open-port=8080</li>
+                            <li>D) firewall-cmd --port 8080 --allow</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A)</strong><br>
+                            <code>sudo firewall-cmd --permanent --add-port=8080/tcp</code> then 
+                            <code>sudo firewall-cmd --reload</code>. Must specify protocol (tcp/udp). 
+                            Use --add-port for custom ports, --add-service for predefined services.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: What zone allows ALL traffic?</h4>
+                        <ul class="quiz-options">
+                            <li>A) public</li>
+                            <li>B) home</li>
+                            <li>C) trusted</li>
+                            <li>D) internal</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) trusted</strong><br>
+                            The trusted zone accepts all traffic. Use carefully! Assign trusted IPs: 
+                            <code>firewall-cmd --permanent --zone=trusted --add-source=192.168.1.10</code>. 
+                            drop zone blocks everything (strictest), trusted allows everything (least strict).
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 6: Rich rule to allow SSH from 192.168.1.100 only?</h4>
+                        <ul class="quiz-options">
+                            <li>A) --add-rich-rule='rule source address="192.168.1.100" service="ssh" accept'</li>
+                            <li>B) --add-rich-rule='rule family="ipv4" source address="192.168.1.100" service name="ssh" accept'</li>
+                            <li>C) --add-source=192.168.1.100 --add-service=ssh</li>
+                            <li>D) Both B and C</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B)</strong><br>
+                            Correct syntax: <code>sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" 
+                            source address="192.168.1.100" service name="ssh" accept'</code>. Must include family, 
+                            full service syntax. Option C would allow SSH from that IP but requires trusted zone.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter14.html" class="nav-button prev">Chapter 14: Network Storage</a>
+                <a href="chapter16.html" class="nav-button next">Chapter 16: Run Containers</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

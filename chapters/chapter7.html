@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 7: Schedule Future Tasks - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html" class="active">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 7</span>
+                    <span class="meta-badge">⏱️ 40 min read</span>
+                    <span class="meta-badge">📚 Intermediate</span>
+                </div>
+                <h1>Schedule Future Tasks</h1>
+                <p class="chapter-intro">
+                    Automate system tasks using cron, anacron, at, and systemd timers. Master job scheduling for recurring 
+                    maintenance, backups, monitoring, and one-time task execution.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#cron">Cron & Crontab</a></li>
+                    <li><a href="#systemd-timers">Systemd Timers</a></li>
+                    <li><a href="#at">At & Batch Commands</a></li>
+                    <li><a href="#anacron">Anacron</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction</h2>
+                <p>
+                    Task scheduling is essential for system administration. Linux provides multiple tools to automate tasks 
+                    at specific times or intervals - from simple recurring jobs (backups, log rotation) to complex maintenance 
+                    schedules. Understanding these tools ensures your systems run smoothly without manual intervention.
+                </p>
+
+                <p>In this chapter, you'll master:</p>
+                <ul>
+                    <li>Cron for recurring scheduled tasks</li>
+                    <li>Systemd timers as a modern alternative to cron</li>
+                    <li>At for one-time future task execution</li>
+                    <li>Anacron for systems not running 24/7</li>
+                    <li>Access control for job scheduling</li>
+                </ul>
+
+                <h3>Scheduling Tools Comparison</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Tool</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Type</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Best For</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>cron</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Recurring</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Regular intervals (daily backups, hourly checks)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>systemd timers</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Recurring</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Modern systems, integrated logging, dependencies</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>at</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">One-time</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Single future execution (reboot at 2am, run report Friday)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>anacron</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Recurring</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Desktop/laptop (may not run 24/7)</td>
+                    </tr>
+                </table>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Note</div>
+                    <p>On RHEL 9, systemd timers are increasingly preferred over cron for new tasks, 
+                    but cron remains widely used and is important for the RHCSA exam.</p>
+                </div>
+            </section>
+
+            <section id="cron" class="content-section">
+                <h2>⏰ Cron & Crontab</h2>
+
+                <p>
+                    Cron is the traditional Unix job scheduler that runs commands at specified times and dates. 
+                    The cron daemon (crond) checks crontab files every minute and executes matching jobs.
+                </p>
+
+                <h3>Crontab Syntax</h3>
+                <p>Each crontab entry has six fields:</p>
+                <pre><code># ┌───────────── minute (0-59)
+# │ ┌───────────── hour (0-23)
+# │ │ ┌───────────── day of month (1-31)
+# │ │ │ ┌───────────── month (1-12)
+# │ │ │ │ ┌───────────── day of week (0-6, Sunday=0)
+# │ │ │ │ │
+# │ │ │ │ │
+# * * * * * command to execute</code></pre>
+
+                <h3>Special Characters</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Character</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Meaning</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Example</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>*</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Any value</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>* * * * *</code> = every minute</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>,</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">List of values</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>0 9,17 * * *</code> = 9am and 5pm</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>-</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Range</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>0 9-17 * * *</code> = 9am to 5pm</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Step values</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>*/15 * * * *</code> = every 15 minutes</td>
+                    </tr>
+                </table>
+
+                <h3>Common Crontab Examples</h3>
+                <pre><code># Run every minute
+* * * * * /path/to/command
+
+# Run at 3:30 AM daily
+30 3 * * * /usr/local/bin/backup.sh
+
+# Run every hour at minute 0
+0 * * * * /usr/bin/check-status.sh
+
+# Run at 2:15 PM on weekdays (Mon-Fri)
+15 14 * * 1-5 /usr/bin/report.sh
+
+# Run on the 1st and 15th of every month at midnight
+0 0 1,15 * * /usr/local/bin/billing.sh
+
+# Run every 15 minutes
+*/15 * * * * /usr/bin/monitor.sh
+
+# Run at 11:45 PM on Sundays
+45 23 * * 0 /usr/local/bin/weekly-cleanup.sh
+
+# Run every 6 hours
+0 */6 * * * /usr/bin/sync-data.sh
+
+# Run on January 1st at midnight (yearly)
+0 0 1 1 * /usr/local/bin/new-year-task.sh
+
+# Run Mon-Fri at 9 AM
+0 9 * * 1-5 /usr/local/bin/workday-start.sh</code></pre>
+
+                <h3>Managing User Crontabs</h3>
+                <pre><code># Edit your crontab
+crontab -e
+
+# List your crontab
+crontab -l
+
+# Remove your crontab (with confirmation)
+crontab -r
+
+# Remove crontab without confirmation
+crontab -r -i
+
+# Edit another user's crontab (as root)
+sudo crontab -u username -e
+
+# List another user's crontab
+sudo crontab -u username -l</code></pre>
+
+                <h3>System Crontabs</h3>
+                <p>System-wide cron jobs are stored in different locations:</p>
+                <pre><code># System crontab (includes username field)
+/etc/crontab
+
+# Sample /etc/crontab:
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+HOME=/
+
+# minute hour day month dayofweek user command
+0 2 * * * root /usr/local/bin/daily-maintenance.sh
+
+# Drop-in directories for scripts
+/etc/cron.hourly/    # Run every hour
+/etc/cron.daily/     # Run once daily
+/etc/cron.weekly/    # Run once weekly
+/etc/cron.monthly/   # Run once monthly
+
+# Additional cron jobs
+/etc/cron.d/         # Additional crontab files
+
+# Example: Add script to daily cron
+sudo cp script.sh /etc/cron.daily/
+sudo chmod +x /etc/cron.daily/script.sh</code></pre>
+
+                <h3>Cron Environment Variables</h3>
+                <p>Set variables at the top of crontab:</p>
+                <pre><code># Set shell
+SHELL=/bin/bash
+
+# Set PATH
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Email output to user
+MAILTO=admin@example.com
+
+# Disable email
+MAILTO=""
+
+# Set HOME directory
+HOME=/home/student
+
+# Your cron jobs below
+0 2 * * * /usr/local/bin/backup.sh</code></pre>
+
+                <h3>Redirecting Cron Output</h3>
+                <pre><code># Discard all output
+0 2 * * * /usr/local/bin/quiet-task.sh > /dev/null 2>&1
+
+# Log output to file
+0 2 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1
+
+# Send errors only
+0 2 * * * /usr/local/bin/task.sh > /dev/null
+
+# Separate stdout and stderr
+0 2 * * * /usr/local/bin/task.sh >> /var/log/task.log 2>> /var/log/task-error.log</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Creating a Daily Backup Cron Job</h4>
+                    <ol>
+                        <li>Create the backup script:
+                            <pre><code>sudo vi /usr/local/bin/daily-backup.sh
+
+#!/bin/bash
+# Daily backup script
+DATE=$(date +%Y%m%d)
+tar -czf /backups/home-$DATE.tar.gz /home
+find /backups -name "home-*.tar.gz" -mtime +7 -delete
+
+# Make executable
+sudo chmod +x /usr/local/bin/daily-backup.sh</code></pre>
+                        </li>
+                        <li>Test the script manually:
+                            <pre><code>sudo /usr/local/bin/daily-backup.sh</code></pre>
+                        </li>
+                        <li>Edit crontab:
+                            <pre><code>sudo crontab -e</code></pre>
+                        </li>
+                        <li>Add cron job (runs at 2 AM daily):
+                            <pre><code># Daily backup at 2 AM
+0 2 * * * /usr/local/bin/daily-backup.sh >> /var/log/backup.log 2>&1</code></pre>
+                        </li>
+                        <li>Verify crontab:
+                            <pre><code>sudo crontab -l</code></pre>
+                        </li>
+                        <li>Check cron is running:
+                            <pre><code>sudo systemctl status crond</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Cron Access Control</h3>
+                <p>Control who can use cron:</p>
+                <pre><code># Allow specific users only
+/etc/cron.allow    # If exists, only listed users can use cron
+/etc/cron.deny     # If exists, listed users cannot use cron
+
+# Example: Allow only student and admin
+echo "student" | sudo tee /etc/cron.allow
+echo "admin" | sudo tee -a /etc/cron.allow
+
+# Example: Deny specific user
+echo "baduser" | sudo tee /etc/cron.deny
+
+# If neither file exists, only root can use cron (RHEL default)
+# If both exist, cron.allow takes precedence</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Cron Best Practices</div>
+                    <ul>
+                        <li>Always use absolute paths in cron jobs</li>
+                        <li>Test scripts manually before adding to cron</li>
+                        <li>Redirect output or set MAILTO to avoid email spam</li>
+                        <li>Use meaningful comments in crontab</li>
+                        <li>For complex schedules, consider systemd timers</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="systemd-timers" class="content-section">
+                <h2>⏲️ Systemd Timers</h2>
+
+                <p>
+                    Systemd timers are the modern alternative to cron. They integrate with systemd services, 
+                    provide better logging, support dependencies, and offer more flexible scheduling options.
+                </p>
+
+                <h3>Why Use Systemd Timers?</h3>
+                <ul>
+                    <li><strong>Integration:</strong> Works with systemd services and dependencies</li>
+                    <li><strong>Logging:</strong> Full journald integration for debugging</li>
+                    <li><strong>Flexibility:</strong> Run on boot, relative to other units, with randomization</li>
+                    <li><strong>Resource control:</strong> Can use systemd resource limits</li>
+                    <li><strong>Accuracy:</strong> Better precision for time-critical tasks</li>
+                </ul>
+
+                <h3>Timer Components</h3>
+                <p>A systemd timer requires two files:</p>
+                <ol>
+                    <li><strong>Service unit</strong> (.service) - Defines what to run</li>
+                    <li><strong>Timer unit</strong> (.timer) - Defines when to run it</li>
+                </ol>
+
+                <h3>Creating a Systemd Timer</h3>
+                <div class="procedure">
+                    <h4>Example: Daily Cleanup Timer</h4>
+                    <ol>
+                        <li>Create the service file:
+                            <pre><code>sudo vi /etc/systemd/system/cleanup.service
+
+[Unit]
+Description=Daily Cleanup Task
+Wants=cleanup.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/cleanup.sh
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+                        </li>
+                        <li>Create the timer file:
+                            <pre><code>sudo vi /etc/systemd/system/cleanup.timer
+
+[Unit]
+Description=Daily Cleanup Timer
+Requires=cleanup.service
+
+[Timer]
+OnCalendar=daily
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target</code></pre>
+                        </li>
+                        <li>Reload systemd:
+                            <pre><code>sudo systemctl daemon-reload</code></pre>
+                        </li>
+                        <li>Enable and start the timer:
+                            <pre><code>sudo systemctl enable cleanup.timer
+sudo systemctl start cleanup.timer</code></pre>
+                        </li>
+                        <li>Verify the timer:
+                            <pre><code>sudo systemctl status cleanup.timer
+sudo systemctl list-timers cleanup.timer</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Timer Scheduling Syntax</h3>
+                <p>OnCalendar accepts various formats:</p>
+                <pre><code># Simple intervals
+OnCalendar=hourly     # Every hour
+OnCalendar=daily      # Every day at midnight
+OnCalendar=weekly     # Every week on Monday
+OnCalendar=monthly    # Every month on the 1st
+OnCalendar=yearly     # Every year on January 1st
+
+# Specific times
+OnCalendar=*-*-* 02:30:00           # Daily at 2:30 AM
+OnCalendar=Mon *-*-* 09:00:00       # Mondays at 9 AM
+OnCalendar=Mon..Fri *-*-* 18:00:00  # Weekdays at 6 PM
+
+# Multiple times
+OnCalendar=*-*-* 06:00:00           # 6 AM
+OnCalendar=*-*-* 18:00:00           # 6 PM
+
+# Every 15 minutes
+OnCalendar=*:0/15
+
+# Test calendar expression
+systemd-analyze calendar "Mon..Fri *-*-* 09:00:00"</code></pre>
+
+                <h3>Timer Options</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Option</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>OnCalendar=</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Real-time (wall clock) scheduling</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>OnBootSec=</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Time after boot</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>OnActiveSec=</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Time after timer activation</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>OnUnitActiveSec=</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Time after service last ran</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>Persistent=</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Run missed timers on boot</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>AccuracySec=</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Accuracy window (default 1min)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>RandomizedDelaySec=</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Random delay before execution</td>
+                    </tr>
+                </table>
+
+                <h3>Managing Timers</h3>
+                <pre><code># List all timers
+systemctl list-timers
+
+# List all timers (including inactive)
+systemctl list-timers --all
+
+# Check timer status
+systemctl status cleanup.timer
+
+# View timer details
+systemctl show cleanup.timer
+
+# Check when timer will run next
+systemctl list-timers cleanup.timer
+
+# Manually trigger the service
+sudo systemctl start cleanup.service
+
+# View service logs
+sudo journalctl -u cleanup.service
+
+# View timer logs
+sudo journalctl -u cleanup.timer</code></pre>
+
+                <h3>Example: Hourly System Check</h3>
+                <pre><code># /etc/systemd/system/syscheck.service
+[Unit]
+Description=Hourly System Health Check
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/check-system.sh
+StandardOutput=journal
+
+# /etc/systemd/system/syscheck.timer
+[Unit]
+Description=Run system check every hour
+
+[Timer]
+OnCalendar=hourly
+OnBootSec=5min
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+
+# Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable --now syscheck.timer</code></pre>
+            </section>
+
+            <section id="at" class="content-section">
+                <h2>📅 At & Batch Commands</h2>
+
+                <p>
+                    The <code>at</code> command schedules one-time tasks to run at a specific time in the future. 
+                    Unlike cron (recurring), at jobs run once and are then removed.
+                </p>
+
+                <h3>Installing At</h3>
+                <pre><code># Install at package
+sudo dnf install at
+
+# Start and enable atd service
+sudo systemctl enable --now atd
+
+# Verify service
+sudo systemctl status atd</code></pre>
+
+                <h3>Scheduling Jobs with At</h3>
+                <pre><code># Run job at specific time
+at 10:00 PM
+> /usr/local/bin/backup.sh
+> <Ctrl+D>
+
+# Run job tomorrow at 9 AM
+at 9am tomorrow
+> echo "Daily report" | mail -s "Report" admin@example.com
+> <Ctrl+D>
+
+# Run job at specific date and time
+at 2:30 PM December 25
+> /usr/local/bin/christmas-task.sh
+> <Ctrl+D>
+
+# Run job in 30 minutes
+at now + 30 minutes
+> /usr/local/bin/quick-task.sh
+> <Ctrl+D>
+
+# Run job in 2 hours
+at now + 2 hours
+> systemctl restart httpd
+> <Ctrl+D>
+
+# Run job next week
+at 10am next week
+> /usr/local/bin/weekly-report.sh
+> <Ctrl+D>
+
+# Run job from file
+at 2am tomorrow -f /usr/local/bin/script.sh
+
+# Run job using here document
+at now + 5 minutes <<EOF
+echo "Task started at \$(date)" >> /var/log/tasks.log
+/usr/local/bin/my-task.sh
+echo "Task completed at \$(date)" >> /var/log/tasks.log
+EOF</code></pre>
+
+                <h3>At Time Specifications</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Format</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Example</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">HH:MM</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">14:30, 10:00 PM</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">midnight, noon, teatime</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">noon tomorrow</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">now + time</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">now + 30 minutes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">today, tomorrow</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">10am tomorrow</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">MMDDYY</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">122524 (Dec 25, 2024)</td>
+                    </tr>
+                </table>
+
+                <h3>Managing At Jobs</h3>
+                <pre><code># List scheduled jobs
+atq
+# or
+at -l
+
+# Output example:
+# 1	Thu Nov 14 22:00:00 2025 a student
+# 2	Fri Nov 15 09:00:00 2025 a student
+
+# View job contents
+at -c 1    # Show job number 1
+
+# Remove job
+atrm 1     # Remove job number 1
+# or
+at -d 1
+
+# Remove all jobs for current user
+atrm $(atq | cut -f1)
+
+# Remove specific user's jobs (as root)
+sudo atrm $(atq -u username | cut -f1)</code></pre>
+
+                <h3>Batch Command</h3>
+                <p>Similar to at, but runs only when system load is low:</p>
+                <pre><code># Run when load average drops below 1.5 (default)
+batch
+> /usr/local/bin/resource-intensive-task.sh
+> <Ctrl+D>
+
+# Batch jobs appear in atq
+atq</code></pre>
+
+                <h3>At Access Control</h3>
+                <pre><code># Control who can use at
+/etc/at.allow    # If exists, only listed users can use at
+/etc/at.deny     # If exists, listed users cannot use at
+
+# Example: Allow specific users
+echo "student" | sudo tee /etc/at.allow
+echo "admin" | sudo tee -a /etc/at.allow
+
+# If neither file exists, only root can use at</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Schedule System Reboot</h4>
+                    <ol>
+                        <li>Schedule reboot for 2 AM:
+                            <pre><code>sudo at 2am tomorrow
+at> systemctl reboot
+at> <Ctrl+D>
+job 3 at Fri Nov 15 02:00:00 2025</code></pre>
+                        </li>
+                        <li>Verify scheduled job:
+                            <pre><code>sudo atq</code></pre>
+                        </li>
+                        <li>View job details:
+                            <pre><code>sudo at -c 3</code></pre>
+                        </li>
+                        <li>To cancel if needed:
+                            <pre><code>sudo atrm 3</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="anacron" class="content-section">
+                <h2>🔄 Anacron</h2>
+
+                <p>
+                    Anacron runs commands periodically but doesn't assume the system is always on. Unlike cron 
+                    (which skips missed jobs), anacron ensures jobs run eventually - perfect for desktops and laptops.
+                </p>
+
+                <h3>Anacron vs Cron</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Feature</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Cron</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Anacron</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Minimum interval</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1 minute</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1 day</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Missed jobs</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Skipped</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Run on next boot</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Best for</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Servers (always on)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Desktops/laptops</td>
+                    </tr>
+                </table>
+
+                <h3>Anacron Configuration</h3>
+                <p>Main configuration file: <code>/etc/anacrontab</code></p>
+                <pre><code># /etc/anacrontab example
+SHELL=/bin/sh
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+RANDOM_DELAY=45        # Maximum random delay in minutes
+START_HOURS_RANGE=3-22 # Only run between 3am-10pm
+
+# period  delay  job-identifier  command
+1         5      cron.daily      nice run-parts /etc/cron.daily
+7         25     cron.weekly     nice run-parts /etc/cron.weekly
+@monthly  45     cron.monthly    nice run-parts /etc/cron.monthly
+
+# Format:
+# period    = days between runs
+# delay     = minutes to wait before running
+# identifier = unique job name
+# command   = command to execute</code></pre>
+
+                <h3>How Anacron Works</h3>
+                <ol>
+                    <li>Anacron checks timestamp files in <code>/var/spool/anacron/</code></li>
+                    <li>If a job hasn't run in its specified period, it's scheduled</li>
+                    <li>Jobs wait for their delay period, then execute</li>
+                    <li>Timestamp is updated after successful execution</li>
+                </ol>
+
+                <h3>Managing Anacron</h3>
+                <pre><code># Manually run anacron (checks all jobs)
+sudo anacron
+
+# Force run all jobs now (ignore timestamps)
+sudo anacron -f
+
+# Run specific job
+sudo anacron -f cron.daily
+
+# Test mode (don't actually run)
+sudo anacron -d -n
+
+# Update timestamps without running
+sudo anacron -u
+
+# Check timestamp files
+ls -l /var/spool/anacron/</code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Anacron Integration</div>
+                    <p>On RHEL, anacron is integrated with cron. The cron.daily, cron.weekly, and cron.monthly 
+                    directories are managed by anacron to ensure they run even if the system was off.</p>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What does this crontab entry do? <code>30 2 * * 1-5</code></h4>
+                        <ul class="quiz-options">
+                            <li>A) Run at 2:30 AM on weekends</li>
+                            <li>B) Run at 2:30 AM on weekdays</li>
+                            <li>C) Run every 30 minutes between 2-5 AM</li>
+                            <li>D) Run on the 30th of every month</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Run at 2:30 AM on weekdays</strong><br>
+                            Format is minute(30) hour(2) day(*) month(*) weekday(1-5 = Mon-Fri). 
+                            So this runs at 2:30 AM Monday through Friday.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: How do you schedule a one-time job to run in 4 hours?</h4>
+                        <ul class="quiz-options">
+                            <li>A) crontab -e and add job</li>
+                            <li>B) at now + 4 hours</li>
+                            <li>C) systemctl start task.timer</li>
+                            <li>D) anacron -t 4h</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) at now + 4 hours</strong><br>
+                            The at command is for one-time future execution. Usage: at now + 4 hours, 
+                            then enter commands, press Ctrl+D. Cron is for recurring tasks.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: What file controls which users can create cron jobs?</h4>
+                        <ul class="quiz-options">
+                            <li>A) /etc/cron.access</li>
+                            <li>B) /etc/cron.allow or /etc/cron.deny</li>
+                            <li>C) /etc/crontab</li>
+                            <li>D) ~/.cron.conf</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) /etc/cron.allow or /etc/cron.deny</strong><br>
+                            If /etc/cron.allow exists, only listed users can use cron. If /etc/cron.deny exists, 
+                            listed users cannot use cron. If neither exists, only root can use cron.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Which command lists all pending at jobs?</h4>
+                        <ul class="quiz-options">
+                            <li>A) at -l or atq</li>
+                            <li>B) crontab -l</li>
+                            <li>C) systemctl list-timers</li>
+                            <li>D) at --list</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A) at -l or atq</strong><br>
+                            Both 'at -l' and 'atq' list scheduled at jobs. Use 'atrm jobnumber' to remove a job. 
+                            crontab -l lists cron jobs, not at jobs.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: What's the advantage of systemd timers over cron?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Easier syntax</li>
+                            <li>B) Better integration with journald logging and systemd services</li>
+                            <li>C) Can run more frequently</li>
+                            <li>D) Doesn't require root access</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Better integration with journald logging and systemd services</strong><br>
+                            Systemd timers integrate with journald for logging, support service dependencies, 
+                            offer more scheduling flexibility (OnBootSec, Persistent, etc.), and are the modern approach on RHEL 9.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter6.html" class="nav-button prev">Chapter 6: Performance</a>
+                <a href="chapter8.html" class="nav-button next">Chapter 8: Software Packages</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 9: Manage Basic Storage - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html" class="active">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 9</span>
+                    <span class="meta-badge">⏱️ 55 min read</span>
+                    <span class="meta-badge">📚 Intermediate</span>
+                </div>
+                <h1>Manage Basic Storage</h1>
+                <p class="chapter-intro">
+                    Master disk partitioning, file system creation, and storage mounting. Learn MBR/GPT partitioning schemes, 
+                    create ext4 and XFS filesystems, configure swap space, and make mounts persistent with /etc/fstab.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#partitioning">Disk Partitioning</a></li>
+                    <li><a href="#filesystems">File Systems</a></li>
+                    <li><a href="#mounting">Mounting File Systems</a></li>
+                    <li><a href="#swap">Swap Space</a></li>
+                    <li><a href="#fstab">Persistent Mounts</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction</h2>
+                <p>
+                    Storage management is fundamental to Linux administration. You must understand how to partition disks, 
+                    create file systems, and mount storage to make it accessible. RHEL supports both MBR (legacy) and 
+                    GPT (modern) partitioning schemes.
+                </p>
+
+                <h3>Storage Hierarchy</h3>
+                <ol>
+                    <li><strong>Physical Disk:</strong> /dev/sda, /dev/vda, /dev/nvme0n1</li>
+                    <li><strong>Partitions:</strong> /dev/sda1, /dev/vda2, /dev/nvme0n1p1</li>
+                    <li><strong>File System:</strong> ext4, XFS, Btrfs</li>
+                    <li><strong>Mount Point:</strong> /, /home, /data</li>
+                </ol>
+
+                <h3>Device Naming Conventions</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Device Type</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Naming Pattern</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Example</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SATA/SAS Disks</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/sd[a-z]</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/sda, /dev/sdb</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Virtual Disks (KVM)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/vd[a-z]</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/vda, /dev/vdb</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">NVMe SSDs</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/nvme[0-9]n[0-9]</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/nvme0n1, /dev/nvme1n1</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">MBR Partitions</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/sda[1-4]</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/sda1, /dev/sda2</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">GPT/NVMe Partitions</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/nvme0n1p[1-128]</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/nvme0n1p1</td>
+                    </tr>
+                </table>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 MBR vs GPT</div>
+                    <p><strong>MBR:</strong> Legacy, max 2TB disks, 4 primary partitions<br>
+                    <strong>GPT:</strong> Modern, supports >2TB disks, up to 128 partitions, more reliable</p>
+                </div>
+            </section>
+
+            <section id="partitioning" class="content-section">
+                <h2>🔧 Disk Partitioning</h2>
+
+                <h3>Viewing Disk Information</h3>
+                <pre><code># List all block devices
+lsblk
+
+# Output example:
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0   20G  0 disk 
+├─sda1   8:1    0    1G  0 part /boot
+└─sda2   8:2    0   19G  0 part 
+  ├─rhel-root 253:0 0 17G 0 lvm  /
+  └─rhel-swap 253:1 0  2G 0 lvm  [SWAP]
+sdb      8:16   0   10G  0 disk 
+
+# Show filesystem information
+lsblk -f
+
+# List partition tables
+sudo fdisk -l
+
+# Show disk usage
+df -h
+
+# Show partition UUID and filesystem
+sudo blkid</code></pre>
+
+                <h3>Partitioning with fdisk (MBR)</h3>
+                <p>Use <code>fdisk</code> for MBR partition tables (disks ≤ 2TB):</p>
+                <pre><code># Start fdisk
+sudo fdisk /dev/sdb
+
+# Commands within fdisk:
+m     # Help
+p     # Print partition table
+n     # New partition
+d     # Delete partition
+t     # Change partition type
+l     # List partition types
+w     # Write changes and exit
+q     # Quit without saving
+
+# Example: Create new partition
+Command: n
+Partition type: p (primary)
+Partition number: 1
+First sector: (press Enter for default)
+Last sector: +2G (create 2GB partition)
+
+# Set partition type to Linux LVM (type 8e)
+Command: t
+Partition number: 1
+Hex code: 8e
+
+# Write changes
+Command: w</code></pre>
+
+                <h3>Partitioning with parted (GPT)</h3>
+                <p>Use <code>parted</code> for GPT partition tables (modern, >2TB disks):</p>
+                <pre><code># Start parted in interactive mode
+sudo parted /dev/sdb
+
+# Create GPT partition table
+(parted) mklabel gpt
+
+# Create partition
+(parted) mkpart primary 1MiB 2GiB
+
+# Name the partition
+(parted) name 1 data
+
+# Set flags
+(parted) set 1 lvm on
+
+# Print partition table
+(parted) print
+
+# Quit
+(parted) quit
+
+# Non-interactive mode
+sudo parted /dev/sdb mklabel gpt
+sudo parted /dev/sdb mkpart primary 1MiB 2GiB
+sudo parted /dev/sdb name 1 data
+sudo parted /dev/sdb set 1 lvm on</code></pre>
+
+                <h3>Updating Kernel Partition Table</h3>
+                <pre><code># Inform kernel of partition table changes
+sudo partprobe /dev/sdb
+
+# Alternative if partprobe fails
+sudo partx -u /dev/sdb
+
+# Verify changes
+lsblk /dev/sdb</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Adding a New 5GB Data Partition</h4>
+                    <ol>
+                        <li>Identify available disk:
+                            <pre><code>lsblk
+# Assume /dev/sdb is available</code></pre>
+                        </li>
+                        <li>Create GPT partition table:
+                            <pre><code>sudo parted /dev/sdb mklabel gpt</code></pre>
+                        </li>
+                        <li>Create 5GB partition:
+                            <pre><code>sudo parted /dev/sdb mkpart primary 1MiB 5GiB</code></pre>
+                        </li>
+                        <li>Update kernel:
+                            <pre><code>sudo partprobe /dev/sdb</code></pre>
+                        </li>
+                        <li>Verify partition:
+                            <pre><code>lsblk /dev/sdb
+sudo parted /dev/sdb print</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Deleting Partitions</h3>
+                <pre><code># With parted
+sudo parted /dev/sdb rm 1
+
+# With fdisk
+sudo fdisk /dev/sdb
+Command: d
+Partition number: 1
+Command: w</code></pre>
+            </section>
+
+            <section id="filesystems" class="content-section">
+                <h2>💾 File Systems</h2>
+
+                <p>RHEL 9 primarily uses XFS (default) and ext4 file systems.</p>
+
+                <h3>File System Comparison</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Feature</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">XFS</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">ext4</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Max file size</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">8 EiB</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">16 TiB</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Max filesystem</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">8 EiB</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1 EiB</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Can shrink</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">No</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Yes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Default RHEL 9</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Yes</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">No</td>
+                    </tr>
+                </table>
+
+                <h3>Creating File Systems</h3>
+                <pre><code># Create XFS filesystem (RHEL default)
+sudo mkfs.xfs /dev/sdb1
+
+# Create ext4 filesystem
+sudo mkfs.ext4 /dev/sdb1
+
+# Create with label
+sudo mkfs.xfs -L "data" /dev/sdb1
+sudo mkfs.ext4 -L "backup" /dev/sdb2
+
+# Force creation (overwrites existing filesystem)
+sudo mkfs.xfs -f /dev/sdb1
+
+# Create with specific options
+sudo mkfs.ext4 -b 4096 -i 8192 /dev/sdb1
+# -b block size
+# -i bytes per inode</code></pre>
+
+                <h3>File System Labels</h3>
+                <pre><code># Set/change XFS label
+sudo xfs_admin -L "newlabel" /dev/sdb1
+
+# Set/change ext4 label
+sudo e2label /dev/sdb1 "newlabel"
+
+# View labels
+lsblk -f
+sudo blkid</code></pre>
+
+                <h3>Checking and Repairing File Systems</h3>
+                <pre><code># Check XFS filesystem
+sudo xfs_repair /dev/sdb1
+
+# Check ext4 filesystem
+sudo fsck.ext4 /dev/sdb1
+# or
+sudo e2fsck /dev/sdb1
+
+# Force check
+sudo e2fsck -f /dev/sdb1
+
+# Automatic repair
+sudo e2fsck -p /dev/sdb1
+
+# Interactive repair
+sudo e2fsck -y /dev/sdb1</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ File System Checks</div>
+                    <p>Never run fsck/xfs_repair on a mounted filesystem! Always unmount first or the system 
+                    will be damaged. Use <code>umount /dev/sdb1</code> before checking.</p>
+                </div>
+
+                <h3>Extending File Systems</h3>
+                <pre><code># Extend XFS (must be mounted)
+sudo xfs_growfs /mount/point
+
+# Extend ext4 (can be mounted or unmounted)
+sudo resize2fs /dev/sdb1
+
+# Extend to specific size
+sudo resize2fs /dev/sdb1 10G</code></pre>
+            </section>
+
+            <section id="mounting" class="content-section">
+                <h2>📂 Mounting File Systems</h2>
+
+                <h3>Manual Mounting</h3>
+                <pre><code># Create mount point
+sudo mkdir /data
+
+# Mount filesystem
+sudo mount /dev/sdb1 /data
+
+# Mount with options
+sudo mount -o ro /dev/sdb1 /data        # Read-only
+sudo mount -o noexec /dev/sdb1 /data    # No execute
+sudo mount -o nosuid /dev/sdb1 /data    # Ignore SUID
+
+# Mount by label
+sudo mount LABEL=data /data
+
+# Mount by UUID
+sudo mount UUID=xxx-xxx-xxx /data
+
+# Verify mount
+mount | grep sdb1
+df -h /data</code></pre>
+
+                <h3>Unmounting</h3>
+                <pre><code># Unmount by device
+sudo umount /dev/sdb1
+
+# Unmount by mount point
+sudo umount /data
+
+# Force unmount (if busy)
+sudo umount -f /data
+
+# Lazy unmount (detach now, cleanup when not busy)
+sudo umount -l /data
+
+# Check what's using the mount
+sudo lsof /data
+sudo fuser -mv /data</code></pre>
+
+                <h3>Common Mount Options</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Option</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>defaults</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">rw, suid, dev, exec, auto, nouser, async</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>ro</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Read-only</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>rw</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Read-write</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>noexec</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Do not allow execution of binaries</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>nosuid</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Ignore SUID and SGID bits</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>noauto</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Do not mount automatically at boot</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>_netdev</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Network device (wait for network)</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section id="swap" class="content-section">
+                <h2>💱 Swap Space</h2>
+
+                <p>Swap is used when RAM is full. It can be a partition or a file.</p>
+
+                <h3>Creating Swap Partition</h3>
+                <pre><code># Create partition (use partition type 82 for MBR, or 'swap' for GPT)
+sudo parted /dev/sdb mkpart primary linux-swap 5GiB 7GiB
+
+# Format as swap
+sudo mkswap /dev/sdb2
+
+# Set label
+sudo mkswap -L swap1 /dev/sdb2
+
+# Enable swap
+sudo swapon /dev/sdb2
+
+# Verify
+swapon --show
+free -h</code></pre>
+
+                <h3>Creating Swap File</h3>
+                <pre><code># Create 2GB swap file
+sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+# or faster with fallocate
+sudo fallocate -l 2G /swapfile
+
+# Set permissions
+sudo chmod 600 /swapfile
+
+# Format as swap
+sudo mkswap /swapfile
+
+# Enable swap
+sudo swapon /swapfile
+
+# Verify
+swapon --show</code></pre>
+
+                <h3>Managing Swap</h3>
+                <pre><code># View swap usage
+swapon --show
+free -h
+cat /proc/swaps
+
+# Disable swap
+sudo swapoff /dev/sdb2
+sudo swapoff /swapfile
+
+# Disable all swap
+sudo swapoff -a
+
+# Enable all swap from /etc/fstab
+sudo swapon -a
+
+# Check swap priority
+swapon --show</code></pre>
+
+                <h3>Swap Priority</h3>
+                <pre><code># Enable with priority (higher number = higher priority)
+sudo swapon -p 10 /dev/sdb2
+
+# In /etc/fstab:
+/dev/sdb2  none  swap  pri=10  0 0</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Swap Size Recommendations</div>
+                    <p><strong>RAM ≤ 2GB:</strong> 2x RAM<br>
+                    <strong>RAM 2-8GB:</strong> Same as RAM<br>
+                    <strong>RAM >8GB:</strong> At least 4GB, or 0.5x RAM<br>
+                    <strong>For hibernation:</strong> RAM size + 0.5GB</p>
+                </div>
+            </section>
+
+            <section id="fstab" class="content-section">
+                <h2>📝 Persistent Mounts (/etc/fstab)</h2>
+
+                <p>
+                    The <code>/etc/fstab</code> file defines filesystems to mount at boot time.
+                </p>
+
+                <h3>fstab Format</h3>
+                <pre><code># /etc/fstab
+# <device>  <mount point>  <type>  <options>  <dump>  <pass>
+
+UUID=xxx-xxx   /data         xfs     defaults   0       2
+LABEL=backup   /backup       ext4    defaults   0       2
+/dev/sdb3      /mnt/extra    xfs     noauto     0       0
+/swapfile      none          swap    sw         0       0</code></pre>
+
+                <h3>Field Descriptions</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Field</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Device</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">UUID, LABEL, or /dev/sdX (UUID preferred)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Mount Point</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Where to mount (use 'none' for swap)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Type</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">xfs, ext4, swap, nfs, etc.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Options</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">defaults, ro, noexec, etc.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Dump</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">0=no backup, 1=backup (usually 0)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Pass</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">0=no fsck, 1=root fs, 2=other fs</td>
+                    </tr>
+                </table>
+
+                <h3>Getting UUID</h3>
+                <pre><code># Show all UUIDs
+sudo blkid
+
+# Show specific device
+sudo blkid /dev/sdb1
+
+# Output:
+/dev/sdb1: UUID="xxx-xxx-xxx" TYPE="xfs"
+
+# Use lsblk
+lsblk -f</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Adding Persistent Mount</h4>
+                    <ol>
+                        <li>Get the UUID:
+                            <pre><code>sudo blkid /dev/sdb1
+UUID="a1b2c3d4-e5f6-..."</code></pre>
+                        </li>
+                        <li>Create mount point:
+                            <pre><code>sudo mkdir /data</code></pre>
+                        </li>
+                        <li>Edit /etc/fstab:
+                            <pre><code>sudo vi /etc/fstab
+
+# Add line:
+UUID=a1b2c3d4-e5f6-...  /data  xfs  defaults  0  2</code></pre>
+                        </li>
+                        <li>Test the fstab entry (without rebooting):
+                            <pre><code>sudo mount -a</code></pre>
+                        </li>
+                        <li>Verify:
+                            <pre><code>df -h /data
+mount | grep /data</code></pre>
+                        </li>
+                        <li>Test fstab syntax:
+                            <pre><code>sudo findmnt --verify</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ Critical: Test Before Reboot</div>
+                    <p>Always test <code>/etc/fstab</code> entries with <code>mount -a</code> before rebooting! 
+                    An incorrect fstab can prevent the system from booting. If that happens, boot into rescue mode 
+                    and fix the fstab file.</p>
+                </div>
+
+                <h3>Systemd Mount Units</h3>
+                <p>Alternative to fstab for complex mounts:</p>
+                <pre><code># Create mount unit: /etc/systemd/system/data.mount
+[Unit]
+Description=Data Partition
+
+[Mount]
+What=/dev/sdb1
+Where=/data
+Type=xfs
+Options=defaults
+
+[Install]
+WantedBy=multi-user.target
+
+# Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable --now data.mount</code></pre>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: Which partition scheme supports disks larger than 2TB?</h4>
+                        <ul class="quiz-options">
+                            <li>A) MBR</li>
+                            <li>B) GPT</li>
+                            <li>C) LVM</li>
+                            <li>D) Extended partition</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) GPT</strong><br>
+                            GPT (GUID Partition Table) supports disks >2TB and up to 128 partitions. MBR is limited 
+                            to 2TB disks and 4 primary partitions. Use 'parted' for GPT partitions.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What command creates an XFS filesystem on /dev/sdb1?</h4>
+                        <ul class="quiz-options">
+                            <li>A) mkfs -t xfs /dev/sdb1</li>
+                            <li>B) mkfs.xfs /dev/sdb1</li>
+                            <li>C) Both A and B</li>
+                            <li>D) xfs_create /dev/sdb1</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Both A and B</strong><br>
+                            Both commands create an XFS filesystem. mkfs.xfs is the direct command, 
+                            while mkfs -t xfs is the generic format. For ext4: mkfs.ext4 or mkfs -t ext4.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: What field in /etc/fstab determines the fsck check order?</h4>
+                        <ul class="quiz-options">
+                            <li>A) 4th field (options)</li>
+                            <li>B) 5th field (dump)</li>
+                            <li>C) 6th field (pass)</li>
+                            <li>D) 3rd field (type)</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) 6th field (pass)</strong><br>
+                            The pass field: 0=no fsck, 1=root filesystem (first), 2=other filesystems (after root). 
+                            Root should be 1, other filesystems should be 2, swap should be 0.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Which is preferred for identifying devices in /etc/fstab?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Device name (/dev/sdb1)</li>
+                            <li>B) UUID</li>
+                            <li>C) Label</li>
+                            <li>D) Both B and C</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: D) Both B and C</strong><br>
+                            UUID and LABEL are preferred over device names because device names can change 
+                            (e.g., /dev/sdb might become /dev/sdc if hardware is added). UUID is most reliable.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: How do you test /etc/fstab without rebooting?</h4>
+                        <ul class="quiz-options">
+                            <li>A) mount -a</li>
+                            <li>B) systemctl restart fstab</li>
+                            <li>C) fstab --test</li>
+                            <li>D) mount --check</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A) mount -a</strong><br>
+                            'mount -a' mounts all filesystems in /etc/fstab. This tests your fstab entries 
+                            without rebooting. Always run this after editing fstab to catch errors. 
+                            Also use: findmnt --verify to check fstab syntax.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter8.html" class="nav-button prev">Chapter 8: Software Packages</a>
+                <a href="chapter10.html" class="nav-button next">Chapter 10: Storage Stack (LVM)</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

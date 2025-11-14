@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 13: Configure Networking - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html" class="active">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 13</span>
+                    <span class="meta-badge">⏱️ 60 min read</span>
+                    <span class="meta-badge">📚 Advanced</span>
+                </div>
+                <h1>Configure Networking</h1>
+                <p class="chapter-intro">
+                    Master network configuration with NetworkManager and nmcli. Learn to configure IP addresses, 
+                    manage connections, set hostnames, and troubleshoot network issues.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction to Networking</a></li>
+                    <li><a href="#nmcli">nmcli - NetworkManager CLI</a></li>
+                    <li><a href="#ip-config">IP Configuration</a></li>
+                    <li><a href="#hostname">Hostname Management</a></li>
+                    <li><a href="#dns">DNS Configuration</a></li>
+                    <li><a href="#troubleshooting">Network Troubleshooting</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction to Networking</h2>
+                <p>
+                    RHEL 9 uses NetworkManager to manage all network configurations. The primary command-line tool 
+                    is <code>nmcli</code> (NetworkManager Command Line Interface).
+                </p>
+
+                <h3>NetworkManager Components</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Component</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Device</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Network interface (eth0, ens33, wlan0)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Connection</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Network configuration profile</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>nmcli</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Command-line tool</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>nmtui</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Text-based UI tool</td>
+                    </tr>
+                </table>
+
+                <h3>Configuration Files</h3>
+                <pre><code># Connection profiles (managed by NetworkManager)
+/etc/NetworkManager/system-connections/
+
+# Legacy network scripts (deprecated in RHEL 9)
+/etc/sysconfig/network-scripts/
+
+# Hostname
+/etc/hostname
+
+# DNS resolution
+/etc/resolv.conf  # Managed by NetworkManager
+/etc/hosts        # Static host mappings</code></pre>
+
+                <h3>Basic Network Information</h3>
+                <pre><code># Show IP addresses
+ip addr show
+ip a
+
+# Show routing table
+ip route show
+ip r
+
+# Show specific interface
+ip addr show ens33
+
+# Legacy commands (still work)
+ifconfig  # May need net-tools package
+route -n</code></pre>
+            </section>
+
+            <section id="nmcli" class="content-section">
+                <h2>🔧 nmcli - NetworkManager CLI</h2>
+
+                <h3>Viewing Network Status</h3>
+                <pre><code># Show all devices
+nmcli device status
+nmcli dev status
+
+# Output example:
+DEVICE  TYPE      STATE      CONNECTION
+ens33   ethernet  connected  ens33
+lo      loopback  unmanaged  --
+
+# Show all connections
+nmcli connection show
+nmcli con show
+
+# Output example:
+NAME   UUID                                  TYPE      DEVICE
+ens33  abc123-def4-5678-9abc-def012345678   ethernet  ens33
+
+# Show connection details
+nmcli con show ens33
+
+# Show device details
+nmcli dev show ens33</code></pre>
+
+                <h3>Managing Connections</h3>
+                <pre><code># Activate connection
+nmcli con up ens33
+
+# Deactivate connection
+nmcli con down ens33
+
+# Reload connections
+nmcli con reload
+
+# Delete connection
+nmcli con delete ens33
+
+# Rename connection
+nmcli con modify ens33 connection.id "LAN"</code></pre>
+
+                <h3>Connection Types</h3>
+                <pre><code># Ethernet connection
+nmcli con add type ethernet con-name eth0 ifname eth0
+
+# WiFi connection
+nmcli dev wifi connect "SSID" password "password"
+
+# List available WiFi networks
+nmcli dev wifi list
+
+# Team/Bond (advanced)
+nmcli con add type team con-name team0 ifname team0
+nmcli con add type bridge con-name br0 ifname br0</code></pre>
+            </section>
+
+            <section id="ip-config" class="content-section">
+                <h2>🌐 IP Configuration</h2>
+
+                <h3>Static IP Configuration</h3>
+                <pre><code># Create new connection with static IP
+nmcli con add \
+  con-name static-ens33 \
+  ifname ens33 \
+  type ethernet \
+  ipv4.addresses 192.168.1.100/24 \
+  ipv4.gateway 192.168.1.1 \
+  ipv4.dns "8.8.8.8 8.8.4.4" \
+  ipv4.method manual
+
+# Activate the connection
+nmcli con up static-ens33
+
+# Verify
+ip addr show ens33</code></pre>
+
+                <h3>Modify Existing Connection</h3>
+                <pre><code># Change to static IP
+nmcli con mod ens33 \
+  ipv4.addresses 192.168.1.100/24 \
+  ipv4.gateway 192.168.1.1 \
+  ipv4.dns "8.8.8.8 8.8.4.4" \
+  ipv4.method manual
+
+# Add second IP address
+nmcli con mod ens33 +ipv4.addresses 192.168.1.101/24
+
+# Remove IP address
+nmcli con mod ens33 -ipv4.addresses 192.168.1.101/24
+
+# Apply changes
+nmcli con up ens33</code></pre>
+
+                <h3>DHCP Configuration</h3>
+                <pre><code># Create DHCP connection
+nmcli con add \
+  con-name dhcp-ens33 \
+  ifname ens33 \
+  type ethernet \
+  ipv4.method auto
+
+# Change existing to DHCP
+nmcli con mod ens33 ipv4.method auto
+
+# Remove static settings
+nmcli con mod ens33 \
+  ipv4.addresses "" \
+  ipv4.gateway "" \
+  ipv4.dns ""
+
+# Apply
+nmcli con up ens33</code></pre>
+
+                <h3>IPv6 Configuration</h3>
+                <pre><code># Static IPv6
+nmcli con mod ens33 \
+  ipv6.addresses 2001:db8::1/64 \
+  ipv6.gateway 2001:db8::ffff \
+  ipv6.method manual
+
+# Auto (SLAAC)
+nmcli con mod ens33 ipv6.method auto
+
+# Disable IPv6
+nmcli con mod ens33 ipv6.method disabled
+
+# Apply
+nmcli con up ens33</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Configure Static IP Address</h4>
+                    <ol>
+                        <li>Check current configuration:
+                            <pre><code>nmcli con show
+ip addr show</code></pre>
+                        </li>
+                        <li>Modify connection for static IP:
+                            <pre><code>sudo nmcli con mod ens33 \
+  ipv4.addresses 192.168.1.100/24 \
+  ipv4.gateway 192.168.1.1 \
+  ipv4.dns "8.8.8.8 8.8.4.4" \
+  ipv4.method manual</code></pre>
+                        </li>
+                        <li>Activate changes:
+                            <pre><code>sudo nmcli con up ens33</code></pre>
+                        </li>
+                        <li>Verify configuration:
+                            <pre><code>ip addr show ens33
+ip route show
+cat /etc/resolv.conf</code></pre>
+                        </li>
+                        <li>Test connectivity:
+                            <pre><code>ping -c 4 8.8.8.8
+ping -c 4 google.com</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Common nmcli Options</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Setting</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ipv4.method</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">auto (DHCP), manual (static), disabled</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ipv4.addresses</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">IP/prefix (192.168.1.100/24)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ipv4.gateway</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Default gateway IP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ipv4.dns</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">DNS servers (space-separated)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">connection.autoconnect</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">yes/no (auto-activate at boot)</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section id="hostname" class="content-section">
+                <h2>🏷️ Hostname Management</h2>
+
+                <h3>Setting Hostname</h3>
+                <pre><code># Set hostname (persistent)
+sudo hostnamectl set-hostname server1.example.com
+
+# View hostname details
+hostnamectl
+
+# Output example:
+ Static hostname: server1.example.com
+       Icon name: computer-vm
+         Chassis: vm
+      Machine ID: abc123...
+         Boot ID: def456...
+  Virtualization: kvm
+Operating System: Red Hat Enterprise Linux 9.0 (Plow)
+     CPE OS Name: cpe:/o:redhat:enterprise_linux:9::baseos
+          Kernel: Linux 5.14.0-70.el9.x86_64
+    Architecture: x86-64
+
+# View just the hostname
+hostname
+hostnamectl hostname</code></pre>
+
+                <h3>Hostname Types</h3>
+                <pre><code># Static hostname (permanent)
+sudo hostnamectl set-hostname server1.example.com
+
+# Pretty hostname (descriptive)
+sudo hostnamectl set-hostname "Web Server 1" --pretty
+
+# Transient hostname (temporary, lost on reboot)
+sudo hostnamectl set-hostname temp-name --transient
+
+# View all types
+hostnamectl status</code></pre>
+
+                <h3>Manual Hostname Configuration</h3>
+                <pre><code># Edit hostname file
+sudo vi /etc/hostname
+server1.example.com
+
+# Or use nmcli
+sudo nmcli general hostname server1.example.com
+
+# Update /etc/hosts for local resolution
+sudo vi /etc/hosts
+127.0.0.1   localhost localhost.localdomain
+192.168.1.100   server1.example.com server1</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Hostname Best Practices</div>
+                    <p>Use FQDN (Fully Qualified Domain Name) for static hostname: server1.example.com<br>
+                    Update /etc/hosts to include the hostname for local resolution<br>
+                    Avoid special characters, use only letters, numbers, hyphens, and dots</p>
+                </div>
+            </section>
+
+            <section id="dns" class="content-section">
+                <h2>🔍 DNS Configuration</h2>
+
+                <h3>Configuring DNS with nmcli</h3>
+                <pre><code># Set DNS servers
+sudo nmcli con mod ens33 ipv4.dns "8.8.8.8 8.8.4.4"
+
+# Add additional DNS server
+sudo nmcli con mod ens33 +ipv4.dns 1.1.1.1
+
+# Set DNS search domains
+sudo nmcli con mod ens33 ipv4.dns-search "example.com lab.local"
+
+# Ignore auto DNS (use manual only)
+sudo nmcli con mod ens33 ipv4.ignore-auto-dns yes
+
+# Apply changes
+sudo nmcli con up ens33
+
+# Verify
+cat /etc/resolv.conf</code></pre>
+
+                <h3>/etc/resolv.conf</h3>
+                <pre><code># View DNS configuration (managed by NetworkManager)
+cat /etc/resolv.conf
+
+# Output example:
+# Generated by NetworkManager
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+search example.com lab.local</code></pre>
+
+                <h3>/etc/hosts</h3>
+                <pre><code># Static hostname to IP mappings
+sudo vi /etc/hosts
+
+127.0.0.1   localhost localhost.localdomain
+::1         localhost localhost.localdomain
+192.168.1.10   server1.example.com server1
+192.168.1.20   server2.example.com server2
+
+# Test host resolution
+getent hosts server1
+ping server1</code></pre>
+
+                <h3>Name Resolution Order</h3>
+                <pre><code># Configure resolution order
+/etc/nsswitch.conf
+
+# Default line:
+hosts: files dns myhostname
+
+# files = /etc/hosts first
+# dns = DNS servers second
+# myhostname = systemd hostname resolution</code></pre>
+
+                <h3>Testing DNS</h3>
+                <pre><code># Test name resolution
+nslookup google.com
+dig google.com
+host google.com
+
+# Specific DNS server
+nslookup google.com 8.8.8.8
+dig @8.8.8.8 google.com
+
+# Reverse DNS lookup
+nslookup 8.8.8.8
+dig -x 8.8.8.8
+
+# Check which DNS server is being used
+systemd-resolve --status</code></pre>
+            </section>
+
+            <section id="troubleshooting" class="content-section">
+                <h2>🔧 Network Troubleshooting</h2>
+
+                <h3>Connectivity Tests</h3>
+                <pre><code># Ping gateway
+ping -c 4 192.168.1.1
+
+# Ping external IP
+ping -c 4 8.8.8.8
+
+# Ping hostname (tests DNS)
+ping -c 4 google.com
+
+# Traceroute
+traceroute google.com
+tracepath google.com
+
+# Check listening ports
+ss -tulpn
+netstat -tulpn  # Legacy</code></pre>
+
+                <h3>Interface Troubleshooting</h3>
+                <pre><code># Check link status
+ip link show ens33
+
+# Bring interface up
+sudo ip link set ens33 up
+
+# Bring interface down
+sudo ip link set ens33 down
+
+# Check driver/hardware info
+ethtool ens33
+
+# View connection status
+nmcli con show ens33
+
+# Restart NetworkManager
+sudo systemctl restart NetworkManager</code></pre>
+
+                <h3>Route Troubleshooting</h3>
+                <pre><code># Show routing table
+ip route show
+
+# Show specific route
+ip route get 8.8.8.8
+
+# Add temporary route
+sudo ip route add 10.0.0.0/8 via 192.168.1.1
+
+# Delete route
+sudo ip route del 10.0.0.0/8
+
+# Add persistent route with nmcli
+sudo nmcli con mod ens33 +ipv4.routes "10.0.0.0/8 192.168.1.1"</code></pre>
+
+                <h3>Common Network Issues</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Problem</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Check</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">No IP address</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Check DHCP, verify ipv4.method, restart connection</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Can't ping gateway</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Check cable, ip link status, firewall</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Can't ping external IP</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Check gateway, routing table, firewall</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Can't resolve names</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Check /etc/resolv.conf, DNS servers, /etc/hosts</td>
+                    </tr>
+                </table>
+
+                <h3>Diagnostic Commands</h3>
+                <pre><code># Show socket statistics
+ss -tuln  # TCP/UDP listening
+ss -ta    # All TCP connections
+
+# Network statistics
+ip -s link show ens33  # Interface statistics
+
+# ARP table (address resolution)
+ip neigh show
+
+# Check NetworkManager status
+systemctl status NetworkManager
+
+# View NetworkManager logs
+journalctl -u NetworkManager -n 50</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Network Troubleshooting Workflow</h4>
+                    <ol>
+                        <li>Check interface status:
+                            <pre><code>ip link show
+nmcli dev status</code></pre>
+                        </li>
+                        <li>Check IP configuration:
+                            <pre><code>ip addr show
+nmcli con show ens33</code></pre>
+                        </li>
+                        <li>Test local connectivity:
+                            <pre><code>ping -c 4 127.0.0.1  # Loopback
+ping -c 4 $(ip route | grep default | awk '{print $3}')  # Gateway</code></pre>
+                        </li>
+                        <li>Test external connectivity:
+                            <pre><code>ping -c 4 8.8.8.8  # Google DNS</code></pre>
+                        </li>
+                        <li>Test DNS resolution:
+                            <pre><code>ping -c 4 google.com
+nslookup google.com</code></pre>
+                        </li>
+                        <li>Check routing:
+                            <pre><code>ip route show
+tracepath google.com</code></pre>
+                        </li>
+                        <li>Check logs:
+                            <pre><code>journalctl -u NetworkManager -n 50</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What command sets a static IP with nmcli?</h4>
+                        <ul class="quiz-options">
+                            <li>A) nmcli con mod ens33 ipv4.method manual ipv4.addresses 192.168.1.100/24</li>
+                            <li>B) ip addr add 192.168.1.100/24 dev ens33</li>
+                            <li>C) ifconfig ens33 192.168.1.100 netmask 255.255.255.0</li>
+                            <li>D) Both B and C</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A)</strong><br>
+                            nmcli is the proper RHEL 9 method for persistent configuration. Must set ipv4.method to 
+                            "manual" for static IP. Commands B and C are temporary (lost on reboot). Don't forget to 
+                            run <code>nmcli con up ens33</code> to apply changes.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: How do you set the hostname permanently?</h4>
+                        <ul class="quiz-options">
+                            <li>A) hostname server1.example.com</li>
+                            <li>B) hostnamectl set-hostname server1.example.com</li>
+                            <li>C) echo "server1" > /etc/hostname</li>
+                            <li>D) Both B and C</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: D) Both B and C</strong><br>
+                            <code>hostnamectl set-hostname</code> is the recommended method (updates multiple files). 
+                            Editing /etc/hostname also works but requires reboot or hostnamectl reload. 
+                            Command A sets hostname temporarily (lost on reboot).
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: What file contains DNS server configuration?</h4>
+                        <ul class="quiz-options">
+                            <li>A) /etc/resolv.conf</li>
+                            <li>B) /etc/hosts</li>
+                            <li>C) /etc/nsswitch.conf</li>
+                            <li>D) /etc/sysconfig/network</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A) /etc/resolv.conf</strong><br>
+                            /etc/resolv.conf contains nameserver entries (managed by NetworkManager in RHEL 9). 
+                            /etc/hosts is for static hostname mappings. /etc/nsswitch.conf defines resolution order. 
+                            Don't manually edit /etc/resolv.conf - use nmcli instead.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What command shows active network connections?</h4>
+                        <ul class="quiz-options">
+                            <li>A) nmcli connection show</li>
+                            <li>B) nmcli con show --active</li>
+                            <li>C) nmcli dev status</li>
+                            <li>D) All of the above</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: D) All of the above</strong><br>
+                            All three commands show active connections/devices. <code>nmcli con show</code> lists all 
+                            connections (active highlighted). <code>nmcli con show --active</code> filters to active only. 
+                            <code>nmcli dev status</code> shows device state. Use <code>nmcli -t -f</code> for scripting.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: How do you add a second DNS server to existing configuration?</h4>
+                        <ul class="quiz-options">
+                            <li>A) nmcli con mod ens33 ipv4.dns 8.8.4.4</li>
+                            <li>B) nmcli con mod ens33 +ipv4.dns 8.8.4.4</li>
+                            <li>C) echo "nameserver 8.8.4.4" >> /etc/resolv.conf</li>
+                            <li>D) nmcli con add dns 8.8.4.4</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) nmcli con mod ens33 +ipv4.dns 8.8.4.4</strong><br>
+                            The <code>+</code> prefix adds to existing values. Without <code>+</code>, it replaces all 
+                            DNS servers. Use <code>-</code> to remove a specific DNS server. Don't manually edit 
+                            /etc/resolv.conf as NetworkManager will overwrite it.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 6: What's the first step in network troubleshooting?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Ping google.com</li>
+                            <li>B) Check link status with ip link show</li>
+                            <li>C) Restart NetworkManager</li>
+                            <li>D) Check /etc/resolv.conf</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Check link status with ip link show</strong><br>
+                            Start with physical layer: verify interface is UP. Then check IP (ip addr), then gateway 
+                            (ping), then DNS. Follow OSI model bottom-up: Physical → Link → Network → Application. 
+                            Use <code>nmcli dev status</code> for quick overview.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter12.html" class="nav-button prev">Chapter 12: System Logs</a>
+                <a href="chapter14.html" class="nav-button next">Chapter 14: Network Storage (NFS/AutoFS)</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

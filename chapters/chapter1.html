@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Access Systems and Get Support - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html" class="active">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Chapter Header -->
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 1</span>
+                    <span class="meta-badge">⏱️ 45 min read</span>
+                    <span class="meta-badge">📚 Beginner</span>
+                </div>
+                <h1>Access Systems and Get Support</h1>
+                <p class="chapter-intro">
+                    Learn how to access and interact with Linux systems using both local and remote terminals. 
+                    This chapter covers essential skills for connecting to RHEL systems via SSH, navigating the 
+                    command-line interface, and accessing system documentation.
+                </p>
+            </div>
+
+            <!-- Table of Contents -->
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#local-access">Access the Local System</a></li>
+                    <li><a href="#ssh-access">Access Remote Systems with SSH</a></li>
+                    <li><a href="#bash-basics">Bash Shell Basics</a></li>
+                    <li><a href="#documentation">Access Documentation</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <!-- Introduction -->
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction</h2>
+                <p>
+                    The ability to access and navigate Linux systems is fundamental to system administration. 
+                    As a system administrator, you'll need to connect to servers both locally (physical access) 
+                    and remotely (over a network using SSH). Understanding these access methods and knowing how 
+                    to find help when needed are critical first steps in your RHCSA journey.
+                </p>
+                <p>
+                    This chapter will equip you with the essential skills to:
+                </p>
+                <ul>
+                    <li>Log in to a Linux system using a virtual console</li>
+                    <li>Connect to remote systems securely using SSH</li>
+                    <li>Navigate the Bash shell environment</li>
+                    <li>Access built-in documentation and help resources</li>
+                    <li>Understand command syntax and options</li>
+                </ul>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Note</div>
+                    <p>Throughout this guide, commands will be shown with example output. You should practice 
+                    these commands on your own RHEL 9 system to reinforce your learning.</p>
+                </div>
+            </section>
+
+            <!-- Local Access -->
+            <section id="local-access" class="content-section">
+                <h2>🖥️ Access the Local System</h2>
+                
+                <h3>Virtual Consoles</h3>
+                <p>
+                    RHEL 9 provides multiple virtual consoles that allow you to have several independent login 
+                    sessions on a single physical system. By default, six text-based virtual consoles are available.
+                </p>
+
+                <h4>Switching Between Virtual Consoles</h4>
+                <p>Use the following keyboard shortcuts to switch between virtual consoles:</p>
+                <ul>
+                    <li><code>Ctrl+Alt+F1</code> through <code>Ctrl+Alt+F6</code> - Access text consoles 1-6</li>
+                    <li><code>Ctrl+Alt+F1</code> - Return to graphical desktop (if installed)</li>
+                </ul>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Tip</div>
+                    <p>Virtual consoles are useful for troubleshooting when the graphical interface becomes 
+                    unresponsive or when you need multiple simultaneous sessions.</p>
+                </div>
+
+                <h3>Login Process</h3>
+                <p>When you access a virtual console, you'll see a login prompt:</p>
+                <pre><code>Red Hat Enterprise Linux 9.3 (Plow)
+Kernel 5.14.0-362.el9.x86_64 on an x86_64
+
+localhost login: _</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Logging In to a Virtual Console</h4>
+                    <ol>
+                        <li>Press <code>Ctrl+Alt+F2</code> to switch to virtual console 2</li>
+                        <li>At the login prompt, type your username and press <code>Enter</code></li>
+                        <li>Type your password and press <code>Enter</code> (password won't be displayed)</li>
+                        <li>After successful login, you'll see the command prompt</li>
+                    </ol>
+                </div>
+
+                <pre><code>[student@localhost ~]$ _</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Warning</div>
+                    <p>Passwords are case-sensitive. Make sure Caps Lock is off when entering your password.</p>
+                </div>
+            </section>
+
+            <!-- SSH Access -->
+            <section id="ssh-access" class="content-section">
+                <h2>🔐 Access Remote Systems with SSH</h2>
+                
+                <h3>What is SSH?</h3>
+                <p>
+                    Secure Shell (SSH) is a cryptographic network protocol that provides a secure channel over 
+                    an unsecured network. SSH encrypts all traffic, including passwords, to protect against 
+                    eavesdropping and connection hijacking.
+                </p>
+
+                <h3>Basic SSH Syntax</h3>
+                <pre><code>ssh username@hostname</code></pre>
+
+                <p>Or using IP address:</p>
+                <pre><code>ssh username@192.168.1.100</code></pre>
+
+                <h3>SSH Connection Example</h3>
+                <pre><code>[student@workstation ~]$ ssh user@servera.example.com
+The authenticity of host 'servera.example.com (192.168.1.10)' can't be established.
+ECDSA key fingerprint is SHA256:1A2B3C4D5E6F7G8H9I0J.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'servera.example.com' (ECDSA) to the list of known hosts.
+user@servera.example.com's password: 
+[user@servera ~]$ </code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Note</div>
+                    <p>The first time you connect to a host, SSH will ask you to verify the host's fingerprint. 
+                    This prevents man-in-the-middle attacks. Type "yes" to continue.</p>
+                </div>
+
+                <h3>SSH Key-Based Authentication</h3>
+                <p>
+                    For better security and convenience, you can use SSH keys instead of passwords. This involves 
+                    creating a public/private key pair.
+                </p>
+
+                <div class="procedure">
+                    <h4>Procedure: Setting Up SSH Key Authentication</h4>
+                    <ol>
+                        <li>Generate an SSH key pair:
+                            <pre><code>ssh-keygen -t rsa -b 4096</code></pre>
+                        </li>
+                        <li>Press Enter to accept the default file location (~/.ssh/id_rsa)</li>
+                        <li>Optionally enter a passphrase for additional security</li>
+                        <li>Copy the public key to the remote server:
+                            <pre><code>ssh-copy-id user@servera.example.com</code></pre>
+                        </li>
+                        <li>Test the connection (you should not be prompted for a password):
+                            <pre><code>ssh user@servera.example.com</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Useful SSH Options</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color); text-align: left;">Option</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color); text-align: left;">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>-p PORT</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Connect to a specific port</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>-v</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Verbose mode (useful for troubleshooting)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>-X</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Enable X11 forwarding for graphical applications</td>
+                    </tr>
+                </table>
+
+                <h3>Exit SSH Session</h3>
+                <p>To disconnect from an SSH session, use one of these methods:</p>
+                <pre><code>exit
+# or
+logout
+# or press
+Ctrl+D</code></pre>
+            </section>
+
+            <!-- Bash Basics -->
+            <section id="bash-basics" class="content-section">
+                <h2>⌨️ Bash Shell Basics</h2>
+                
+                <h3>Understanding the Command Prompt</h3>
+                <p>The default Bash prompt shows useful information:</p>
+                <pre><code>[student@localhost ~]$</code></pre>
+
+                <p>Breaking it down:</p>
+                <ul>
+                    <li><code>student</code> - Current username</li>
+                    <li><code>localhost</code> - Hostname of the system</li>
+                    <li><code>~</code> - Current directory (~ represents home directory)</li>
+                    <li><code>$</code> - Regular user prompt (# for root user)</li>
+                </ul>
+
+                <h3>Basic Command Structure</h3>
+                <pre><code>command [options] [arguments]</code></pre>
+
+                <p>Example:</p>
+                <pre><code>ls -l /etc</code></pre>
+                <ul>
+                    <li><code>ls</code> - Command (list directory contents)</li>
+                    <li><code>-l</code> - Option (long format)</li>
+                    <li><code>/etc</code> - Argument (directory to list)</li>
+                </ul>
+
+                <h3>Essential Bash Shortcuts</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color); text-align: left;">Shortcut</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color); text-align: left;">Action</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>Tab</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Auto-complete commands and file names</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>Ctrl+C</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Cancel current command</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>Ctrl+D</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Exit current shell</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>Ctrl+A</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Move to beginning of line</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>Ctrl+E</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Move to end of line</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>↑/↓</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Browse command history</td>
+                    </tr>
+                </table>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Tip</div>
+                    <p>Tab completion is one of the most useful features in Bash. Press Tab once to complete, 
+                    or press it twice to see all possible completions.</p>
+                </div>
+            </section>
+
+            <!-- Documentation -->
+            <section id="documentation" class="content-section">
+                <h2>📚 Access Documentation</h2>
+                
+                <h3>Man Pages</h3>
+                <p>
+                    Manual pages (man pages) are the primary source of documentation for Linux commands and system calls.
+                </p>
+
+                <h4>Basic Usage</h4>
+                <pre><code>man command_name</code></pre>
+
+                <p>Example:</p>
+                <pre><code>man ls</code></pre>
+
+                <h4>Navigating Man Pages</h4>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color); text-align: left;">Key</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color); text-align: left;">Action</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>Space</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Scroll down one page</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>b</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Scroll up one page</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/pattern</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Search for pattern</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>n</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Next search result</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>q</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Quit man page</td>
+                    </tr>
+                </table>
+
+                <h3>Man Page Sections</h3>
+                <p>Man pages are organized into sections:</p>
+                <ol>
+                    <li>User commands</li>
+                    <li>System calls</li>
+                    <li>Library functions</li>
+                    <li>Special files (devices)</li>
+                    <li>File formats</li>
+                    <li>Games</li>
+                    <li>Miscellaneous</li>
+                    <li>System administration commands</li>
+                </ol>
+
+                <p>To access a specific section:</p>
+                <pre><code>man 5 passwd    # View passwd file format
+man 1 passwd    # View passwd command</code></pre>
+
+                <h3>Info Pages</h3>
+                <p>Some commands have more detailed documentation in Info format:</p>
+                <pre><code>info command_name</code></pre>
+
+                <h3>--help Option</h3>
+                <p>Most commands support the --help option for quick reference:</p>
+                <pre><code>ls --help
+mkdir --help</code></pre>
+
+                <h3>Documentation in /usr/share/doc</h3>
+                <p>Additional documentation is often available in:</p>
+                <pre><code>ls /usr/share/doc/</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Tip</div>
+                    <p>Use <code>man -k keyword</code> to search for commands related to a keyword. 
+                    For example: <code>man -k network</code></p>
+                </div>
+            </section>
+
+            <!-- Practice Questions -->
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: Which keyboard shortcut switches to virtual console 3?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Ctrl+Alt+F1</li>
+                            <li>B) Ctrl+Alt+F2</li>
+                            <li>C) Ctrl+Alt+F3</li>
+                            <li>D) Alt+F3</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Ctrl+Alt+F3</strong><br>
+                            Virtual consoles 1-6 are accessed with Ctrl+Alt+F1 through Ctrl+Alt+F6.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What command creates an SSH key pair with 4096-bit RSA encryption?</h4>
+                        <ul class="quiz-options">
+                            <li>A) ssh-keygen</li>
+                            <li>B) ssh-keygen -t rsa</li>
+                            <li>C) ssh-keygen -t rsa -b 4096</li>
+                            <li>D) ssh-create-key -rsa 4096</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) ssh-keygen -t rsa -b 4096</strong><br>
+                            The -t flag specifies the key type (rsa) and -b specifies the number of bits (4096).
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: Which command displays the manual page for the passwd command?</h4>
+                        <ul class="quiz-options">
+                            <li>A) help passwd</li>
+                            <li>B) man passwd</li>
+                            <li>C) info passwd</li>
+                            <li>D) passwd --man</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) man passwd</strong><br>
+                            The man command displays manual pages for commands and system calls.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What does the ~ symbol represent in the Bash prompt?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Root directory</li>
+                            <li>B) Home directory</li>
+                            <li>C) Current directory</li>
+                            <li>D) Parent directory</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Home directory</strong><br>
+                            The tilde (~) is a shortcut for the current user's home directory.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Which key combination cancels a running command in the terminal?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Ctrl+X</li>
+                            <li>B) Ctrl+C</li>
+                            <li>C) Ctrl+Z</li>
+                            <li>D) Ctrl+D</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Ctrl+C</strong><br>
+                            Ctrl+C sends an interrupt signal to cancel the current command. Ctrl+D exits the shell, 
+                            and Ctrl+Z suspends a process.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter Navigation -->
+            <div class="chapter-navigation">
+                <a href="../index.html" class="nav-button prev">Home</a>
+                <a href="chapter2.html" class="nav-button next">Chapter 2: Manage Files</a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification and Linux system administration.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../index.html#chapters">All Chapters</a></li>
+                        <li><a href="https://youtube.com/@DevOpsniDiary" target="_blank">YouTube Channel</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
