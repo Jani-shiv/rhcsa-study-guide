@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Manage Files from the Command Line - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html" class="active">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 2</span>
+                    <span class="meta-badge">⏱️ 60 min read</span>
+                    <span class="meta-badge">📚 Beginner</span>
+                </div>
+                <h1>Manage Files from the Command Line</h1>
+                <p class="chapter-intro">
+                    Master essential file system operations including navigation, file creation, copying, moving, 
+                    and deletion. Learn to efficiently work with files and directories using powerful command-line tools.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#filesystem">Linux File System Hierarchy</a></li>
+                    <li><a href="#navigation">Navigate the File System</a></li>
+                    <li><a href="#manage-files">Manage Files and Directories</a></li>
+                    <li><a href="#links">Working with Links</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction</h2>
+                <p>
+                    File management is a core skill for Linux system administrators. Understanding how to navigate 
+                    the file system, create and modify files, and organize data efficiently is essential for 
+                    daily system administration tasks.
+                </p>
+                <p>Key skills you'll learn:</p>
+                <ul>
+                    <li>Understanding the Linux file system hierarchy</li>
+                    <li>Navigating directories with cd, pwd, and ls</li>
+                    <li>Creating, copying, moving, and deleting files and directories</li>
+                    <li>Using wildcards for efficient file operations</li>
+                    <li>Creating and managing symbolic and hard links</li>
+                </ul>
+            </section>
+
+            <section id="filesystem" class="content-section">
+                <h2>🗂️ Linux File System Hierarchy</h2>
+                <p>
+                    Linux follows the Filesystem Hierarchy Standard (FHS), which defines the directory structure 
+                    and directory contents in Unix-like operating systems.
+                </p>
+
+                <h3>Important Directories</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Directory</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Purpose</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Root directory (top of hierarchy)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/home</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">User home directories</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/root</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Root user's home directory</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/etc</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Configuration files</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/var</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Variable data (logs, databases)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/usr</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">User programs and utilities</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/tmp</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Temporary files</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>/dev</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Device files</td>
+                    </tr>
+                </table>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Note</div>
+                    <p>Absolute paths start with / (e.g., /home/student). Relative paths don't start with / 
+                    and are relative to your current directory.</p>
+                </div>
+            </section>
+
+            <section id="navigation" class="content-section">
+                <h2>🧭 Navigate the File System</h2>
+
+                <h3>pwd - Print Working Directory</h3>
+                <p>Display your current location in the file system:</p>
+                <pre><code>[student@localhost ~]$ pwd
+/home/student</code></pre>
+
+                <h3>cd - Change Directory</h3>
+                <p>Navigate to different directories:</p>
+                <pre><code># Go to home directory
+cd
+
+# Go to specific directory
+cd /etc
+
+# Go up one level
+cd ..
+
+# Go to previous directory
+cd -
+
+# Go to parent directory
+cd ../..
+
+# Go to user's home
+cd ~student</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Tip</div>
+                    <p>Use Tab completion when typing paths. Type the first few letters and press Tab to auto-complete.</p>
+                </div>
+
+                <h3>ls - List Directory Contents</h3>
+                <p>Display files and directories:</p>
+                <pre><code># Basic listing
+ls
+
+# Long format (detailed)
+ls -l
+
+# Show hidden files
+ls -a
+
+# Human-readable sizes
+ls -lh
+
+# Sort by modification time
+ls -lt
+
+# Reverse order
+ls -lr
+
+# Combined options
+ls -lah</code></pre>
+
+                <h4>Understanding ls -l Output</h4>
+                <pre><code>-rw-r--r--. 1 student student 1234 Nov 14 10:30 file.txt
+│││││││││││ │ │       │       │    │         │
+│││││││││││ │ │       │       │    │         └─ Filename
+│││││││││││ │ │       │       │    └─ Modification time
+│││││││││││ │ │       │       └─ Size (bytes)
+│││││││││││ │ │       └─ Group owner
+│││││││││││ │ └─ Owner
+│││││││││││ └─ Number of hard links
+│└┬┬┬┬┬┬┬┬┬─ SELinux context indicator
+│ │││││││└─ Other permissions (r--)
+│ │││└┬┬─ Group permissions (r--)
+│ └┬┬─ Owner permissions (rw-)
+└─ File type (- = regular file, d = directory)</code></pre>
+            </section>
+
+            <section id="manage-files" class="content-section">
+                <h2>📝 Manage Files and Directories</h2>
+
+                <h3>Creating Files and Directories</h3>
+                
+                <h4>touch - Create Empty File</h4>
+                <pre><code># Create a new file
+touch newfile.txt
+
+# Create multiple files
+touch file1.txt file2.txt file3.txt
+
+# Update timestamp of existing file
+touch existingfile.txt</code></pre>
+
+                <h4>mkdir - Make Directory</h4>
+                <pre><code># Create directory
+mkdir mydir
+
+# Create multiple directories
+mkdir dir1 dir2 dir3
+
+# Create parent directories as needed
+mkdir -p parent/child/grandchild
+
+# Set permissions while creating
+mkdir -m 755 securedir</code></pre>
+
+                <h3>Copying Files and Directories</h3>
+                
+                <h4>cp - Copy</h4>
+                <pre><code># Copy file
+cp source.txt destination.txt
+
+# Copy to directory
+cp file.txt /tmp/
+
+# Copy multiple files
+cp file1.txt file2.txt /tmp/
+
+# Copy directory recursively
+cp -r sourcedir/ destdir/
+
+# Preserve attributes
+cp -p file.txt backup.txt
+
+# Interactive (prompt before overwrite)
+cp -i file.txt existing.txt
+
+# Verbose output
+cp -v file.txt /tmp/</code></pre>
+
+                <h3>Moving and Renaming</h3>
+                
+                <h4>mv - Move/Rename</h4>
+                <pre><code># Rename file
+mv oldname.txt newname.txt
+
+# Move file to directory
+mv file.txt /tmp/
+
+# Move multiple files
+mv file1.txt file2.txt /tmp/
+
+# Move directory
+mv olddir/ newdir/
+
+# Interactive mode
+mv -i file.txt /tmp/
+
+# No overwrite
+mv -n file.txt /tmp/</code></pre>
+
+                <h3>Deleting Files and Directories</h3>
+                
+                <h4>rm - Remove</h4>
+                <pre><code># Delete file
+rm file.txt
+
+# Delete multiple files
+rm file1.txt file2.txt
+
+# Interactive deletion
+rm -i file.txt
+
+# Force deletion
+rm -f file.txt
+
+# Delete directory and contents
+rm -r directory/
+
+# Verbose output
+rm -v file.txt</code></pre>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ Warning</div>
+                    <p>Be extremely careful with <code>rm -rf</code>. There is no trash/recycle bin in Linux. 
+                    Deleted files cannot be easily recovered!</p>
+                </div>
+
+                <h4>rmdir - Remove Empty Directory</h4>
+                <pre><code># Delete empty directory
+rmdir emptydir/
+
+# Delete parent directories if empty
+rmdir -p parent/child/</code></pre>
+
+                <h3>Wildcards and Pattern Matching</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Pattern</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Matches</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Example</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>*</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Any characters</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>ls *.txt</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>?</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Single character</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>ls file?.txt</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>[abc]</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Any char in brackets</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>ls file[123].txt</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>[!abc]</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Not in brackets</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>ls file[!0-9].txt</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>{a,b}</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Brace expansion</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>cp file.{txt,bak}</code></td>
+                    </tr>
+                </table>
+
+                <h4>Wildcard Examples</h4>
+                <pre><code># List all .txt files
+ls *.txt
+
+# Copy all .conf files
+cp /etc/*.conf ~/backup/
+
+# Delete all files starting with 'temp'
+rm temp*
+
+# List files with single character extension
+ls *.?
+
+# Create backup copies
+cp file.txt{,.bak}</code></pre>
+            </section>
+
+            <section id="links" class="content-section">
+                <h2>🔗 Working with Links</h2>
+
+                <h3>Hard Links</h3>
+                <p>
+                    A hard link is an additional directory entry for an existing file. Both names point to 
+                    the same data on disk.
+                </p>
+
+                <pre><code># Create hard link
+ln /path/to/original /path/to/link
+
+# Example
+ln /tmp/original.txt /home/student/link.txt</code></pre>
+
+                <h4>Hard Link Characteristics</h4>
+                <ul>
+                    <li>Cannot span different file systems</li>
+                    <li>Cannot link to directories</li>
+                    <li>Deleting one link doesn't affect others</li>
+                    <li>All links have equal status</li>
+                    <li>Same inode number</li>
+                </ul>
+
+                <h3>Symbolic (Soft) Links</h3>
+                <p>
+                    A symbolic link is a special file that points to another file or directory by name.
+                </p>
+
+                <pre><code># Create symbolic link
+ln -s /path/to/original /path/to/link
+
+# Example
+ln -s /usr/share/doc ~/Documents/shared-docs
+
+# Link to directory
+ln -s /var/log ~/logs</code></pre>
+
+                <h4>Symbolic Link Characteristics</h4>
+                <ul>
+                    <li>Can span different file systems</li>
+                    <li>Can link to directories</li>
+                    <li>Breaks if target is deleted</li>
+                    <li>Different inode number</li>
+                    <li>Shows as l type in ls -l</li>
+                </ul>
+
+                <div class="procedure">
+                    <h4>Procedure: Creating and Verifying Links</h4>
+                    <ol>
+                        <li>Create original file:
+                            <pre><code>echo "Original content" > original.txt</code></pre>
+                        </li>
+                        <li>Create hard link:
+                            <pre><code>ln original.txt hardlink.txt</code></pre>
+                        </li>
+                        <li>Create symbolic link:
+                            <pre><code>ln -s original.txt symlink.txt</code></pre>
+                        </li>
+                        <li>Verify with ls -li:
+                            <pre><code>ls -li *.txt</code></pre>
+                        </li>
+                        <li>Test by modifying original:
+                            <pre><code>echo "Modified" >> original.txt
+cat hardlink.txt
+cat symlink.txt</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Tip</div>
+                    <p>Use <code>ls -i</code> to see inode numbers. Hard links to the same file share the same inode.</p>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: Which command creates parent directories as needed?</h4>
+                        <ul class="quiz-options">
+                            <li>A) mkdir -r parent/child</li>
+                            <li>B) mkdir -p parent/child</li>
+                            <li>C) mkdir -a parent/child</li>
+                            <li>D) mkdir parent/child</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) mkdir -p parent/child</strong><br>
+                            The -p option creates parent directories as needed without errors.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What is the difference between hard and symbolic links?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Hard links can span file systems</li>
+                            <li>B) Symbolic links share the same inode</li>
+                            <li>C) Hard links cannot link to directories</li>
+                            <li>D) Symbolic links are faster</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Hard links cannot link to directories</strong><br>
+                            Hard links point to the same inode and cannot link to directories or span file systems.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: Which wildcard matches exactly one character?</h4>
+                        <ul class="quiz-options">
+                            <li>A) *</li>
+                            <li>B) ?</li>
+                            <li>C) []</li>
+                            <li>D) {}</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) ?</strong><br>
+                            The ? wildcard matches exactly one character, while * matches zero or more characters.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What does 'cp -r' do?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Copy in reverse order</li>
+                            <li>B) Copy recursively (including subdirectories)</li>
+                            <li>C) Copy and remove source</li>
+                            <li>D) Copy with root permissions</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Copy recursively (including subdirectories)</strong><br>
+                            The -r option enables recursive copying, necessary for copying directories.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Which directory contains system configuration files?</h4>
+                        <ul class="quiz-options">
+                            <li>A) /var</li>
+                            <li>B) /usr</li>
+                            <li>C) /etc</li>
+                            <li>D) /opt</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) /etc</strong><br>
+                            The /etc directory contains system and application configuration files.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter1.html" class="nav-button prev">Chapter 1: Access Systems</a>
+                <a href="chapter3.html" class="nav-button next">Chapter 3: Users & Groups</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

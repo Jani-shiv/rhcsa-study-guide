@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 10: Manage Logical Volumes - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html" class="active">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 10</span>
+                    <span class="meta-badge">⏱️ 60 min read</span>
+                    <span class="meta-badge">📚 Advanced</span>
+                </div>
+                <h1>Manage Logical Volumes (LVM)</h1>
+                <p class="chapter-intro">
+                    Master Logical Volume Management (LVM) for flexible storage. Create and manage physical volumes, 
+                    volume groups, and logical volumes. Learn to extend, reduce, snapshot, and migrate storage dynamically.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction to LVM</a></li>
+                    <li><a href="#physical">Physical Volumes</a></li>
+                    <li><a href="#volume-groups">Volume Groups</a></li>
+                    <li><a href="#logical">Logical Volumes</a></li>
+                    <li><a href="#extending">Extending Storage</a></li>
+                    <li><a href="#reducing">Reducing Storage</a></li>
+                    <li><a href="#snapshots">LVM Snapshots</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction to LVM</h2>
+                <p>
+                    Logical Volume Manager (LVM) provides flexible disk management. Unlike traditional partitioning, 
+                    LVM allows you to resize volumes, create snapshots, and move data between physical disks without downtime.
+                </p>
+
+                <h3>LVM Architecture</h3>
+                <pre><code>Physical Disks (/dev/sdb, /dev/sdc)
+    ↓
+Physical Volumes (PV) - pvcreate
+    ↓
+Volume Group (VG) - vgcreate (pool of storage)
+    ↓
+Logical Volumes (LV) - lvcreate (virtual partitions)
+    ↓
+File Systems (mkfs, mount)</code></pre>
+
+                <h3>LVM Components</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Component</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Example</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Physical Volume (PV)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Physical disk or partition used by LVM</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/sdb1, /dev/sdc</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Physical Extent (PE)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Smallest unit of storage (default 4MB)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">4MB blocks</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Volume Group (VG)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Pool of PVs</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">vg_data, rhel</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Logical Volume (LV)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Virtual partition created from VG</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/dev/vg_data/lv_web</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Logical Extent (LE)</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">PE mapped to LV</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Same size as PE</td>
+                    </tr>
+                </table>
+
+                <h3>LVM Benefits</h3>
+                <ul>
+                    <li><strong>Flexible Sizing:</strong> Resize volumes online (extend XFS/ext4, shrink ext4)</li>
+                    <li><strong>Snapshots:</strong> Point-in-time backups for testing/rollback</li>
+                    <li><strong>Striping:</strong> Spread data across disks for performance</li>
+                    <li><strong>Mirroring:</strong> Data redundancy across physical volumes</li>
+                    <li><strong>Migration:</strong> Move data between disks without downtime</li>
+                </ul>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 LVM vs Traditional Partitions</div>
+                    <p><strong>Traditional:</strong> Fixed sizes, hard to resize, limited flexibility<br>
+                    <strong>LVM:</strong> Dynamic sizing, snapshots, pooled storage, easier management</p>
+                </div>
+            </section>
+
+            <section id="physical" class="content-section">
+                <h2>💽 Physical Volumes (PV)</h2>
+
+                <h3>Creating Physical Volumes</h3>
+                <pre><code># Initialize partition or disk as PV
+sudo pvcreate /dev/sdb1
+sudo pvcreate /dev/sdc
+
+# Initialize multiple at once
+sudo pvcreate /dev/sdb1 /dev/sdc /dev/sdd1
+
+# Output example:
+  Physical volume "/dev/sdb1" successfully created.</code></pre>
+
+                <h3>Viewing Physical Volumes</h3>
+                <pre><code># List all PVs
+sudo pvs
+
+# Output:
+  PV         VG     Fmt  Attr PSize  PFree
+  /dev/sda2  rhel   lvm2 a--  19.00g    0 
+  /dev/sdb1  vgdata lvm2 a--   5.00g 2.00g
+
+# Detailed information
+sudo pvdisplay
+
+# Specific PV
+sudo pvdisplay /dev/sdb1
+
+# Show PE information
+sudo pvs -v
+sudo pvscan</code></pre>
+
+                <h3>Removing Physical Volumes</h3>
+                <pre><code># Remove PV from VG first (pvmove if data exists)
+sudo pvremove /dev/sdb1
+
+# Output:
+  Labels on physical volume "/dev/sdb1" successfully wiped.</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 PV Best Practices</div>
+                    <p>Use whole disks or partitions with Linux LVM type (8e for MBR, lvm flag for GPT). 
+                    Label partitions with parted before creating PVs for clarity.</p>
+                </div>
+            </section>
+
+            <section id="volume-groups" class="content-section">
+                <h2>🗄️ Volume Groups (VG)</h2>
+
+                <h3>Creating Volume Groups</h3>
+                <pre><code># Create VG from one PV
+sudo vgcreate vg_data /dev/sdb1
+
+# Create VG from multiple PVs
+sudo vgcreate vg_data /dev/sdb1 /dev/sdc
+
+# Specify PE size (default 4MB)
+sudo vgcreate -s 8M vg_data /dev/sdb1
+
+# Output:
+  Volume group "vg_data" successfully created</code></pre>
+
+                <h3>Viewing Volume Groups</h3>
+                <pre><code># List all VGs
+sudo vgs
+
+# Output:
+  VG      #PV #LV #SN Attr   VSize  VFree
+  rhel      1   2   0 wz--n- 19.00g    0 
+  vg_data   2   1   0 wz--n-  9.99g 7.00g
+
+# Detailed information
+sudo vgdisplay
+
+# Specific VG
+sudo vgdisplay vg_data
+
+# Show PVs in VG
+sudo vgs -o +pv_name</code></pre>
+
+                <h3>Extending Volume Groups</h3>
+                <pre><code># Add PV to existing VG
+sudo vgextend vg_data /dev/sdd1
+
+# Output:
+  Volume group "vg_data" successfully extended
+
+# Verify
+sudo vgs vg_data</code></pre>
+
+                <h3>Reducing Volume Groups</h3>
+                <pre><code># Remove PV from VG (must be empty or use pvmove first)
+sudo vgreduce vg_data /dev/sdd1
+
+# Remove missing/failed PVs
+sudo vgreduce --removemissing vg_data</code></pre>
+
+                <h3>Removing Volume Groups</h3>
+                <pre><code># Remove VG (must delete all LVs first)
+sudo vgremove vg_data
+
+# Output:
+  Volume group "vg_data" successfully removed</code></pre>
+
+                <h3>Renaming Volume Groups</h3>
+                <pre><code># Rename VG
+sudo vgrename vg_data vg_backup
+
+# Or by path
+sudo vgrename /dev/vg_data vg_backup</code></pre>
+            </section>
+
+            <section id="logical" class="content-section">
+                <h2>📦 Logical Volumes (LV)</h2>
+
+                <h3>Creating Logical Volumes</h3>
+                <pre><code># Create 2GB LV
+sudo lvcreate -L 2G -n lv_web vg_data
+
+# Create LV using all free space
+sudo lvcreate -l 100%FREE -n lv_backup vg_data
+
+# Create LV with specific extents
+sudo lvcreate -l 512 -n lv_logs vg_data
+
+# Output:
+  Logical volume "lv_web" created.</code></pre>
+
+                <h3>LV Naming</h3>
+                <pre><code># LVs are accessed via:
+/dev/VG_NAME/LV_NAME
+/dev/vg_data/lv_web
+
+# Or via mapper:
+/dev/mapper/VG_NAME-LV_NAME
+/dev/mapper/vg_data-lv_web</code></pre>
+
+                <h3>Viewing Logical Volumes</h3>
+                <pre><code># List all LVs
+sudo lvs
+
+# Output:
+  LV      VG      Attr       LSize  Pool Origin Data%
+  lv_web  vg_data -wi-a-----  2.00g                   
+  root    rhel    -wi-ao---- 17.00g                   
+  swap    rhel    -wi-ao----  2.00g                   
+
+# Detailed information
+sudo lvdisplay
+
+# Specific LV
+sudo lvdisplay /dev/vg_data/lv_web
+
+# Show all attributes
+sudo lvs -a -o +devices</code></pre>
+
+                <h3>Creating Filesystem on LV</h3>
+                <pre><code># Create XFS filesystem
+sudo mkfs.xfs /dev/vg_data/lv_web
+
+# Create ext4 filesystem
+sudo mkfs.ext4 /dev/vg_data/lv_logs
+
+# Mount
+sudo mkdir /web
+sudo mount /dev/vg_data/lv_web /web
+
+# Verify
+df -h /web</code></pre>
+
+                <h3>Removing Logical Volumes</h3>
+                <pre><code># Unmount first
+sudo umount /web
+
+# Remove LV
+sudo lvremove /dev/vg_data/lv_web
+
+# Confirm:
+Do you really want to remove active logical volume vg_data/lv_web? [y/n]: y
+  Logical volume "lv_web" successfully removed</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Complete LVM Setup</h4>
+                    <ol>
+                        <li>Create partition with LVM type:
+                            <pre><code>sudo parted /dev/sdb mkpart primary 1MiB 5GiB
+sudo parted /dev/sdb set 1 lvm on</code></pre>
+                        </li>
+                        <li>Create Physical Volume:
+                            <pre><code>sudo pvcreate /dev/sdb1</code></pre>
+                        </li>
+                        <li>Create Volume Group:
+                            <pre><code>sudo vgcreate vg_data /dev/sdb1</code></pre>
+                        </li>
+                        <li>Create Logical Volume (2GB):
+                            <pre><code>sudo lvcreate -L 2G -n lv_web vg_data</code></pre>
+                        </li>
+                        <li>Create filesystem:
+                            <pre><code>sudo mkfs.xfs /dev/vg_data/lv_web</code></pre>
+                        </li>
+                        <li>Mount persistently:
+                            <pre><code>sudo mkdir /web
+echo "/dev/vg_data/lv_web /web xfs defaults 0 2" | sudo tee -a /etc/fstab
+sudo mount -a</code></pre>
+                        </li>
+                        <li>Verify:
+                            <pre><code>df -h /web
+sudo lvs
+sudo vgs</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="extending" class="content-section">
+                <h2>📈 Extending Storage</h2>
+
+                <h3>Extending Logical Volumes</h3>
+                <pre><code># Extend by specific size
+sudo lvextend -L +1G /dev/vg_data/lv_web
+
+# Extend to specific total size
+sudo lvextend -L 5G /dev/vg_data/lv_web
+
+# Extend using all free space
+sudo lvextend -l +100%FREE /dev/vg_data/lv_web
+
+# Extend and resize filesystem in one command
+sudo lvextend -r -L +1G /dev/vg_data/lv_web
+
+# Output:
+  Size of logical volume vg_data/lv_web changed from 2.00 GiB to 3.00 GiB.
+  Logical volume vg_data/lv_web successfully resized.</code></pre>
+
+                <h3>Extending File Systems</h3>
+                <pre><code># After extending LV, extend the filesystem:
+
+# XFS (must be mounted)
+sudo xfs_growfs /web
+
+# ext4 (can be mounted or unmounted)
+sudo resize2fs /dev/vg_data/lv_web
+
+# Check filesystem after extending
+df -h /web</code></pre>
+
+                <h3>Extending Volume Groups</h3>
+                <pre><code># If VG is out of space, add more PVs:
+
+# Create new PV
+sudo pvcreate /dev/sdc1
+
+# Extend VG
+sudo vgextend vg_data /dev/sdc1
+
+# Now extend LV
+sudo lvextend -L +5G /dev/vg_data/lv_web
+sudo xfs_growfs /web</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Extend LV and Filesystem</h4>
+                    <ol>
+                        <li>Check current size:
+                            <pre><code>df -h /web
+sudo lvs /dev/vg_data/lv_web</code></pre>
+                        </li>
+                        <li>Check VG free space:
+                            <pre><code>sudo vgs vg_data</code></pre>
+                        </li>
+                        <li>Extend LV by 2GB:
+                            <pre><code>sudo lvextend -L +2G /dev/vg_data/lv_web</code></pre>
+                        </li>
+                        <li>Extend filesystem (XFS):
+                            <pre><code>sudo xfs_growfs /web</code></pre>
+                        </li>
+                        <li>Verify:
+                            <pre><code>df -h /web
+sudo lvs</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Quick Extend</div>
+                    <p>Use <code>lvextend -r</code> to automatically resize the filesystem after extending the LV. 
+                    This works for both XFS and ext4: <code>sudo lvextend -r -L +2G /dev/vg_data/lv_web</code></p>
+                </div>
+            </section>
+
+            <section id="reducing" class="content-section">
+                <h2>📉 Reducing Storage</h2>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ Critical Warning</div>
+                    <p><strong>XFS cannot be reduced!</strong> Only ext4 supports shrinking. Always backup data 
+                    before reducing. Unmount the filesystem first. Risk of data loss if done incorrectly!</p>
+                </div>
+
+                <h3>Reducing ext4 Logical Volumes</h3>
+                <pre><code># IMPORTANT: Unmount first!
+sudo umount /backup
+
+# Check filesystem
+sudo e2fsck -f /dev/vg_data/lv_backup
+
+# Reduce filesystem first (to 3GB)
+sudo resize2fs /dev/vg_data/lv_backup 3G
+
+# Then reduce LV (to 3GB)
+sudo lvreduce -L 3G /dev/vg_data/lv_backup
+
+# WARNING prompt:
+  WARNING: Reducing active logical volume to 3.00 GiB.
+  THIS MAY DESTROY YOUR DATA (filesystem etc.)
+Do you really want to reduce vg_data/lv_backup? [y/n]: y
+
+# Remount
+sudo mount /dev/vg_data/lv_backup /backup
+
+# Verify
+df -h /backup
+sudo lvs</code></pre>
+
+                <h3>Safe Reduction Steps</h3>
+                <ol>
+                    <li><strong>Backup data</strong> (critical!)</li>
+                    <li>Unmount the filesystem</li>
+                    <li>Check filesystem integrity (e2fsck -f)</li>
+                    <li>Reduce filesystem first (resize2fs)</li>
+                    <li>Reduce LV to same or larger size</li>
+                    <li>Remount and verify</li>
+                </ol>
+
+                <h3>Alternative: lvreduce with -r</h3>
+                <pre><code># Reduce LV and filesystem together (ext4 only)
+sudo umount /backup
+sudo lvreduce -r -L 3G /dev/vg_data/lv_backup
+
+# This automatically:
+# 1. Checks filesystem
+# 2. Reduces filesystem
+# 3. Reduces LV</code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Why XFS Can't Shrink</div>
+                    <p>XFS is optimized for performance and scalability, not shrinking. If you need to reduce 
+                    an XFS volume, you must: backup data → destroy LV → create smaller LV → restore data.</p>
+                </div>
+            </section>
+
+            <section id="snapshots" class="content-section">
+                <h2>📸 LVM Snapshots</h2>
+
+                <p>
+                    Snapshots provide point-in-time copies of logical volumes. Perfect for backups before 
+                    system changes, testing, or rollback scenarios.
+                </p>
+
+                <h3>Creating Snapshots</h3>
+                <pre><code># Create snapshot (20% of original LV size for changes)
+sudo lvcreate -L 1G -s -n lv_web_snap /dev/vg_data/lv_web
+
+# Or use percentage
+sudo lvcreate -l 20%ORIGIN -s -n lv_web_snap /dev/vg_data/lv_web
+
+# Output:
+  Logical volume "lv_web_snap" created.</code></pre>
+
+                <h3>Viewing Snapshots</h3>
+                <pre><code># List snapshots
+sudo lvs
+
+# Output shows snapshot with origin:
+  LV           VG      Attr       LSize  Pool Origin Data%
+  lv_web       vg_data owi-aos---  5.00g                   
+  lv_web_snap  vg_data swi-a-s---  1.00g      lv_web 0.02
+
+# Detailed snapshot info
+sudo lvdisplay /dev/vg_data/lv_web_snap</code></pre>
+
+                <h3>Mounting Snapshots</h3>
+                <pre><code># Mount snapshot for backup
+sudo mkdir /snapshot
+sudo mount -o ro /dev/vg_data/lv_web_snap /snapshot
+
+# Backup from snapshot
+sudo tar -czf /backup/web_backup.tar.gz -C /snapshot .
+
+# Unmount
+sudo umount /snapshot</code></pre>
+
+                <h3>Restoring from Snapshots</h3>
+                <pre><code># Unmount original LV
+sudo umount /web
+
+# Merge snapshot back to original (reverts changes)
+sudo lvconvert --merge /dev/vg_data/lv_web_snap
+
+# Remount (after reboot or LV reactivation)
+sudo mount /dev/vg_data/lv_web /web</code></pre>
+
+                <h3>Removing Snapshots</h3>
+                <pre><code># Remove snapshot (keeps original LV)
+sudo lvremove /dev/vg_data/lv_web_snap
+
+# Confirm:
+Do you really want to remove active logical volume vg_data/lv_web_snap? [y/n]: y</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Safe System Update with Snapshot</h4>
+                    <ol>
+                        <li>Create snapshot before update:
+                            <pre><code>sudo lvcreate -L 2G -s -n root_snap /dev/rhel/root</code></pre>
+                        </li>
+                        <li>Perform system update:
+                            <pre><code>sudo dnf update -y</code></pre>
+                        </li>
+                        <li>Test the system. If problems occur, rollback:
+                            <pre><code># Boot to rescue mode or single user
+sudo umount /
+sudo lvconvert --merge /dev/rhel/root_snap
+sudo reboot</code></pre>
+                        </li>
+                        <li>If update successful, remove snapshot:
+                            <pre><code>sudo lvremove /dev/rhel/root_snap</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Snapshot Best Practices</h3>
+                <ul>
+                    <li>Size snapshots at 20-30% of origin LV for typical changes</li>
+                    <li>Monitor snapshot usage (<code>lvs</code> shows Data% column)</li>
+                    <li>Remove snapshots after use to free space</li>
+                    <li>Snapshot fills = becomes invalid and is removed automatically</li>
+                    <li>Use snapshots for backups, not long-term storage</li>
+                </ul>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Snapshot Space</div>
+                    <p>If snapshot runs out of space (Data% reaches 100%), it becomes invalid and is 
+                    automatically removed. Monitor with <code>lvs</code> and extend if needed: 
+                    <code>sudo lvextend -L +500M /dev/vg_data/lv_web_snap</code></p>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What is the correct order for creating LVM storage?</h4>
+                        <ul class="quiz-options">
+                            <li>A) LV → VG → PV → filesystem</li>
+                            <li>B) PV → VG → LV → filesystem</li>
+                            <li>C) VG → PV → LV → filesystem</li>
+                            <li>D) filesystem → LV → VG → PV</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) PV → VG → LV → filesystem</strong><br>
+                            Correct order: 1) pvcreate (Physical Volume), 2) vgcreate (Volume Group), 
+                            3) lvcreate (Logical Volume), 4) mkfs (filesystem), 5) mount. 
+                            Think: physical → pool → virtual → format → use.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: Which filesystem can be extended but NOT reduced?</h4>
+                        <ul class="quiz-options">
+                            <li>A) ext4</li>
+                            <li>B) ext3</li>
+                            <li>C) XFS</li>
+                            <li>D) Btrfs</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) XFS</strong><br>
+                            XFS can only be extended (xfs_growfs), never reduced. Use ext4 if you need 
+                            shrinking capability. To "reduce" XFS, you must backup → delete → create smaller → restore.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: What command extends both LV and filesystem in one step?</h4>
+                        <ul class="quiz-options">
+                            <li>A) lvextend -L +2G /dev/vg/lv</li>
+                            <li>B) lvextend -r -L +2G /dev/vg/lv</li>
+                            <li>C) lvresize -L +2G /dev/vg/lv</li>
+                            <li>D) vgextend -L +2G /dev/vg</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) lvextend -r -L +2G /dev/vg/lv</strong><br>
+                            The -r (or --resizefs) option automatically resizes the filesystem after extending 
+                            the LV. Without -r, you must manually run xfs_growfs or resize2fs after lvextend.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What happens when an LVM snapshot runs out of space?</h4>
+                        <ul class="quiz-options">
+                            <li>A) System crashes</li>
+                            <li>B) Snapshot becomes read-only</li>
+                            <li>C) Snapshot becomes invalid and is removed</li>
+                            <li>D) Original LV is corrupted</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Snapshot becomes invalid and is removed</strong><br>
+                            When snapshot space fills (Data% = 100%), it becomes invalid and LVM automatically 
+                            removes it. The original LV is not affected. Monitor with <code>lvs</code> and extend 
+                            snapshot if needed: <code>lvextend -L +500M /dev/vg/snap</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: How do you create a 3GB logical volume named 'lv_data' in 'vg_app'?</h4>
+                        <ul class="quiz-options">
+                            <li>A) lvcreate -n lv_data -L 3G vg_app</li>
+                            <li>B) lvcreate -L 3G -n lv_data vg_app</li>
+                            <li>C) Both A and B</li>
+                            <li>D) vgcreate -L 3G lv_data vg_app</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Both A and B</strong><br>
+                            Both commands are valid. Options order doesn't matter: 
+                            <code>lvcreate -L SIZE -n NAME VG</code> or <code>lvcreate -n NAME -L SIZE VG</code>. 
+                            The VG name must be last. Use -l for extents, -L for size.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 6: What must you do before reducing an ext4 logical volume?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Nothing, just run lvreduce</li>
+                            <li>B) Unmount, check filesystem, reduce filesystem first</li>
+                            <li>C) Create a snapshot</li>
+                            <li>D) Extend the VG</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Unmount, check filesystem, reduce filesystem first</strong><br>
+                            Safe reduction: 1) Backup data, 2) umount, 3) e2fsck -f, 4) resize2fs to smaller size, 
+                            5) lvreduce to same or larger size. Or use <code>lvreduce -r</code> to automate steps 3-5. 
+                            Never reduce LV before reducing filesystem = data loss!
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter9.html" class="nav-button prev">Chapter 9: Basic Storage</a>
+                <a href="chapter11.html" class="nav-button next">Chapter 11: Services & Boot Process</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

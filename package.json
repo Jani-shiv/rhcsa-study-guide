@@ -1,0 +1,26 @@
+{
+  "name": "rhcsa-study-guide",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jani-shiv/rhcsa-study-guide.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jani-shiv/rhcsa-study-guide/issues"
+  },
+  "homepage": "https://github.com/Jani-shiv/rhcsa-study-guide#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.0.2",
+    "@capacitor/cli": "^8.0.2",
+    "@capacitor/core": "^8.0.2"
+  }
+}

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 14: Mount Network Storage - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html" class="active">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 14</span>
+                    <span class="meta-badge">⏱️ 55 min read</span>
+                    <span class="meta-badge">📚 Advanced</span>
+                </div>
+                <h1>Mount Network Storage (NFS & AutoFS)</h1>
+                <p class="chapter-intro">
+                    Master network file system mounting with NFS and automatic mounting with AutoFS. Learn to configure 
+                    NFS clients, create persistent mounts, and implement on-demand mounting with wildcard maps.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction to Network Storage</a></li>
+                    <li><a href="#nfs-client">NFS Client Configuration</a></li>
+                    <li><a href="#autofs">AutoFS - Automatic Mounting</a></li>
+                    <li><a href="#autofs-direct">Direct Maps</a></li>
+                    <li><a href="#autofs-indirect">Indirect Maps</a></li>
+                    <li><a href="#autofs-wildcard">Wildcard Maps</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction to Network Storage</h2>
+                <p>
+                    Network File System (NFS) allows sharing directories over the network. AutoFS provides automatic, 
+                    on-demand mounting of NFS shares and local filesystems.
+                </p>
+
+                <h3>NFS Versions</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Version</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Features</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">NFSv3</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Legacy, UDP/TCP, no encryption</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">NFSv4</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Default in RHEL 9, TCP only, Kerberos support</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">NFSv4.2</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Latest, server-side copy, sparse files</td>
+                    </tr>
+                </table>
+
+                <h3>NFS vs AutoFS</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Method</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Pros</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Cons</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>/etc/fstab</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Simple, mounts at boot</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Always mounted, boot hangs if server down</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>AutoFS</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">On-demand, auto-unmount, no boot delays</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">More complex setup</td>
+                    </tr>
+                </table>
+
+                <h3>Required Packages</h3>
+                <pre><code># Install NFS utilities (client)
+sudo dnf install -y nfs-utils
+
+# Install AutoFS
+sudo dnf install -y autofs
+
+# Verify installation
+rpm -q nfs-utils autofs</code></pre>
+            </section>
+
+            <section id="nfs-client" class="content-section">
+                <h2>📂 NFS Client Configuration</h2>
+
+                <h3>Discovering NFS Shares</h3>
+                <pre><code># Show exported shares from NFS server
+showmount -e server.example.com
+
+# Output example:
+Export list for server.example.com:
+/shared     192.168.1.0/24
+/home/users *
+/data       client1.example.com
+
+# Check NFS server availability
+ping server.example.com
+rpcinfo -p server.example.com</code></pre>
+
+                <h3>Manual NFS Mount</h3>
+                <pre><code># Create mount point
+sudo mkdir -p /mnt/nfs
+
+# Mount NFS share (NFSv4)
+sudo mount -t nfs4 server.example.com:/shared /mnt/nfs
+
+# Mount with NFSv3
+sudo mount -t nfs -o vers=3 server.example.com:/shared /mnt/nfs
+
+# Verify mount
+df -h /mnt/nfs
+mount | grep nfs
+
+# Unmount
+sudo umount /mnt/nfs</code></pre>
+
+                <h3>Persistent NFS Mount (/etc/fstab)</h3>
+                <pre><code># Edit /etc/fstab
+sudo vi /etc/fstab
+
+# Add NFS mount (NFSv4)
+server.example.com:/shared  /mnt/nfs  nfs  defaults  0  0
+
+# With options
+server.example.com:/shared  /mnt/nfs  nfs  defaults,_netdev  0  0
+
+# NFSv3 specific
+server.example.com:/shared  /mnt/nfs  nfs  defaults,_netdev,vers=3  0  0
+
+# Test before reboot
+sudo mount -a
+
+# Verify
+df -h /mnt/nfs</code></pre>
+
+                <h3>Common NFS Mount Options</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Option</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">_netdev</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Wait for network before mounting (critical for NFS!)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">soft</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Return error if server timeout</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">hard</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Keep retrying (default, safer)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ro</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Read-only</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">rw</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Read-write</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">vers=4</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Force NFSv4 (default)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">sec=krb5</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Use Kerberos authentication</td>
+                    </tr>
+                </table>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Always Use _netdev</div>
+                    <p>Always include <code>_netdev</code> option for NFS mounts in /etc/fstab! 
+                    Without it, system may hang at boot if network isn't ready. This ensures the system 
+                    waits for network before attempting NFS mounts.</p>
+                </div>
+
+                <div class="procedure">
+                    <h4>Procedure: Mount NFS Share Persistently</h4>
+                    <ol>
+                        <li>Check available shares:
+                            <pre><code>showmount -e server.example.com</code></pre>
+                        </li>
+                        <li>Create mount point:
+                            <pre><code>sudo mkdir -p /mnt/shared</code></pre>
+                        </li>
+                        <li>Test manual mount:
+                            <pre><code>sudo mount -t nfs4 server.example.com:/shared /mnt/shared
+df -h /mnt/shared</code></pre>
+                        </li>
+                        <li>Add to /etc/fstab:
+                            <pre><code>sudo vi /etc/fstab
+server.example.com:/shared  /mnt/shared  nfs  defaults,_netdev  0  0</code></pre>
+                        </li>
+                        <li>Unmount and test fstab:
+                            <pre><code>sudo umount /mnt/shared
+sudo mount -a
+df -h /mnt/shared</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="autofs" class="content-section">
+                <h2>🔄 AutoFS - Automatic Mounting</h2>
+
+                <p>
+                    AutoFS mounts filesystems automatically when accessed and unmounts after idle timeout (default 5 minutes).
+                </p>
+
+                <h3>AutoFS Configuration Files</h3>
+                <pre><code># Main configuration
+/etc/auto.master        # Master map (defines mount points)
+/etc/auto.master.d/     # Additional master map files
+
+# Map files (define what to mount)
+/etc/auto.misc          # Default indirect map
+/etc/auto.net           # Network automount
+/etc/auto.home          # Home directories (example)</code></pre>
+
+                <h3>AutoFS Service</h3>
+                <pre><code># Start AutoFS
+sudo systemctl start autofs
+
+# Enable at boot
+sudo systemctl enable --now autofs
+
+# Restart after config changes
+sudo systemctl restart autofs
+
+# Check status
+systemctl status autofs
+
+# Reload configuration
+sudo systemctl reload autofs</code></pre>
+
+                <h3>Master Map Format</h3>
+                <pre><code># /etc/auto.master format:
+# mount-point  map-file  [options]
+
+/mnt/auto    /etc/auto.nfs    --timeout=60
+/home        /etc/auto.home   --timeout=300</code></pre>
+            </section>
+
+            <section id="autofs-direct" class="content-section">
+                <h2>📍 AutoFS Direct Maps</h2>
+
+                <p>
+                    Direct maps specify the exact mount point. Use <code>/-</code> in master map.
+                </p>
+
+                <div class="procedure">
+                    <h4>Procedure: Configure Direct Map</h4>
+                    <ol>
+                        <li>Create map file:
+                            <pre><code>sudo vi /etc/auto.direct
+
+# Add direct mount (absolute path)
+/mnt/data  -rw,soft  server.example.com:/exports/data</code></pre>
+                        </li>
+                        <li>Add to master map:
+                            <pre><code>sudo vi /etc/auto.master
+
+# Add line:
+/-  /etc/auto.direct</code></pre>
+                        </li>
+                        <li>Restart AutoFS:
+                            <pre><code>sudo systemctl restart autofs</code></pre>
+                        </li>
+                        <li>Test access (triggers mount):
+                            <pre><code>ls /mnt/data
+df -h /mnt/data</code></pre>
+                        </li>
+                        <li>Verify automount:
+                            <pre><code>mount | grep autofs</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Direct Map Format</h3>
+                <pre><code># /etc/auto.direct
+# mount-point  options  location
+
+/mnt/project  -rw,soft  nfsserver:/exports/project
+/backup       -ro       nfsserver:/backups
+/share        -rw       192.168.1.100:/shared</code></pre>
+            </section>
+
+            <section id="autofs-indirect" class="content-section">
+                <h2>📂 AutoFS Indirect Maps</h2>
+
+                <p>
+                    Indirect maps create subdirectories under a parent mount point. More flexible than direct maps.
+                </p>
+
+                <div class="procedure">
+                    <h4>Procedure: Configure Indirect Map</h4>
+                    <ol>
+                        <li>Create map file:
+                            <pre><code>sudo vi /etc/auto.shares
+
+# Add indirect mounts (relative paths, no leading /)
+data     -rw,soft  server.example.com:/exports/data
+backup   -ro       server.example.com:/exports/backup
+docs     -rw       server.example.com:/exports/docs</code></pre>
+                        </li>
+                        <li>Add to master map:
+                            <pre><code>sudo vi /etc/auto.master
+
+# Add line (parent directory):
+/mnt/remote  /etc/auto.shares  --timeout=60</code></pre>
+                        </li>
+                        <li>Restart AutoFS:
+                            <pre><code>sudo systemctl restart autofs</code></pre>
+                        </li>
+                        <li>Test access:
+                            <pre><code>ls /mnt/remote/data      # Mounts server:/exports/data
+ls /mnt/remote/backup    # Mounts server:/exports/backup
+ls /mnt/remote/docs      # Mounts server:/exports/docs</code></pre>
+                        </li>
+                        <li>Check mounts:
+                            <pre><code>df -h | grep remote
+mount | grep autofs</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Indirect Map Format</h3>
+                <pre><code># /etc/auto.shares
+# key  options  location
+
+docs     -rw  nfsserver:/exports/documentation
+home     -rw  nfsserver:/home/&
+tools    -ro  nfsserver:/opt/tools</code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Direct vs Indirect</div>
+                    <p><strong>Direct:</strong> Uses <code>/-</code> in master map, absolute paths in map file<br>
+                    <strong>Indirect:</strong> Uses parent directory in master map, relative keys in map file<br>
+                    <strong>When to use:</strong> Indirect is preferred for multiple related mounts</p>
+                </div>
+            </section>
+
+            <section id="autofs-wildcard" class="content-section">
+                <h2>🎯 AutoFS Wildcard Maps</h2>
+
+                <p>
+                    Wildcard maps use <code>*</code> to match any key, useful for user home directories.
+                </p>
+
+                <h3>Home Directory Automount</h3>
+                <pre><code># Create map for home directories
+sudo vi /etc/auto.home
+
+# Wildcard entry (&amp; substitutes the key)
+*  -rw,soft  nfsserver:/home/&amp;
+
+# Add to master map
+sudo vi /etc/auto.master
+/home  /etc/auto.home  --timeout=300
+
+# Restart AutoFS
+sudo systemctl restart autofs
+
+# Access user homes (auto-mounts on access)
+cd /home/john    # Mounts nfsserver:/home/john
+cd /home/alice   # Mounts nfsserver:/home/alice</code></pre>
+
+                <h3>Wildcard Examples</h3>
+                <pre><code># Multi-user shares
+sudo vi /etc/auto.users
+*  -rw  nfsserver:/users/&amp;
+
+# Department shares
+sudo vi /etc/auto.dept
+*  -rw  fileserver:/departments/&amp;
+
+# Access:
+ls /mnt/users/bob      # Mounts /users/bob
+ls /mnt/dept/sales     # Mounts /departments/sales</code></pre>
+
+                <h3>Complex Wildcard with Subdirectories</h3>
+                <pre><code># Multi-level structure
+sudo vi /etc/auto.projects
+
+*  -rw  projectserver:/projects/&amp;/current
+
+# Creates structure:
+/mnt/projects/alpha  → projectserver:/projects/alpha/current
+/mnt/projects/beta   → projectserver:/projects/beta/current</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Setup Wildcard AutoFS for User Homes</h4>
+                    <ol>
+                        <li>Create map file with wildcard:
+                            <pre><code>sudo vi /etc/auto.home
+*  -rw,soft,_netdev  server.example.com:/home/&amp;</code></pre>
+                        </li>
+                        <li>Add to master map:
+                            <pre><code>sudo vi /etc/auto.master
+/rhome  /etc/auto.home</code></pre>
+                        </li>
+                        <li>Restart AutoFS:
+                            <pre><code>sudo systemctl restart autofs</code></pre>
+                        </li>
+                        <li>Test with different users:
+                            <pre><code>ls /rhome/user1    # Auto-mounts server:/home/user1
+ls /rhome/user2    # Auto-mounts server:/home/user2</code></pre>
+                        </li>
+                        <li>Verify mounts:
+                            <pre><code>df -h | grep rhome
+mount | grep autofs</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Troubleshooting AutoFS</h3>
+                <pre><code># Check AutoFS status
+systemctl status autofs
+
+# View AutoFS logs
+journalctl -u autofs -n 50
+
+# Test with verbose logging
+sudo automount -f -v
+
+# Check master map parsing
+sudo cat /etc/auto.master | grep -v '^#'
+
+# Verify map file syntax
+sudo cat /etc/auto.home
+
+# Check if mount point exists (shouldn't exist before access)
+ls -ld /mnt/auto
+
+# Force unmount stuck AutoFS
+sudo umount -l /mnt/auto/*</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 AutoFS Best Practices</div>
+                    <p>• Don't manually create AutoFS mount points (AutoFS creates them)<br>
+                    • Use indirect maps for multiple related shares<br>
+                    • Set appropriate timeout (default 300s, use --timeout= option)<br>
+                    • Always restart autofs after configuration changes<br>
+                    • Check logs if mounts don't trigger: <code>journalctl -u autofs</code></p>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What option is CRITICAL for NFS mounts in /etc/fstab?</h4>
+                        <ul class="quiz-options">
+                            <li>A) rw</li>
+                            <li>B) _netdev</li>
+                            <li>C) defaults</li>
+                            <li>D) soft</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) _netdev</strong><br>
+                            <code>_netdev</code> tells systemd to wait for network before mounting. Without it, 
+                            system can hang at boot if NFS server is unreachable. Always use: 
+                            <code>server:/share /mnt nfs defaults,_netdev 0 0</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What symbol is used in AutoFS master map for direct mounts?</h4>
+                        <ul class="quiz-options">
+                            <li>A) *</li>
+                            <li>B) /-</li>
+                            <li>C) /mnt</li>
+                            <li>D) &amp;</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) /-</strong><br>
+                            Direct maps use <code>/-</code> as mount point in /etc/auto.master. 
+                            Map file then uses absolute paths. Indirect maps use a parent directory instead. 
+                            Example: <code>/-  /etc/auto.direct</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: What does the "&amp;" symbol mean in AutoFS wildcard maps?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Match all files</li>
+                            <li>B) Substitute with the key (username/directory)</li>
+                            <li>C) Background process</li>
+                            <li>D) Optional parameter</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Substitute with the key</strong><br>
+                            In <code>*  -rw  server:/home/&amp;</code>, the &amp; is replaced with whatever key is accessed. 
+                            Accessing /home/john mounts server:/home/john. Perfect for user home directories.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: After editing AutoFS maps, what must you do?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Reboot the system</li>
+                            <li>B) Run mount -a</li>
+                            <li>C) systemctl restart autofs</li>
+                            <li>D) Nothing, changes are automatic</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) systemctl restart autofs</strong><br>
+                            Always restart autofs after changing configuration files: 
+                            <code>sudo systemctl restart autofs</code>. Can also use <code>reload</code> but 
+                            restart is safer. Check status: <code>systemctl status autofs</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: What command shows NFS exports from a server?</h4>
+                        <ul class="quiz-options">
+                            <li>A) nfs-list server.example.com</li>
+                            <li>B) showmount -e server.example.com</li>
+                            <li>C) exportfs -v</li>
+                            <li>D) mount | grep nfs</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) showmount -e server.example.com</strong><br>
+                            <code>showmount -e</code> queries NFS server for available exports. 
+                            <code>exportfs -v</code> is run on the NFS server to show its exports. 
+                            <code>mount | grep nfs</code> shows locally mounted NFS shares.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 6: Indirect map: "/shares /etc/auto.data" - Where does "docs" key mount?</h4>
+                        <ul class="quiz-options">
+                            <li>A) /docs</li>
+                            <li>B) /shares</li>
+                            <li>C) /shares/docs</li>
+                            <li>D) /etc/auto.data/docs</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) /shares/docs</strong><br>
+                            Indirect maps create subdirectories under parent mount point. Master map shows 
+                            /shares as parent, map file has "docs" key, so mount point is /shares/docs. 
+                            Direct maps would use absolute path in map file instead.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter13.html" class="nav-button prev">Chapter 13: Configure Networking</a>
+                <a href="chapter15.html" class="nav-button next">Chapter 15: Network Security (Firewalld)</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

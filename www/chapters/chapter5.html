@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5: Manage SELinux Security - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html" class="active">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 5</span>
+                    <span class="meta-badge">⏱️ 60 min read</span>
+                    <span class="meta-badge">📚 Advanced</span>
+                </div>
+                <h1>Manage SELinux Security</h1>
+                <p class="chapter-intro">
+                    Master Security-Enhanced Linux (SELinux), a mandatory access control (MAC) security mechanism. 
+                    Learn to configure SELinux modes, manage contexts, work with booleans, and troubleshoot access denials.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction to SELinux</a></li>
+                    <li><a href="#modes">SELinux Modes</a></li>
+                    <li><a href="#contexts">SELinux Contexts</a></li>
+                    <li><a href="#booleans">SELinux Booleans</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting SELinux</a></li>
+                    <li><a href="#port-labeling">Port Labeling</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🛡️ Introduction to SELinux</h2>
+                
+                <p>
+                    SELinux (Security-Enhanced Linux) is a mandatory access control (MAC) security system developed by the NSA. 
+                    Unlike traditional discretionary access control (DAC) based on file permissions, SELinux enforces security 
+                    policies that cannot be overridden by users, even root.
+                </p>
+
+                <h3>Why SELinux?</h3>
+                <ul>
+                    <li><strong>Defense in Depth:</strong> Additional security layer beyond traditional permissions</li>
+                    <li><strong>Least Privilege:</strong> Processes run with minimum necessary permissions</li>
+                    <li><strong>Containment:</strong> Compromised processes are restricted to their security context</li>
+                    <li><strong>Compliance:</strong> Required for many security standards (PCI-DSS, HIPAA, etc.)</li>
+                </ul>
+
+                <h3>SELinux Architecture</h3>
+                <p>SELinux operates on the principle of labeling everything:</p>
+                <ul>
+                    <li><strong>Subjects:</strong> Processes (labeled with security contexts)</li>
+                    <li><strong>Objects:</strong> Files, directories, ports, devices (also labeled)</li>
+                    <li><strong>Policy:</strong> Rules defining which subjects can access which objects</li>
+                </ul>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 SELinux vs Traditional Permissions</div>
+                    <p><strong>Traditional:</strong> If you're the owner or root, you can access the file<br>
+                    <strong>SELinux:</strong> Even root must follow the SELinux policy rules</p>
+                </div>
+
+                <h3>Key Concepts</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Term</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Context</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Security label on files/processes (user:role:type:level)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Type</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Most important part of context; defines what can access what</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Boolean</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">On/off switch to enable/disable specific policy features</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Policy</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Set of rules (RHEL uses 'targeted' policy by default)</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section id="modes" class="content-section">
+                <h2>⚙️ SELinux Modes</h2>
+
+                <p>SELinux can operate in three modes:</p>
+
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Mode</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Behavior</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Use Case</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Enforcing</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SELinux enforces policy; denials are logged and blocked</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Production systems (default)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Permissive</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SELinux logs denials but allows access</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Troubleshooting, testing policies</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Disabled</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SELinux is turned off</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Not recommended (requires reboot)</td>
+                    </tr>
+                </table>
+
+                <h3>Checking SELinux Status</h3>
+                <pre><code># Check current SELinux status
+getenforce
+Enforcing
+
+# Detailed status information
+sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing
+Mode from config file:          enforcing
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Memory protection checking:     actual (secure)
+Max kernel policy version:      33</code></pre>
+
+                <h3>Changing SELinux Modes</h3>
+
+                <h4>Temporary Change (Runtime - Lost on Reboot)</h4>
+                <pre><code># Switch to permissive mode (temporary)
+sudo setenforce 0
+# or
+sudo setenforce Permissive
+
+# Switch to enforcing mode (temporary)
+sudo setenforce 1
+# or
+sudo setenforce Enforcing
+
+# Verify the change
+getenforce</code></pre>
+
+                <h4>Permanent Change (Survives Reboot)</h4>
+                <pre><code># Edit SELinux configuration file
+sudo vi /etc/selinux/config
+
+# Set SELINUX variable:
+SELINUX=enforcing    # or permissive or disabled
+
+# Example config file:
+# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#     enforcing - SELinux security policy is enforced.
+#     permissive - SELinux prints warnings instead of enforcing.
+#     disabled - No SELinux policy is loaded.
+SELINUX=enforcing
+# SELINUXTYPE= can take one of these values:
+#     targeted - Targeted processes are protected,
+#     minimum - Modification of targeted policy. Only selected processes are protected.
+#     mls - Multi Level Security protection.
+SELINUXTYPE=targeted
+
+# Reboot to apply changes (required for disabled mode)
+sudo reboot</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Warning: Changing from Disabled to Enforcing</div>
+                    <p>When enabling SELinux on a system where it was disabled, all files must be relabeled. 
+                    This happens automatically on reboot but can take significant time:</p>
+                    <pre><code># Force relabeling on next boot
+sudo touch /.autorelabel
+sudo reboot
+
+# System will relabel all files on boot (may take 5-30 minutes)</code></pre>
+                </div>
+
+                <h3>Per-Domain Permissive Mode</h3>
+                <p>You can set specific domains to permissive while keeping the system in enforcing mode:</p>
+                <pre><code># Make httpd_t domain permissive (troubleshooting web server)
+sudo semanage permissive -a httpd_t
+
+# List permissive domains
+sudo semanage permissive -l
+
+# Remove permissive setting
+sudo semanage permissive -d httpd_t</code></pre>
+            </section>
+
+            <section id="contexts" class="content-section">
+                <h2>🏷️ SELinux Contexts</h2>
+
+                <p>
+                    Every file, process, and port has an SELinux context (label). The context format is:<br>
+                    <strong>user:role:type:level</strong>
+                </p>
+
+                <h3>Context Components</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Component</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Example</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>User</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SELinux user (not Linux user)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">system_u, unconfined_u</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Role</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Role-based access control</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">object_r, system_r</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Type</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Most important; used in policy rules</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">httpd_sys_content_t, user_home_t</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Level</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">MLS/MCS security level</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">s0, s0-s0:c0.c1023</td>
+                    </tr>
+                </table>
+
+                <h3>Viewing Contexts</h3>
+                <pre><code># View file contexts with ls -Z
+ls -Z /var/www/html/
+-rw-r--r--. root root unconfined_u:object_r:httpd_sys_content_t:s0 index.html
+
+# View process contexts with ps -Z
+ps -eZ | grep httpd
+system_u:system_r:httpd_t:s0    1234 ?        00:00:01 httpd
+
+# View current process context
+id -Z
+unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+
+# View port contexts
+sudo semanage port -l | grep http
+http_cache_port_t              tcp      8080, 8118, 8123, 10001-10010
+http_port_t                    tcp      80, 81, 443, 488, 8008, 8009, 8443, 9000</code></pre>
+
+                <h3>Changing File Contexts</h3>
+
+                <h4>Temporary Context Change (chcon)</h4>
+                <p>Use <code>chcon</code> for temporary changes that will be reset by relabeling:</p>
+                <pre><code># Change type only
+sudo chcon -t httpd_sys_content_t /var/www/html/index.html
+
+# Change entire context
+sudo chcon -u system_u -r object_r -t httpd_sys_content_t /var/www/html/index.html
+
+# Copy context from reference file
+sudo chcon --reference=/var/www/html/template.html /var/www/html/newfile.html
+
+# Recursive change
+sudo chcon -R -t httpd_sys_content_t /var/www/html/</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ chcon vs semanage fcontext</div>
+                    <p><strong>chcon:</strong> Temporary change, lost when filesystem is relabeled<br>
+                    <strong>semanage fcontext:</strong> Permanent change, survives relabeling (preferred)</p>
+                </div>
+
+                <h4>Permanent Context Change (semanage fcontext)</h4>
+                <p>Use <code>semanage fcontext</code> for permanent changes:</p>
+                <pre><code># Add file context rule
+sudo semanage fcontext -a -t httpd_sys_content_t "/web/html(/.*)?"
+
+# Apply the new context (restorecon)
+sudo restorecon -Rv /web/html/
+
+# Verify the context
+ls -Zd /web/html/
+
+# List all custom file context rules
+sudo semanage fcontext -l -C
+
+# Modify existing rule
+sudo semanage fcontext -m -t httpd_sys_rw_content_t "/web/uploads(/.*)?"
+
+# Delete custom rule
+sudo semanage fcontext -d "/web/html(/.*)?"</code></pre>
+
+                <h3>Restoring Default Contexts</h3>
+                <pre><code># Restore context for single file
+sudo restorecon -v /var/www/html/index.html
+
+# Restore context recursively
+sudo restorecon -Rv /var/www/html/
+
+# Preview what would be changed (no actual changes)
+sudo restorecon -Rvn /var/www/html/
+
+# Restore context for entire filesystem (useful after enabling SELinux)
+sudo restorecon -Rv /
+
+# Force reset to default (ignore current context)
+sudo restorecon -Fv /path/to/file</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Setting Up Custom Web Directory</h4>
+                    <ol>
+                        <li>Create custom web directory:
+                            <pre><code>sudo mkdir -p /custom/website</code></pre>
+                        </li>
+                        <li>Create test file:
+                            <pre><code>sudo echo "Hello from custom location" > /custom/website/index.html</code></pre>
+                        </li>
+                        <li>Check current context (wrong):
+                            <pre><code>ls -Zd /custom/website
+drwxr-xr-x. root root unconfined_u:object_r:default_t:s0 /custom/website</code></pre>
+                        </li>
+                        <li>Add permanent context rule:
+                            <pre><code>sudo semanage fcontext -a -t httpd_sys_content_t "/custom/website(/.*)?"</code></pre>
+                        </li>
+                        <li>Apply the context:
+                            <pre><code>sudo restorecon -Rv /custom/website</code></pre>
+                        </li>
+                        <li>Verify the change:
+                            <pre><code>ls -Zd /custom/website
+drwxr-xr-x. root root unconfined_u:object_r:httpd_sys_content_t:s0 /custom/website</code></pre>
+                        </li>
+                        <li>Configure Apache to use the directory:
+                            <pre><code>sudo vi /etc/httpd/conf.d/custom.conf
+# Add DocumentRoot /custom/website</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Common SELinux Types for Services</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Service</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Type for Content</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Process Type</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Apache (httpd)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">httpd_sys_content_t</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">httpd_t</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SSH (sshd)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ssh_home_t</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">sshd_t</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">FTP (vsftpd)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">public_content_t</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ftpd_t</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Samba (smbd)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">samba_share_t</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">smbd_t</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section id="booleans" class="content-section">
+                <h2>🔘 SELinux Booleans</h2>
+
+                <p>
+                    SELinux booleans are on/off switches that enable or disable specific features in the SELinux policy 
+                    without requiring policy recompilation. They provide a flexible way to adjust policy behavior.
+                </p>
+
+                <h3>Working with Booleans</h3>
+                <pre><code># List all booleans
+sudo getsebool -a
+
+# List booleans with descriptions
+sudo semanage boolean -l
+
+# Check specific boolean
+getsebool httpd_can_network_connect
+httpd_can_network_connect --> off
+
+# Search for related booleans
+sudo getsebool -a | grep httpd
+httpd_anon_write --> off
+httpd_builtin_scripting --> on
+httpd_can_connect_ftp --> off
+httpd_can_connect_ldap --> off
+httpd_can_network_connect --> off
+httpd_can_network_connect_db --> off
+httpd_can_sendmail --> off
+httpd_enable_cgi --> on
+httpd_enable_homedirs --> off
+httpd_use_nfs --> off
+httpd_use_cifs --> off</code></pre>
+
+                <h3>Setting Booleans</h3>
+                <pre><code># Set boolean temporarily (runtime only)
+sudo setsebool httpd_can_network_connect on
+
+# Set boolean permanently (survives reboot)
+sudo setsebool -P httpd_can_network_connect on
+
+# Turn off a boolean
+sudo setsebool -P httpd_enable_homedirs off
+
+# Set multiple booleans at once
+sudo setsebool -P httpd_can_network_connect=on httpd_can_network_connect_db=on</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Always Use -P Flag</div>
+                    <p>In practice, always use <code>setsebool -P</code> to make changes permanent. 
+                    Temporary changes are lost on reboot and can cause confusion.</p>
+                </div>
+
+                <h3>Common SELinux Booleans</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Boolean</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Purpose</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>httpd_can_network_connect</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Allow httpd to make network connections (proxy, API calls)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>httpd_can_network_connect_db</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Allow httpd to connect to databases</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>httpd_enable_homedirs</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Allow httpd to access user home directories</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>httpd_use_nfs</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Allow httpd to access NFS mounted files</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>ftpd_anon_write</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Allow anonymous FTP users to upload files</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>samba_enable_home_dirs</code></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Allow Samba to share home directories</td>
+                    </tr>
+                </table>
+
+                <h3>Finding the Right Boolean</h3>
+                <pre><code># Search by service name
+sudo getsebool -a | grep httpd
+sudo getsebool -a | grep ftp
+sudo getsebool -a | grep nfs
+
+# Get boolean description
+sudo semanage boolean -l | grep httpd_can_network_connect
+
+# Use man pages for service-specific booleans
+man httpd_selinux
+man ftpd_selinux
+man samba_selinux</code></pre>
+            </section>
+
+            <section id="troubleshooting" class="content-section">
+                <h2>🔧 Troubleshooting SELinux</h2>
+
+                <p>When applications fail due to SELinux, follow this systematic approach:</p>
+
+                <h3>Step 1: Confirm SELinux is the Issue</h3>
+                <pre><code># Temporarily set SELinux to permissive
+sudo setenforce 0
+
+# Test if application works now
+# If yes, SELinux is blocking it
+# If no, problem is elsewhere
+
+# Remember to re-enable enforcing
+sudo setenforce 1</code></pre>
+
+                <h3>Step 2: Check AVC Denials</h3>
+                <p>SELinux logs denials as AVC (Access Vector Cache) messages:</p>
+                <pre><code># View recent denials in audit log
+sudo ausearch -m AVC -ts recent
+
+# View denials from last 10 minutes
+sudo ausearch -m AVC -ts recent -i
+
+# Search for specific service denials
+sudo ausearch -m AVC -c httpd -ts today
+
+# Tail audit log in real-time
+sudo tail -f /var/log/audit/audit.log | grep AVC</code></pre>
+
+                <h3>Step 3: Use sealert for Analysis</h3>
+                <p>The <code>sealert</code> tool provides human-readable analysis and suggestions:</p>
+                <pre><code># Install setroubleshoot tools if not present
+sudo dnf install setroubleshoot-server
+
+# Analyze all denials
+sudo sealert -a /var/log/audit/audit.log
+
+# Analyze specific denial by ID
+sudo sealert -l <alert-id>
+
+# Example output:
+SELinux is preventing httpd from name_connect access on the tcp_socket port 8080.
+
+***** Plugin catchall_boolean (47.5 confidence) suggests *******************
+
+If you want to allow httpd to can network connect
+Then you must tell SELinux about this by enabling the 'httpd_can_network_connect' boolean.
+
+Do
+setsebool -P httpd_can_network_connect 1
+
+***** Plugin catchall (6.38 confidence) suggests **************************
+
+If you believe that httpd should be allowed name_connect access on the port 8080 tcp_socket by default.
+Then you should report this as a bug.
+You can generate a local policy module to allow this access.
+
+Do
+# ausearch -c 'httpd' --raw | audit2allow -M my-httpd
+# semodule -X 300 -i my-httpd.pp</code></pre>
+
+                <h3>Step 4: Common Solutions</h3>
+
+                <h4>Solution 1: Fix File Contexts</h4>
+                <pre><code># Restore default contexts
+sudo restorecon -Rv /var/www/html/
+
+# Or set custom context
+sudo semanage fcontext -a -t httpd_sys_content_t "/custom/path(/.*)?"
+sudo restorecon -Rv /custom/path/</code></pre>
+
+                <h4>Solution 2: Enable Boolean</h4>
+                <pre><code># Enable required boolean
+sudo setsebool -P httpd_can_network_connect on</code></pre>
+
+                <h4>Solution 3: Add Port Label</h4>
+                <pre><code># Allow httpd to bind to custom port
+sudo semanage port -a -t http_port_t -p tcp 8080</code></pre>
+
+                <h4>Solution 4: Create Custom Policy Module</h4>
+                <p>When no other solution works, create a custom policy:</p>
+                <pre><code># Generate policy from audit log
+sudo ausearch -m AVC -ts recent | audit2allow -M mypolicy
+
+# Review the generated policy
+cat mypolicy.te
+
+# Install the policy module
+sudo semodule -i mypolicy.pp
+
+# List installed modules
+sudo semodule -l | grep mypolicy
+
+# Remove module if needed
+sudo semodule -r mypolicy</code></pre>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ Custom Policies: Last Resort</div>
+                    <p>Custom policy modules should be a last resort. They can create security holes if not properly reviewed. 
+                    Always try file context changes, booleans, or port labeling first.</p>
+                </div>
+
+                <h3>Troubleshooting Workflow</h3>
+                <div class="procedure">
+                    <ol>
+                        <li><strong>Identify the problem:</strong> Service fails, application can't access file, etc.</li>
+                        <li><strong>Confirm SELinux:</strong> Check if <code>setenforce 0</code> fixes it</li>
+                        <li><strong>Find AVC denials:</strong> <code>ausearch -m AVC -ts recent</code></li>
+                        <li><strong>Analyze with sealert:</strong> <code>sealert -a /var/log/audit/audit.log</code></li>
+                        <li><strong>Try suggested fix:</strong> Boolean, context, port, or policy</li>
+                        <li><strong>Test the solution:</strong> Verify application works</li>
+                        <li><strong>Re-enable enforcing:</strong> <code>setenforce 1</code></li>
+                    </ol>
+                </div>
+
+                <h3>Useful Troubleshooting Commands</h3>
+                <pre><code># Check which process is being denied
+sudo ausearch -m AVC -c httpd -ts recent
+
+# Find all denials for a specific file
+sudo ausearch -m AVC -f /var/www/html/index.html
+
+# Generate allow rules from recent denials
+sudo ausearch -m AVC -ts recent | audit2allow
+
+# Check if a specific boolean would help
+sudo getsebool -a | grep httpd
+
+# Verify file has correct context
+matchpathcon /var/www/html/index.html
+ls -Z /var/www/html/index.html</code></pre>
+            </section>
+
+            <section id="port-labeling" class="content-section">
+                <h2>🔌 Port Labeling</h2>
+
+                <p>
+                    SELinux controls which ports services can bind to. Each port is labeled with a type, 
+                    and only processes with matching types can use those ports.
+                </p>
+
+                <h3>Viewing Port Labels</h3>
+                <pre><code># List all port labels
+sudo semanage port -l
+
+# Search for specific service ports
+sudo semanage port -l | grep http
+http_cache_port_t              tcp      8080, 8118, 8123, 10001-10010
+http_port_t                    tcp      80, 81, 443, 488, 8008, 8009, 8443, 9000
+
+# Check if a port is labeled
+sudo semanage port -l | grep 8080</code></pre>
+
+                <h3>Adding Port Labels</h3>
+                <pre><code># Allow httpd to bind to port 8080
+sudo semanage port -a -t http_port_t -p tcp 8080
+
+# Allow httpd to bind to port range
+sudo semanage port -a -t http_port_t -p tcp 8080-8090
+
+# Add UDP port
+sudo semanage port -a -t dns_port_t -p udp 5353</code></pre>
+
+                <h3>Modifying Port Labels</h3>
+                <pre><code># Change port type
+sudo semanage port -m -t http_cache_port_t -p tcp 8080
+
+# List custom port definitions only
+sudo semanage port -l -C</code></pre>
+
+                <h3>Removing Port Labels</h3>
+                <pre><code># Remove custom port label
+sudo semanage port -d -t http_port_t -p tcp 8080
+
+# Remove port range
+sudo semanage port -d -t http_port_t -p tcp 8080-8090</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Configuring Apache on Custom Port</h4>
+                    <ol>
+                        <li>Edit Apache config:
+                            <pre><code>sudo vi /etc/httpd/conf/httpd.conf
+# Change: Listen 8888</code></pre>
+                        </li>
+                        <li>Try to start Apache:
+                            <pre><code>sudo systemctl start httpd
+# Fails with "Permission denied" in SELinux enforcing mode</code></pre>
+                        </li>
+                        <li>Check audit log:
+                            <pre><code>sudo ausearch -m AVC -c httpd -ts recent
+# Shows denial for name_bind on tcp_socket port 8888</code></pre>
+                        </li>
+                        <li>Add port label:
+                            <pre><code>sudo semanage port -a -t http_port_t -p tcp 8888</code></pre>
+                        </li>
+                        <li>Start Apache successfully:
+                            <pre><code>sudo systemctl start httpd
+sudo systemctl status httpd</code></pre>
+                        </li>
+                        <li>Verify:
+                            <pre><code>sudo ss -tlnp | grep 8888
+curl http://localhost:8888</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: How do you permanently change SELinux to permissive mode?</h4>
+                        <ul class="quiz-options">
+                            <li>A) setenforce 0</li>
+                            <li>B) Edit /etc/selinux/config, set SELINUX=permissive, reboot</li>
+                            <li>C) systemctl disable selinux</li>
+                            <li>D) chmod 000 /sys/fs/selinux</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Edit /etc/selinux/config, set SELINUX=permissive, reboot</strong><br>
+                            setenforce 0 is temporary (lost on reboot). Permanent changes require editing /etc/selinux/config 
+                            and setting SELINUX=permissive, then rebooting.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: Which command permanently sets a file's SELinux context?</h4>
+                        <ul class="quiz-options">
+                            <li>A) chcon -t httpd_sys_content_t /var/www/html/file.html</li>
+                            <li>B) semanage fcontext -a -t httpd_sys_content_t "/path(/.*)?" && restorecon -Rv /path</li>
+                            <li>C) chmod --context httpd_sys_content_t file.html</li>
+                            <li>D) setfacl -m t:httpd_sys_content_t file.html</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) semanage fcontext -a -t httpd_sys_content_t "/path(/.*)?" && restorecon -Rv /path</strong><br>
+                            semanage fcontext creates a permanent rule in the SELinux policy database. restorecon applies it. 
+                            chcon makes temporary changes that are lost when the filesystem is relabeled.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: How do you allow httpd to connect to network databases permanently?</h4>
+                        <ul class="quiz-options">
+                            <li>A) setsebool httpd_can_network_connect_db on</li>
+                            <li>B) setsebool -P httpd_can_network_connect_db on</li>
+                            <li>C) semanage boolean -a httpd_can_network_connect_db</li>
+                            <li>D) getenforce -s httpd_can_network_connect_db</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) setsebool -P httpd_can_network_connect_db on</strong><br>
+                            The -P flag makes the boolean change persistent across reboots. Without -P, 
+                            the change is temporary and lost on reboot.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What tool provides human-readable SELinux denial explanations?</h4>
+                        <ul class="quiz-options">
+                            <li>A) ausearch</li>
+                            <li>B) sealert</li>
+                            <li>C) seinfo</li>
+                            <li>D) getenforce</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) sealert</strong><br>
+                            sealert analyzes audit logs and provides detailed, human-readable explanations of SELinux denials 
+                            with suggested solutions. Usage: sealert -a /var/log/audit/audit.log
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: How do you allow Apache to bind to port 8080?</h4>
+                        <ul class="quiz-options">
+                            <li>A) firewall-cmd --add-port=8080/tcp</li>
+                            <li>B) semanage port -a -t http_port_t -p tcp 8080</li>
+                            <li>C) setsebool -P httpd_port_8080 on</li>
+                            <li>D) chcon -t http_port_t 8080</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) semanage port -a -t http_port_t -p tcp 8080</strong><br>
+                            semanage port adds a port label allowing httpd (http_port_t type) to bind to the specified port. 
+                            This is separate from firewall configuration.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter4.html" class="nav-button prev">Chapter 4: File Access</a>
+                <a href="chapter6.html" class="nav-button next">Chapter 6: Performance</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

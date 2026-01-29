@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 8: Manage Software Packages - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html" class="active">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 8</span>
+                    <span class="meta-badge">⏱️ 50 min read</span>
+                    <span class="meta-badge">📚 Intermediate</span>
+                </div>
+                <h1>Manage Software Packages</h1>
+                <p class="chapter-intro">
+                    Master software management using DNF/YUM. Learn to install, update, remove packages, manage repositories, 
+                    work with package groups, and handle AppStream module streams on RHEL 9.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#dnf-basics">DNF/YUM Basics</a></li>
+                    <li><a href="#repositories">Managing Repositories</a></li>
+                    <li><a href="#groups">Package Groups</a></li>
+                    <li><a href="#modules">AppStream Modules</a></li>
+                    <li><a href="#rpm">RPM Commands</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction</h2>
+                <p>
+                    Package management is a core skill for Red Hat administrators. RHEL uses RPM (Red Hat Package Manager) 
+                    format packages managed by DNF (Dandified YUM) - the successor to YUM. DNF handles dependency resolution, 
+                    repository management, and transaction history.
+                </p>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>RPM Package:</strong> Pre-compiled software bundle (.rpm file)</li>
+                    <li><strong>Repository:</strong> Collection of packages with metadata</li>
+                    <li><strong>DNF/YUM:</strong> High-level package managers (handle dependencies)</li>
+                    <li><strong>rpm:</strong> Low-level tool (no automatic dependency resolution)</li>
+                    <li><strong>AppStream:</strong> RHEL 9 repository with multiple software versions</li>
+                    <li><strong>BaseOS:</strong> Core operating system packages</li>
+                </ul>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 DNF vs YUM</div>
+                    <p>On RHEL 9, <code>yum</code> is a symbolic link to <code>dnf</code>. Both commands work identically. 
+                    DNF is faster, more efficient, and has better dependency resolution than YUM.</p>
+                </div>
+
+                <h3>RHEL 9 Repository Structure</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Repository</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Content</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>BaseOS</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Core OS packages (kernel, systemd, bash)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>AppStream</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Applications, languages, databases (multiple versions)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><strong>Extras</strong></td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Additional tools and utilities</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section id="dnf-basics" class="content-section">
+                <h2>📦 DNF/YUM Basics</h2>
+
+                <h3>Installing Packages</h3>
+                <pre><code># Install a package
+sudo dnf install httpd
+
+# Install multiple packages
+sudo dnf install httpd mariadb-server php
+
+# Install without confirmation
+sudo dnf install -y nginx
+
+# Install specific version
+sudo dnf install httpd-2.4.51
+
+# Download package without installing
+sudo dnf download httpd
+
+# Install downloaded RPM with dependencies
+sudo dnf install ./httpd-2.4.51-7.el9.x86_64.rpm
+
+# Reinstall a package
+sudo dnf reinstall httpd</code></pre>
+
+                <h3>Updating Packages</h3>
+                <pre><code># Check for updates
+sudo dnf check-update
+
+# Update all packages
+sudo dnf update
+
+# Update specific package
+sudo dnf update httpd
+
+# Update to latest security patches only
+sudo dnf update --security
+
+# Update without updating kernel
+sudo dnf update --exclude=kernel*
+
+# Download updates without installing
+sudo dnf update --downloadonly</code></pre>
+
+                <h3>Removing Packages</h3>
+                <pre><code># Remove a package
+sudo dnf remove httpd
+
+# Remove with dependencies
+sudo dnf autoremove httpd
+
+# Clean up unused dependencies
+sudo dnf autoremove
+
+# Remove old kernel versions (keep latest 3)
+sudo dnf remove --oldinstallonly --setopt installonly_limit=3</code></pre>
+
+                <h3>Searching and Querying</h3>
+                <pre><code># Search for package
+dnf search nginx
+dnf search web server
+
+# Find which package provides a file
+dnf provides /usr/sbin/httpd
+dnf provides */semanage
+
+# Show package information
+dnf info httpd
+
+# List all packages
+dnf list all
+
+# List installed packages
+dnf list installed
+
+# List available packages
+dnf list available
+
+# List recent packages
+dnf list recent
+
+# Show package groups
+dnf group list
+
+# Check if package is installed
+dnf list installed httpd</code></pre>
+
+                <h3>Package Information</h3>
+                <pre><code># Display package details
+dnf info httpd
+
+# Show dependencies
+dnf repoquery --requires httpd
+
+# Show what depends on this package
+dnf repoquery --whatrequires httpd
+
+# List files in package
+dnf repoquery -l httpd
+
+# Show changelog
+dnf changelog httpd</code></pre>
+
+                <h3>DNF History</h3>
+                <pre><code># Show transaction history
+sudo dnf history
+
+# Show details of specific transaction
+sudo dnf history info 5
+
+# Undo a transaction
+sudo dnf history undo 5
+
+# Redo a transaction
+sudo dnf history redo 5
+
+# Rollback to specific transaction
+sudo dnf history rollback 10
+
+# List all transaction IDs
+sudo dnf history list</code></pre>
+
+                <h3>Cleaning Up</h3>
+                <pre><code># Clean cache
+sudo dnf clean all
+
+# Clean only metadata
+sudo dnf clean metadata
+
+# Clean packages
+sudo dnf clean packages
+
+# Remove duplicate packages
+sudo dnf remove --duplicates
+
+# Check for problems
+sudo dnf check</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Pro Tips</div>
+                    <ul>
+                        <li>Use <code>dnf whatprovides</code> to find which package provides a command</li>
+                        <li>Add <code>-y</code> to skip confirmation prompts in scripts</li>
+                        <li>Use <code>dnf history</code> to track and undo package changes</li>
+                        <li>The <code>dnf repoquery</code> command is powerful for package research</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="repositories" class="content-section">
+                <h2>🗄️ Managing Repositories</h2>
+
+                <h3>Viewing Repositories</h3>
+                <pre><code># List all enabled repositories
+dnf repolist
+
+# List all repositories (enabled and disabled)
+dnf repolist all
+
+# Show detailed repo information
+dnf repoinfo
+
+# Show specific repository
+dnf repoinfo baseos</code></pre>
+
+                <h3>Repository Configuration Files</h3>
+                <p>Repository configurations are stored in:</p>
+                <ul>
+                    <li><code>/etc/yum.repos.d/*.repo</code> - Repository definition files</li>
+                    <li><code>/etc/dnf/dnf.conf</code> - Main DNF configuration</li>
+                </ul>
+
+                <h3>Repository File Format</h3>
+                <pre><code># Example: /etc/yum.repos.d/example.repo
+[repository-id]
+name=Repository Name
+baseurl=https://repo.example.com/rhel9/
+# or
+metalink=https://mirrors.example.com/metalink?repo=rhel9
+# or
+mirrorlist=https://mirrors.example.com/mirrorlist?repo=rhel9
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-example</code></pre>
+
+                <h3>Common Repository Operations</h3>
+                <pre><code># Enable a repository temporarily (one command)
+sudo dnf install httpd --enablerepo=extras
+
+# Disable a repository temporarily
+sudo dnf install httpd --disablerepo=appstream
+
+# Enable a repository permanently
+sudo dnf config-manager --set-enabled extras
+
+# Disable a repository permanently
+sudo dnf config-manager --set-disabled extras
+
+# Add a new repository
+sudo dnf config-manager --add-repo https://example.com/repo/rhel9.repo
+
+# Install config-manager if not present
+sudo dnf install dnf-plugins-core</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Adding EPEL Repository</h4>
+                    <ol>
+                        <li>Install EPEL release package:
+                            <pre><code>sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm</code></pre>
+                        </li>
+                        <li>Verify repository is enabled:
+                            <pre><code>dnf repolist | grep epel</code></pre>
+                        </li>
+                        <li>Search for EPEL packages:
+                            <pre><code>dnf search htop</code></pre>
+                        </li>
+                        <li>Install package from EPEL:
+                            <pre><code>sudo dnf install htop</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Creating a Local Repository</h3>
+                <pre><code># Install required tools
+sudo dnf install createrepo
+
+# Create directory for packages
+sudo mkdir -p /var/local-repo
+
+# Copy RPM files
+sudo cp *.rpm /var/local-repo/
+
+# Create repository metadata
+sudo createrepo /var/local-repo/
+
+# Create repo file
+sudo vi /etc/yum.repos.d/local.repo
+
+[local]
+name=Local Repository
+baseurl=file:///var/local-repo
+enabled=1
+gpgcheck=0
+
+# Clean and update cache
+sudo dnf clean all
+sudo dnf repolist</code></pre>
+
+                <h3>Repository Priority</h3>
+                <pre><code># Install priority plugin
+sudo dnf install dnf-plugin-priorities
+
+# Set priority in repo file (lower number = higher priority)
+[high-priority-repo]
+name=High Priority Repo
+baseurl=https://repo.example.com/
+enabled=1
+priority=1
+
+[normal-repo]
+name=Normal Repo
+baseurl=https://other.example.com/
+enabled=1
+priority=10</code></pre>
+
+                <h3>GPG Key Management</h3>
+                <pre><code># Import GPG key
+sudo rpm --import https://example.com/RPM-GPG-KEY
+
+# List imported keys
+rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'
+
+# Verify package signature
+rpm --checksig package.rpm
+
+# Install package without GPG check (not recommended)
+sudo dnf install --nogpgcheck package.rpm</code></pre>
+            </section>
+
+            <section id="groups" class="content-section">
+                <h2>📚 Package Groups</h2>
+
+                <p>Package groups are collections of related packages that can be installed together.</p>
+
+                <h3>Working with Groups</h3>
+                <pre><code># List all groups
+dnf group list
+
+# List all groups (including hidden)
+dnf group list --hidden
+
+# Show group information
+dnf group info "Development Tools"
+
+# Install a group
+sudo dnf group install "Development Tools"
+
+# Install group without optional packages
+sudo dnf group install --with-optional "Server with GUI"
+
+# Remove a group
+sudo dnf group remove "Development Tools"
+
+# Update a group
+sudo dnf group update "System Tools"
+
+# Mark group as installed (without installing packages)
+sudo dnf group mark install "Development Tools"</code></pre>
+
+                <h3>Common Package Groups</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Group Name</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Purpose</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Development Tools</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Compilers, make, gcc, git</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">System Tools</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Administrative tools</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Server with GUI</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Graphical environment for servers</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Workstation</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Desktop applications</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Virtualization Host</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">KVM, libvirt, QEMU</td>
+                    </tr>
+                </table>
+
+                <h3>Environment Groups</h3>
+                <pre><code># List environments
+dnf group list --ids
+
+# Show environment details
+dnf group info "Server with GUI"
+
+# Install environment
+sudo dnf install @"Server with GUI"
+
+# Switch to graphical target
+sudo systemctl set-default graphical.target</code></pre>
+            </section>
+
+            <section id="modules" class="content-section">
+                <h2>🔧 AppStream Modules</h2>
+
+                <p>
+                    AppStream provides multiple versions of software through module streams. This allows you to choose 
+                    specific versions of applications (e.g., Python 3.9 vs 3.11, PostgreSQL 13 vs 15).
+                </p>
+
+                <h3>Module Concepts</h3>
+                <ul>
+                    <li><strong>Module:</strong> Collection of packages (e.g., postgresql)</li>
+                    <li><strong>Stream:</strong> Version of the module (e.g., 13, 15)</li>
+                    <li><strong>Profile:</strong> Subset of packages for a use case (e.g., server, client)</li>
+                </ul>
+
+                <h3>Working with Modules</h3>
+                <pre><code># List all modules
+dnf module list
+
+# List specific module streams
+dnf module list postgresql
+
+# Show module information
+dnf module info postgresql
+
+# Show specific stream
+dnf module info postgresql:15
+
+# List installed modules
+dnf module list --installed</code></pre>
+
+                <h3>Enabling and Installing Modules</h3>
+                <pre><code># Enable a module stream (doesn't install packages)
+sudo dnf module enable postgresql:15
+
+# Install default profile of enabled stream
+sudo dnf module install postgresql:15
+
+# Install specific profile
+sudo dnf module install postgresql:15/server
+
+# Enable and install in one command
+sudo dnf install @postgresql:15/server
+
+# Install multiple profiles
+sudo dnf module install postgresql:15/{server,client}</code></pre>
+
+                <h3>Switching Module Streams</h3>
+                <pre><code># Check current stream
+dnf module list postgresql
+
+# Reset module
+sudo dnf module reset postgresql
+
+# Switch to different stream
+sudo dnf module enable postgresql:13
+sudo dnf distro-sync
+
+# Alternative: remove and install different stream
+sudo dnf module remove postgresql:15
+sudo dnf module reset postgresql
+sudo dnf module install postgresql:13</code></pre>
+
+                <h3>Module Management</h3>
+                <pre><code># Disable a module
+sudo dnf module disable postgresql
+
+# Remove installed module
+sudo dnf module remove postgresql:15
+
+# Reset module state
+sudo dnf module reset postgresql
+
+# Show module profiles
+dnf module info --profile postgresql:15</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Installing Python 3.11 Module</h4>
+                    <ol>
+                        <li>List available Python versions:
+                            <pre><code>dnf module list python3*</code></pre>
+                        </li>
+                        <li>View Python 3.11 module details:
+                            <pre><code>dnf module info python39:3.11</code></pre>
+                        </li>
+                        <li>Enable Python 3.11 stream:
+                            <pre><code>sudo dnf module enable python39:3.11</code></pre>
+                        </li>
+                        <li>Install Python 3.11:
+                            <pre><code>sudo dnf install python3</code></pre>
+                        </li>
+                        <li>Verify installation:
+                            <pre><code>python3 --version</code></pre>
+                        </li>
+                    </ol>
+                </div>
+
+                <h3>Common Modules</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Module</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Common Streams</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">postgresql</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">13, 15</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">python39</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">3.9, 3.11</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">nodejs</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">16, 18, 20</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ruby</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">3.0, 3.1</td>
+                    </tr>
+                </table>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Module Stream Limitation</div>
+                    <p>Only one stream of a module can be enabled at a time. To switch streams, you must first 
+                    reset or disable the current stream.</p>
+                </div>
+            </section>
+
+            <section id="rpm" class="content-section">
+                <h2>⚙️ RPM Commands</h2>
+
+                <p>The <code>rpm</code> command is the low-level package manager. It doesn't handle dependencies automatically.</p>
+
+                <h3>Querying Packages</h3>
+                <pre><code># List all installed packages
+rpm -qa
+
+# Query specific package
+rpm -q httpd
+
+# Show package information
+rpm -qi httpd
+
+# List files in package
+rpm -ql httpd
+
+# List documentation files
+rpm -qd httpd
+
+# List configuration files
+rpm -qc httpd
+
+# Show package dependencies
+rpm -qR httpd
+
+# Find which package owns a file
+rpm -qf /usr/sbin/httpd
+
+# Query package file (not installed)
+rpm -qip package.rpm
+rpm -qlp package.rpm</code></pre>
+
+                <h3>Installing/Removing with RPM</h3>
+                <pre><code># Install RPM package (no dependency resolution)
+sudo rpm -ivh package.rpm
+# i = install, v = verbose, h = hash marks (progress)
+
+# Upgrade package
+sudo rpm -Uvh package.rpm
+# U = upgrade (install if not present)
+
+# Freshen (upgrade only if already installed)
+sudo rpm -Fvh package.rpm
+
+# Remove package
+sudo rpm -e httpd
+
+# Force remove (ignore dependencies - dangerous!)
+sudo rpm -e --nodeps httpd
+
+# Install without running scripts
+sudo rpm -ivh --noscripts package.rpm</code></pre>
+
+                <h3>Verifying Packages</h3>
+                <pre><code># Verify all installed packages
+sudo rpm -Va
+
+# Verify specific package
+sudo rpm -V httpd
+
+# Verify files from package
+sudo rpm -Vf /usr/sbin/httpd
+
+# Output codes:
+# S = Size differs
+# M = Mode differs (permissions)
+# 5 = MD5 sum differs
+# D = Device differs
+# L = Link differs
+# U = User ownership differs
+# G = Group ownership differs
+# T = mTime differs
+# P = capabilities differ</code></pre>
+
+                <h3>Extracting RPM Contents</h3>
+                <pre><code># Extract files from RPM without installing
+rpm2cpio package.rpm | cpio -idmv
+
+# Extract specific file
+rpm2cpio package.rpm | cpio -idmv ./usr/bin/command</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 RPM vs DNF</div>
+                    <p><strong>Use DNF when:</strong> Installing, updating, or removing packages (handles dependencies)<br>
+                    <strong>Use RPM when:</strong> Querying installed packages, verifying, or low-level operations</p>
+                </div>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What command installs httpd and all its dependencies?</h4>
+                        <ul class="quiz-options">
+                            <li>A) rpm -ivh httpd</li>
+                            <li>B) dnf install httpd</li>
+                            <li>C) yum search httpd</li>
+                            <li>D) rpm -Uvh httpd</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) dnf install httpd</strong><br>
+                            DNF (and YUM) automatically resolve and install dependencies. RPM commands (rpm -ivh) 
+                            do NOT handle dependencies automatically and will fail if dependencies are missing.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: How do you find which package provides the /usr/sbin/semanage command?</h4>
+                        <ul class="quiz-options">
+                            <li>A) dnf search semanage</li>
+                            <li>B) dnf provides /usr/sbin/semanage</li>
+                            <li>C) rpm -qf /usr/sbin/semanage</li>
+                            <li>D) dnf info semanage</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) dnf provides /usr/sbin/semanage</strong><br>
+                            dnf provides (or dnf whatprovides) searches for which package provides a specific file. 
+                            rpm -qf only works if the package is already installed. You can also use: dnf provides */semanage
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: What's the correct way to switch from PostgreSQL 13 to PostgreSQL 15?</h4>
+                        <ul class="quiz-options">
+                            <li>A) dnf install postgresql:15</li>
+                            <li>B) dnf module reset postgresql && dnf module install postgresql:15</li>
+                            <li>C) dnf update postgresql</li>
+                            <li>D) dnf module enable postgresql:15</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) dnf module reset postgresql && dnf module install postgresql:15</strong><br>
+                            To switch module streams, you must first reset the current stream, then install the new one. 
+                            Alternatively: dnf module remove postgresql:13, then reset, then install postgresql:15.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: How do you list all files installed by the httpd package?</h4>
+                        <ul class="quiz-options">
+                            <li>A) dnf list httpd</li>
+                            <li>B) rpm -ql httpd</li>
+                            <li>C) dnf info httpd</li>
+                            <li>D) rpm -qa httpd</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) rpm -ql httpd</strong><br>
+                            rpm -ql (query list) shows all files from a package. You can also use: dnf repoquery -l httpd. 
+                            rpm -qa lists all installed packages, not files.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: What does 'dnf group install "Development Tools"' do?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Installs only the group metadata</li>
+                            <li>B) Installs gcc, make, git, and other development packages</li>
+                            <li>C) Lists available development tools</li>
+                            <li>D) Creates a development environment</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Installs gcc, make, git, and other development packages</strong><br>
+                            Package groups bundle related packages. "Development Tools" includes compilers (gcc), 
+                            build tools (make), version control (git), and libraries needed for software development.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter7.html" class="nav-button prev">Chapter 7: Schedule Tasks</a>
+                <a href="chapter9.html" class="nav-button next">Chapter 9: Basic Storage</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

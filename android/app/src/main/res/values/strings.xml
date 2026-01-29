@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RHCSA Study Guide</string>
+    <string name="title_activity_main">RHCSA Study Guide</string>
+    <string name="package_name">com.devopsnidiary.rhcsaguide</string>
+    <string name="custom_url_scheme">com.devopsnidiary.rhcsaguide</string>
+</resources>

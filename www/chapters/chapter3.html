@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Manage Local Users and Groups - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html" class="active">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 3</span>
+                    <span class="meta-badge">⏱️ 55 min read</span>
+                    <span class="meta-badge">📚 Intermediate</span>
+                </div>
+                <h1>Manage Local Users and Groups</h1>
+                <p class="chapter-intro">
+                    Learn to create, modify, and delete user accounts and groups. Master password policies, 
+                    user configuration files, and effective user management strategies for multi-user Linux systems.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#user-accounts">Understanding User Accounts</a></li>
+                    <li><a href="#manage-users">Manage User Accounts</a></li>
+                    <li><a href="#manage-groups">Manage Group Accounts</a></li>
+                    <li><a href="#passwords">Password Management</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction</h2>
+                <p>
+                    User and group management is fundamental to Linux security and system organization. 
+                    Every process runs as a specific user, and access to files and resources is controlled 
+                    through user and group permissions.
+                </p>
+                <p>In this chapter, you'll learn to:</p>
+                <ul>
+                    <li>Create and manage local user accounts</li>
+                    <li>Configure user properties and home directories</li>
+                    <li>Manage group memberships</li>
+                    <li>Set and enforce password policies</li>
+                    <li>Understand key configuration files (/etc/passwd, /etc/shadow, /etc/group)</li>
+                </ul>
+            </section>
+
+            <section id="user-accounts" class="content-section">
+                <h2>👤 Understanding User Accounts</h2>
+                
+                <h3>User Account Components</h3>
+                <p>Each user account in Linux consists of:</p>
+                <ul>
+                    <li><strong>Username:</strong> Unique identifier for the user</li>
+                    <li><strong>UID:</strong> User ID number (numeric identifier)</li>
+                    <li><strong>Primary Group:</strong> Default group (GID)</li>
+                    <li><strong>Home Directory:</strong> User's personal workspace</li>
+                    <li><strong>Login Shell:</strong> Default command interpreter</li>
+                    <li><strong>Password:</strong> Encrypted authentication credential</li>
+                </ul>
+
+                <h3>User Types</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">User Type</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">UID Range</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Purpose</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Root</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">0</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Superuser (full system access)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">System</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1-999</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Service accounts (daemons)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Regular</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">1000+</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Human users</td>
+                    </tr>
+                </table>
+
+                <h3>Key Configuration Files</h3>
+                
+                <h4>/etc/passwd</h4>
+                <p>Contains basic user account information:</p>
+                <pre><code>student:x:1000:1000:Student User:/home/student:/bin/bash
+│       │ │    │    │            │             │
+│       │ │    │    │            │             └─ Login shell
+│       │ │    │    │            └─ Home directory
+│       │ │    │    └─ GECOS (comment field)
+│       │ │    └─ Primary GID
+│       │ └─ UID
+│       └─ Password (x = stored in /etc/shadow)
+└─ Username</code></pre>
+
+                <h4>/etc/shadow</h4>
+                <p>Stores encrypted passwords and password policies:</p>
+                <pre><code>student:$6$random$hash:18900:0:99999:7:::
+│       │                │     │ │     │
+│       │                │     │ │     └─ Password warning period
+│       │                │     │ └─ Maximum password age
+│       │                │     └─ Minimum password age
+│       │                └─ Last password change
+│       └─ Encrypted password
+└─ Username</code></pre>
+
+                <h4>/etc/group</h4>
+                <p>Defines groups and membership:</p>
+                <pre><code>developers:x:2000:alice,bob,charlie
+│          │ │    │
+│          │ │    └─ Group members
+│          │ └─ GID
+│          └─ Password field (usually x or empty)
+└─ Group name</code></pre>
+            </section>
+
+            <section id="manage-users" class="content-section">
+                <h2>👥 Manage User Accounts</h2>
+
+                <h3>Creating Users</h3>
+                
+                <h4>useradd Command</h4>
+                <pre><code># Basic user creation
+sudo useradd john
+
+# Create with specific UID
+sudo useradd -u 1500 jane
+
+# Create with specific home directory
+sudo useradd -d /custom/home/path alice
+
+# Create with specific shell
+sudo useradd -s /bin/zsh bob
+
+# Create without home directory
+sudo useradd -M serviceaccount
+
+# Create with comment
+sudo useradd -c "John Doe" john
+
+# Create with specific groups
+sudo useradd -G developers,admins charlie
+
+# Complete example
+sudo useradd -u 1501 -g users -G developers,docker -c "Alice Developer" -s /bin/bash alice</code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Note</div>
+                    <p>By default, useradd creates a home directory, assigns the next available UID, 
+                    and uses /bin/bash as the shell.</p>
+                </div>
+
+                <h3>Modifying Users</h3>
+                
+                <h4>usermod Command</h4>
+                <pre><code># Change username
+sudo usermod -l newname oldname
+
+# Change UID
+sudo usermod -u 2000 john
+
+# Change home directory
+sudo usermod -d /new/home -m john
+
+# Change shell
+sudo usermod -s /bin/zsh john
+
+# Add to supplementary groups
+sudo usermod -aG docker,wheel john
+
+# Set expiration date
+sudo usermod -e 2025-12-31 john
+
+# Lock account
+sudo usermod -L john
+
+# Unlock account
+sudo usermod -U john</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Warning</div>
+                    <p>Use <code>-aG</code> to add groups. Using only <code>-G</code> replaces all supplementary groups!</p>
+                </div>
+
+                <h3>Deleting Users</h3>
+                
+                <h4>userdel Command</h4>
+                <pre><code># Delete user (keep home directory)
+sudo userdel john
+
+# Delete user and home directory
+sudo userdel -r john
+
+# Force deletion (even if user is logged in)
+sudo userdel -f john</code></pre>
+
+                <h3>Viewing User Information</h3>
+                <pre><code># View user details
+id john
+
+# View current user
+whoami
+
+# View logged-in users
+who
+
+# View user's groups
+groups john
+
+# Last login information
+lastlog -u john</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Creating a Complete User Account</h4>
+                    <ol>
+                        <li>Create the user with options:
+                            <pre><code>sudo useradd -u 1600 -c "Developer Account" -s /bin/bash developer</code></pre>
+                        </li>
+                        <li>Set the password:
+                            <pre><code>sudo passwd developer</code></pre>
+                        </li>
+                        <li>Add to supplementary groups:
+                            <pre><code>sudo usermod -aG wheel,developers developer</code></pre>
+                        </li>
+                        <li>Verify the account:
+                            <pre><code>id developer
+grep developer /etc/passwd</code></pre>
+                        </li>
+                        <li>Test login:
+                            <pre><code>su - developer</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="manage-groups" class="content-section">
+                <h2>👨‍👩‍👧‍👦 Manage Group Accounts</h2>
+
+                <h3>Creating Groups</h3>
+                
+                <h4>groupadd Command</h4>
+                <pre><code># Create basic group
+sudo groupadd developers
+
+# Create with specific GID
+sudo groupadd -g 5000 admins
+
+# Create system group
+sudo groupadd -r sysgroup</code></pre>
+
+                <h3>Modifying Groups</h3>
+                
+                <h4>groupmod Command</h4>
+                <pre><code># Rename group
+sudo groupmod -n newname oldname
+
+# Change GID
+sudo groupmod -g 6000 developers</code></pre>
+
+                <h3>Deleting Groups</h3>
+                
+                <h4>groupdel Command</h4>
+                <pre><code># Delete group
+sudo groupdel developers</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Warning</div>
+                    <p>You cannot delete a group if it's the primary group of any user. 
+                    Change the user's primary group first.</p>
+                </div>
+
+                <h3>Managing Group Membership</h3>
+                <pre><code># Add user to group
+sudo gpasswd -a username groupname
+
+# Remove user from group
+sudo gpasswd -d username groupname
+
+# Set group administrators
+sudo gpasswd -A admin1,admin2 groupname
+
+# Set group members
+sudo gpasswd -M user1,user2,user3 groupname</code></pre>
+
+                <h4>Alternative Methods</h4>
+                <pre><code># Using usermod (append to groups)
+sudo usermod -aG group1,group2 username
+
+# View group members
+getent group groupname
+
+# View all groups
+getent group</code></pre>
+            </section>
+
+            <section id="passwords" class="content-section">
+                <h2>🔐 Password Management</h2>
+
+                <h3>Setting Passwords</h3>
+                
+                <h4>passwd Command</h4>
+                <pre><code># Set password for current user
+passwd
+
+# Set password for specific user (as root)
+sudo passwd john
+
+# Set password from stdin (scripting)
+echo "newpassword" | sudo passwd --stdin john
+
+# Force password change on next login
+sudo passwd -e john
+
+# Lock user account
+sudo passwd -l john
+
+# Unlock user account
+sudo passwd -u john
+
+# Delete password (dangerous!)
+sudo passwd -d john</code></pre>
+
+                <h3>Password Aging</h3>
+                
+                <h4>chage Command</h4>
+                <pre><code># View password aging information
+sudo chage -l john
+
+# Set maximum password age (days)
+sudo chage -M 90 john
+
+# Set minimum password age
+sudo chage -m 7 john
+
+# Set password expiration warning
+sudo chage -W 14 john
+
+# Set account expiration date
+sudo chage -E 2025-12-31 john
+
+# Force password change
+sudo chage -d 0 john
+
+# Set inactive period after password expiration
+sudo chage -I 30 john</code></pre>
+
+                <h4>Example: Complete Password Policy</h4>
+                <pre><code># Set comprehensive password policy
+sudo chage -M 90 -m 7 -W 14 -I 30 john
+
+# Explanation:
+# -M 90:  Password expires in 90 days
+# -m 7:   Minimum 7 days between password changes
+# -W 14:  Warn user 14 days before expiration
+# -I 30:  Account locks 30 days after password expiration</code></pre>
+
+                <h3>Default Password Policies</h3>
+                
+                <h4>/etc/login.defs</h4>
+                <p>Configure default password policies for new users:</p>
+                <pre><code># Edit /etc/login.defs
+PASS_MAX_DAYS   90
+PASS_MIN_DAYS   7
+PASS_MIN_LEN    8
+PASS_WARN_AGE   14</code></pre>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 Tip</div>
+                    <p>Password policies in /etc/login.defs only apply to newly created users. 
+                    Existing users must be updated with chage.</p>
+                </div>
+
+                <h3>Password Quality Requirements</h3>
+                <p>Configure password complexity using PAM (Pluggable Authentication Modules):</p>
+                <pre><code># Edit /etc/security/pwquality.conf
+minlen = 12
+dcredit = -1    # At least 1 digit
+ucredit = -1    # At least 1 uppercase
+lcredit = -1    # At least 1 lowercase
+ocredit = -1    # At least 1 special character
+difok = 3       # At least 3 different characters from old password</code></pre>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What is the UID of the root user?</h4>
+                        <ul class="quiz-options">
+                            <li>A) 1</li>
+                            <li>B) 0</li>
+                            <li>C) 1000</li>
+                            <li>D) 999</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) 0</strong><br>
+                            The root user always has UID 0. Regular users typically start at UID 1000.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: Which file stores encrypted user passwords?</h4>
+                        <ul class="quiz-options">
+                            <li>A) /etc/passwd</li>
+                            <li>B) /etc/shadow</li>
+                            <li>C) /etc/group</li>
+                            <li>D) /etc/security</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) /etc/shadow</strong><br>
+                            /etc/shadow stores encrypted passwords and password aging information. 
+                            It's only readable by root for security.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: How do you add a user to supplementary groups without removing existing groups?</h4>
+                        <ul class="quiz-options">
+                            <li>A) usermod -G groups user</li>
+                            <li>B) usermod -aG groups user</li>
+                            <li>C) useradd -G groups user</li>
+                            <li>D) groupadd -u user groups</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) usermod -aG groups user</strong><br>
+                            The -a (append) flag with -G adds groups without removing existing memberships.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Which command forces a user to change password on next login?</h4>
+                        <ul class="quiz-options">
+                            <li>A) passwd -e user</li>
+                            <li>B) chage -d 0 user</li>
+                            <li>C) usermod -f user</li>
+                            <li>D) Both A and B</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: D) Both A and B</strong><br>
+                            Both <code>passwd -e</code> and <code>chage -d 0</code> expire the password immediately, 
+                            forcing a change on next login.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: What does the command 'userdel -r john' do?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Deletes user and keeps home directory</li>
+                            <li>B) Deletes user and home directory</li>
+                            <li>C) Renames the user</li>
+                            <li>D) Locks the user account</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Deletes user and home directory</strong><br>
+                            The -r option removes the user's home directory and mail spool along with the account.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter2.html" class="nav-button prev">Chapter 2: Manage Files</a>
+                <a href="chapter4.html" class="nav-button next">Chapter 4: File Access</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

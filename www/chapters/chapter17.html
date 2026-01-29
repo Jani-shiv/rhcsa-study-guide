@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 17: Comprehensive Review - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html" class="active">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 17</span>
+                    <span class="meta-badge">⏱️ 60 min read</span>
+                    <span class="meta-badge">📚 Review</span>
+                </div>
+                <h1>Comprehensive RHCSA Review</h1>
+                <p class="chapter-intro">
+                    Complete review of all RHCSA exam objectives. Master command reference, practice scenarios, 
+                    and exam strategies for EX200 certification success.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#objectives">Exam Objectives</a></li>
+                    <li><a href="#commands">Command Reference</a></li>
+                    <li><a href="#scenarios">Practice Scenarios</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting Guide</a></li>
+                    <li><a href="#exam-tips">Exam Tips</a></li>
+                    <li><a href="#final-quiz">Final Review Quiz</a></li>
+                </ul>
+            </div>
+
+            <section id="objectives" class="content-section">
+                <h2>🎯 RHCSA Exam Objectives (EX200)</h2>
+
+                <h3>1. Understand and Use Essential Tools</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Access shell prompt and execute commands</li>
+                    <li>✅ Use I/O redirection (>, >>, <, |, 2>&1)</li>
+                    <li>✅ Use grep and regular expressions</li>
+                    <li>✅ Access remote systems using SSH</li>
+                    <li>✅ Log in and switch users (su, sudo)</li>
+                    <li>✅ Archive, compress, unpack files (tar, gzip, bzip2)</li>
+                    <li>✅ Create and edit text files (vim)</li>
+                    <li>✅ Create, delete, copy, move files and directories</li>
+                    <li>✅ Create hard and soft links</li>
+                    <li>✅ List, set, change file permissions</li>
+                    <li>✅ Locate, read, and use documentation (man, info, /usr/share/doc)</li>
+                </ul>
+
+                <h3>2. Create Simple Shell Scripts</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Conditionally execute code (if, test)</li>
+                    <li>✅ Use looping constructs (for, while)</li>
+                    <li>✅ Process script inputs ($1, $2, $#, $@)</li>
+                </ul>
+
+                <h3>3. Operate Running Systems</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Boot, reboot, shutdown systems normally</li>
+                    <li>✅ Boot systems into different targets manually</li>
+                    <li>✅ Interrupt boot process to gain access</li>
+                    <li>✅ Identify CPU/memory intensive processes</li>
+                    <li>✅ Adjust process scheduling (nice, renice)</li>
+                    <li>✅ Manage tuning profiles (tuned)</li>
+                    <li>✅ Locate and interpret system log files</li>
+                    <li>✅ Preserve system journals</li>
+                    <li>✅ Start, stop, check service status</li>
+                    <li>✅ Transfer files between systems securely</li>
+                </ul>
+
+                <h3>4. Configure Local Storage</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ List, create, delete partitions (MBR and GPT)</li>
+                    <li>✅ Create and remove physical volumes</li>
+                    <li>✅ Assign physical volumes to volume groups</li>
+                    <li>✅ Create and delete logical volumes</li>
+                    <li>✅ Configure systems to mount file systems at boot</li>
+                    <li>✅ Add new partitions, logical volumes, swap non-destructively</li>
+                </ul>
+
+                <h3>5. Create and Configure File Systems</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Create, mount, unmount, use vfat, ext4, xfs</li>
+                    <li>✅ Mount and unmount network file systems (NFS)</li>
+                    <li>✅ Configure autofs</li>
+                    <li>✅ Extend existing logical volumes</li>
+                    <li>✅ Create and configure set-GID directories</li>
+                    <li>✅ Diagnose and correct file permission problems</li>
+                </ul>
+
+                <h3>6. Deploy, Configure, Maintain Systems</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Schedule tasks using at and cron</li>
+                    <li>✅ Start and stop services, configure services to start at boot</li>
+                    <li>✅ Configure systems to boot into a specific target</li>
+                    <li>✅ Configure time service clients</li>
+                    <li>✅ Install and update software packages</li>
+                    <li>✅ Modify system bootloader</li>
+                </ul>
+
+                <h3>7. Manage Basic Networking</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Configure IPv4 and IPv6 addresses</li>
+                    <li>✅ Configure hostname resolution</li>
+                    <li>✅ Configure network services to start at boot</li>
+                    <li>✅ Restrict network access using firewall-cmd/firewalld</li>
+                </ul>
+
+                <h3>8. Manage Users and Groups</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Create, delete, modify local user accounts</li>
+                    <li>✅ Change passwords and adjust password aging</li>
+                    <li>✅ Create, delete, modify local groups</li>
+                    <li>✅ Configure superuser access</li>
+                </ul>
+
+                <h3>9. Manage Security</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Configure firewall settings (firewall-cmd)</li>
+                    <li>✅ Manage default file permissions (umask)</li>
+                    <li>✅ Configure key-based authentication for SSH</li>
+                    <li>✅ Set enforcing and permissive modes for SELinux</li>
+                    <li>✅ List and identify SELinux file and process context</li>
+                    <li>✅ Restore default file contexts</li>
+                    <li>✅ Manage SELinux port labels</li>
+                    <li>✅ Use boolean settings to modify system SELinux</li>
+                    <li>✅ Diagnose and address routine SELinux policy violations</li>
+                </ul>
+
+                <h3>10. Manage Containers</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Find and retrieve container images from remote registry</li>
+                    <li>✅ Inspect container images</li>
+                    <li>✅ Perform container management (run, start, stop, list)</li>
+                    <li>✅ Run a service inside a container</li>
+                    <li>✅ Configure a container to start automatically</li>
+                    <li>✅ Attach persistent storage to a container</li>
+                </ul>
+            </section>
+
+            <section id="commands" class="content-section">
+                <h2>📚 Essential Command Reference</h2>
+
+                <h3>File Management</h3>
+                <pre><code># Navigation & listing
+ls -lah, cd, pwd, tree
+
+# File operations
+cp -r, mv, rm -rf, mkdir -p, touch
+ln -s source link  # symbolic link
+ln source link     # hard link
+
+# Search & find
+find /path -name "*.txt" -type f -size +10M
+locate filename
+which command
+whereis command
+
+# Text processing
+cat, less, more, head -n 10, tail -f
+grep -r "pattern" /path
+cut -d: -f1 /etc/passwd
+sort, uniq, wc -l
+sed 's/old/new/g' file
+awk '{print $1}' file</code></pre>
+
+                <h3>User & Group Management</h3>
+                <pre><code># Users
+useradd -m -s /bin/bash -G wheel username
+usermod -aG group username
+userdel -r username
+passwd username
+chage -l username
+chage -M 90 username  # max password age
+
+# Groups
+groupadd groupname
+groupmod -n newname oldname
+groupdel groupname
+groups username
+id username
+
+# Sudo access
+visudo
+usermod -aG wheel username</code></pre>
+
+                <h3>Permissions & ACLs</h3>
+                <pre><code># Basic permissions
+chmod 755 file
+chmod u+x,g+w,o-r file
+chown user:group file
+chown -R user:group directory
+
+# Special permissions
+chmod 2755 directory  # setgid
+chmod 1777 directory  # sticky bit
+chmod 4755 file       # setuid
+
+# ACLs
+setfacl -m u:user:rwx file
+setfacl -m g:group:rx file
+setfacl -x u:user file
+getfacl file
+setfacl -R -m d:u:user:rwx directory  # default ACL
+
+# SELinux contexts
+ls -Z, ps -Z
+chcon -t httpd_sys_content_t file
+restorecon -Rv /path
+semanage fcontext -a -t type "/path(/.*)?"
+semanage fcontext -l | grep /path</code></pre>
+
+                <h3>Storage Management</h3>
+                <pre><code># Partitioning
+lsblk, fdisk -l, parted -l
+fdisk /dev/sdb       # MBR
+parted /dev/sdb      # GPT
+partprobe /dev/sdb
+
+# File systems
+mkfs.xfs /dev/sdb1
+mkfs.ext4 /dev/sdb1
+mkfs.vfat /dev/sdb1
+mount /dev/sdb1 /mnt
+umount /mnt
+blkid  # show UUIDs
+
+# /etc/fstab
+UUID=xxx /mnt xfs defaults 0 0
+/dev/sdb1 /data ext4 defaults 0 0
+
+# LVM
+pvcreate /dev/sdb
+pvs, pvdisplay
+vgcreate vg01 /dev/sdb /dev/sdc
+vgs, vgdisplay, vgextend vg01 /dev/sdd
+lvcreate -n lv01 -L 5G vg01
+lvs, lvdisplay
+lvextend -L +2G /dev/vg01/lv01
+lvextend -r -L +2G /dev/vg01/lv01  # resize fs too
+xfs_growfs /mnt  # xfs
+resize2fs /dev/vg01/lv01  # ext4
+
+# Swap
+mkswap /dev/sdb2
+swapon /dev/sdb2
+swapoff /dev/sdb2
+swapon -a  # activate all in fstab</code></pre>
+
+                <h3>Systemd & Services</h3>
+                <pre><code># Service management
+systemctl start service
+systemctl stop service
+systemctl restart service
+systemctl status service
+systemctl enable --now service
+systemctl disable service
+systemctl is-enabled service
+systemctl list-units --type=service
+systemctl daemon-reload
+
+# Targets
+systemctl get-default
+systemctl set-default multi-user.target
+systemctl isolate graphical.target
+systemctl list-units --type=target
+
+# Boot process
+systemctl reboot
+systemctl poweroff
+systemctl rescue
+systemctl emergency</code></pre>
+
+                <h3>Networking</h3>
+                <pre><code># NetworkManager
+nmcli con show
+nmcli con add type ethernet con-name ens33 ifname ens33
+nmcli con mod ens33 ipv4.addresses 192.168.1.100/24
+nmcli con mod ens33 ipv4.gateway 192.168.1.1
+nmcli con mod ens33 ipv4.dns "8.8.8.8 8.8.4.4"
+nmcli con mod ens33 ipv4.method manual
+nmcli con up ens33
+nmcli con down ens33
+
+# Hostname
+hostnamectl set-hostname server.example.com
+nmcli general hostname server.example.com
+
+# Testing
+ping -c 4 8.8.8.8
+ip addr show
+ip route
+ss -tulpn
+curl, wget</code></pre>
+
+                <h3>Firewalld</h3>
+                <pre><code># Basic operations
+firewall-cmd --state
+firewall-cmd --get-default-zone
+firewall-cmd --set-default-zone=public
+firewall-cmd --list-all
+firewall-cmd --reload
+
+# Services & ports
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --add-port=8080/tcp
+firewall-cmd --permanent --remove-service=http
+firewall-cmd --reload
+
+# Rich rules
+firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="192.168.1.0/24" service name="ssh" accept'
+firewall-cmd --list-rich-rules</code></pre>
+
+                <h3>Containers (Podman)</h3>
+                <pre><code># Images
+podman search nginx
+podman pull nginx
+podman images
+podman rmi nginx
+
+# Containers
+podman run -d --name web -p 8080:80 nginx
+podman ps
+podman ps -a
+podman stop web
+podman start web
+podman rm web
+podman logs web
+podman exec -it web /bin/bash
+
+# Storage
+podman run -d -v ~/data:/data:Z nginx
+
+# Systemd
+podman generate systemd --name web --files --new
+mkdir -p ~/.config/systemd/user
+mv container-web.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now container-web
+loginctl enable-linger $USER</code></pre>
+            </section>
+
+            <section id="scenarios" class="content-section">
+                <h2>🧪 Practice Scenarios</h2>
+
+                <div class="procedure">
+                    <h4>Scenario 1: Create User with Restricted Access</h4>
+                    <p><strong>Task:</strong> Create user "developer" with:</p>
+                    <ul>
+                        <li>Home directory /home/developer</li>
+                        <li>Default shell /bin/bash</li>
+                        <li>Member of "devteam" group</li>
+                        <li>Password expires every 60 days</li>
+                        <li>Sudo access to restart httpd service only</li>
+                    </ul>
+                    <pre><code># Create group
+sudo groupadd devteam
+
+# Create user
+sudo useradd -m -s /bin/bash -G devteam developer
+
+# Set password
+sudo passwd developer
+
+# Configure password aging
+sudo chage -M 60 developer
+
+# Configure sudo
+sudo visudo
+# Add line:
+developer ALL=(ALL) /usr/bin/systemctl restart httpd
+
+# Verify
+id developer
+sudo -l -U developer</code></pre>
+                </div>
+
+                <div class="procedure">
+                    <h4>Scenario 2: Configure Persistent Storage</h4>
+                    <p><strong>Task:</strong> Create 2GB logical volume for /data:</p>
+                    <ul>
+                        <li>Use disk /dev/sdb</li>
+                        <li>Volume group: vg_data</li>
+                        <li>Logical volume: lv_data</li>
+                        <li>File system: XFS</li>
+                        <li>Mount persistently at /data</li>
+                    </ul>
+                    <pre><code># Create physical volume
+sudo pvcreate /dev/sdb
+
+# Create volume group
+sudo vgcreate vg_data /dev/sdb
+
+# Create logical volume
+sudo lvcreate -n lv_data -L 2G vg_data
+
+# Create filesystem
+sudo mkfs.xfs /dev/vg_data/lv_data
+
+# Create mount point
+sudo mkdir /data
+
+# Add to fstab
+echo '/dev/vg_data/lv_data /data xfs defaults 0 0' | sudo tee -a /etc/fstab
+
+# Mount
+sudo mount -a
+
+# Verify
+df -h /data
+lsblk</code></pre>
+                </div>
+
+                <div class="procedure">
+                    <h4>Scenario 3: Configure Web Server with Firewall</h4>
+                    <p><strong>Task:</strong> Setup httpd accessible only from 192.168.1.0/24:</p>
+                    <pre><code># Install httpd
+sudo dnf install -y httpd
+
+# Enable and start
+sudo systemctl enable --now httpd
+
+# Create test page
+echo "&lt;h1&gt;Test Page&lt;/h1&gt;" | sudo tee /var/www/html/index.html
+
+# SELinux (if needed)
+sudo restorecon -Rv /var/www/html
+
+# Firewall - allow from specific subnet only
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="192.168.1.0/24" service name="http" accept'
+sudo firewall-cmd --reload
+
+# Verify
+curl http://localhost
+sudo firewall-cmd --list-all</code></pre>
+                </div>
+
+                <div class="procedure">
+                    <h4>Scenario 4: Automate Container at Boot</h4>
+                    <p><strong>Task:</strong> Run nginx container that starts automatically:</p>
+                    <pre><code># Pull image
+podman pull nginx
+
+# Run container
+podman run -d --name webserver -p 8080:80 nginx
+
+# Test
+curl http://localhost:8080
+
+# Generate systemd unit
+podman generate systemd --name webserver --files --new
+
+# Stop original container
+podman stop webserver
+podman rm webserver
+
+# Install service
+mkdir -p ~/.config/systemd/user
+mv container-webserver.service ~/.config/systemd/user/
+
+# Reload systemd
+systemctl --user daemon-reload
+
+# Enable linger
+sudo loginctl enable-linger $USER
+
+# Enable and start
+systemctl --user enable --now container-webserver.service
+
+# Verify
+systemctl --user status container-webserver.service
+curl http://localhost:8080</code></pre>
+                </div>
+
+                <div class="procedure">
+                    <h4>Scenario 5: Troubleshoot SELinux Denial</h4>
+                    <p><strong>Task:</strong> Apache can't access /web/index.html:</p>
+                    <pre><code># Check SELinux mode
+getenforce
+
+# Check context
+ls -Z /web/index.html
+
+# Check for denials
+sudo ausearch -m AVC -ts recent
+sudo journalctl -t setroubleshoot
+
+# Fix context
+sudo semanage fcontext -a -t httpd_sys_content_t "/web(/.*)?"
+sudo restorecon -Rv /web
+
+# Verify
+ls -Z /web
+curl http://localhost/index.html
+
+# Alternative: troubleshoot tool
+sudo sealert -a /var/log/audit/audit.log</code></pre>
+                </div>
+            </section>
+
+            <section id="troubleshooting" class="content-section">
+                <h2>🔧 Troubleshooting Guide</h2>
+
+                <h3>Boot Issues</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Problem</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Solution</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Forgot root password</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Boot to rd.break, mount -o remount,rw /sysroot, chroot /sysroot, passwd, touch /.autorelabel</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Wrong fstab entry</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Boot to emergency.target, edit /etc/fstab, systemctl daemon-reload, mount -a</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SELinux blocking boot</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Add selinux=0 to kernel line (temporary), or enforcing=0</td>
+                    </tr>
+                </table>
+
+                <h3>Network Issues</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Problem</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Check</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Fix</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">No IP address</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ip addr, nmcli con show</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">nmcli con up connection</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Can't ping gateway</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ip route</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">nmcli con mod con ipv4.gateway x.x.x.x</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">DNS not working</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">cat /etc/resolv.conf</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">nmcli con mod con ipv4.dns "8.8.8.8"</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Port blocked</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">firewall-cmd --list-all</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">firewall-cmd --add-port=X/tcp --permanent</td>
+                    </tr>
+                </table>
+
+                <h3>Storage Issues</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Problem</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Solution</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Disk full</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">df -h, du -sh /*, lvextend -r -L +5G /dev/vg/lv</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Mount fails</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Check blkid UUID, verify /etc/fstab syntax, mount -a</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Permission denied</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">ls -ld, chmod, chown, getfacl, ls -Z, restorecon</td>
+                    </tr>
+                </table>
+
+                <h3>Service Issues</h3>
+                <pre><code># Service won't start
+systemctl status service.service
+journalctl -u service.service -n 50
+journalctl -xe
+
+# Service not enabled
+systemctl is-enabled service
+systemctl enable service
+
+# Port already in use
+ss -tulpn | grep :80
+kill -9 PID</code></pre>
+            </section>
+
+            <section id="exam-tips" class="content-section">
+                <h2>💡 Exam Tips & Strategy</h2>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">⏱️ Time Management</div>
+                    <p><strong>Exam Duration:</strong> 3 hours (180 minutes)<br>
+                    <strong>Strategy:</strong><br>
+                    • Read ALL questions first (5-10 min)<br>
+                    • Do easy tasks first to build confidence (30 min)<br>
+                    • Tackle medium difficulty tasks (60 min)<br>
+                    • Work on complex tasks (60 min)<br>
+                    • Review and verify all work (20-30 min)<br>
+                    • Don't get stuck! Move on and come back</p>
+                </div>
+
+                <h3>Before You Start</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Read instructions carefully</li>
+                    <li>✅ Note server names and IP addresses</li>
+                    <li>✅ Check connectivity to all machines</li>
+                    <li>✅ Verify sudo/root access works</li>
+                    <li>✅ Check SELinux is enforcing (don't disable it!)</li>
+                </ul>
+
+                <h3>During the Exam</h3>
+                <ul style="line-height: 1.8;">
+                    <li>✅ Use man pages liberally (man -k keyword)</li>
+                    <li>✅ Check examples: /usr/share/doc/</li>
+                    <li>✅ Verify after each task (systemctl status, mount -a, etc.)</li>
+                    <li>✅ Make configurations persistent (/etc/fstab, systemctl enable)</li>
+                    <li>✅ Test survival after reboot for critical tasks</li>
+                    <li>✅ Use systemctl daemon-reload after changing unit files</li>
+                    <li>✅ Use firewall-cmd --reload after firewall changes</li>
+                    <li>✅ Don't forget :Z for container volumes on SELinux systems</li>
+                </ul>
+
+                <h3>Common Mistakes to Avoid</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Mistake</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Prevention</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Forgetting --permanent for firewall</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Always use --permanent then --reload</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Not enabling services</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Use systemctl enable --now</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Typos in /etc/fstab</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Test with mount -a before reboot</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Wrong SELinux context</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Use semanage + restorecon, not just chcon</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Missing _netdev for NFS</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Always use _netdev in fstab for network mounts</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Container volume without :Z</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Use :Z for bind mounts with SELinux</td>
+                    </tr>
+                </table>
+
+                <h3>Quick Verification Checklist</h3>
+                <pre><code># After each configuration, verify:
+
+# Services
+systemctl is-enabled service
+systemctl status service
+ss -tulpn | grep port
+
+# Firewall
+firewall-cmd --list-all
+curl http://localhost
+
+# Storage
+lsblk
+df -h
+cat /etc/fstab
+mount -a  # Test without reboot!
+
+# Network
+ip addr
+ip route
+ping gateway
+ping 8.8.8.8
+ping google.com
+
+# Users
+id username
+sudo -l -U username
+
+# SELinux
+getenforce  # Should be Enforcing
+ls -Z /path
+ps -Z | grep service
+
+# Containers
+podman ps
+systemctl --user status container-*
+loginctl show-user $USER | grep Linger</code></pre>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ Critical Reboot Survival</div>
+                    <p>These MUST survive reboot:<br>
+                    • Services: systemctl enable<br>
+                    • Mounts: /etc/fstab with correct options<br>
+                    • Network: nmcli configurations persist by default<br>
+                    • Firewall: --permanent flag required<br>
+                    • Containers: systemd unit + loginctl enable-linger<br>
+                    • AutoFS: systemctl enable autofs<br>
+                    <br>If time permits, REBOOT to verify critical tasks!</p>
+                </div>
+            </section>
+
+            <section id="final-quiz" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Final Review Quiz</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: User created with useradd needs what to login?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Nothing, ready to use</li>
+                            <li>B) Password set with passwd</li>
+                            <li>C) Home directory created with -m</li>
+                            <li>D) Both B and shell defined</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Password set with passwd</strong><br>
+                            User needs password before login. Home directory optional (created with -m). 
+                            Default shell from /etc/default/useradd (usually /bin/bash). 
+                            <code>useradd -m user; passwd user</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: Make LVM logical volume persistent at boot?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Add to /etc/fstab</li>
+                            <li>B) Use systemctl enable lvm</li>
+                            <li>C) Run vgchange -ay at boot</li>
+                            <li>D) No action needed, automatic</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: A) Add to /etc/fstab</strong><br>
+                            LVM volumes activate automatically, but MOUNT requires /etc/fstab entry. 
+                            <code>/dev/vg/lv /mnt xfs defaults 0 0</code>. Test with <code>mount -a</code> 
+                            before rebooting!
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: After setting permanent SELinux context, what's next?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Reboot system</li>
+                            <li>B) Run restorecon -Rv /path</li>
+                            <li>C) setenforce 0 then 1</li>
+                            <li>D) Nothing, automatic</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) Run restorecon -Rv /path</strong><br>
+                            <code>semanage fcontext</code> sets policy (permanent), but <code>restorecon</code> 
+                            applies it to files. Full sequence:<br>
+                            <code>semanage fcontext -a -t type "/path(/.*)?"</code><br>
+                            <code>restorecon -Rv /path</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Container with persistent storage needs what flag?</h4>
+                        <ul class="quiz-options">
+                            <li>A) -v /host:/container</li>
+                            <li>B) -v /host:/container:Z</li>
+                            <li>C) --mount /host:/container</li>
+                            <li>D) --storage /host:/container</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) -v /host:/container:Z</strong><br>
+                            <code>:Z</code> sets SELinux context on RHEL. Without it, container can't access files. 
+                            Example: <code>podman run -d -v ~/data:/data:Z nginx</code>. 
+                            Use :z for shared, :Z for private.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Extend XFS filesystem on LVM?</h4>
+                        <ul class="quiz-options">
+                            <li>A) lvextend -L +5G /dev/vg/lv; xfs_growfs /mnt</li>
+                            <li>B) lvextend -r -L +5G /dev/vg/lv</li>
+                            <li>C) lvextend -L +5G /dev/vg/lv; resize2fs /dev/vg/lv</li>
+                            <li>D) Both A and B</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: D) Both A and B</strong><br>
+                            Method 1: <code>lvextend -L +5G /dev/vg/lv; xfs_growfs /mnt</code><br>
+                            Method 2: <code>lvextend -r -L +5G /dev/vg/lv</code> (resizes fs automatically)<br>
+                            Note: ext4 uses resize2fs, XFS uses xfs_growfs
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 6: Most critical step for rootless container at boot?</h4>
+                        <ul class="quiz-options">
+                            <li>A) systemctl --user enable container-name</li>
+                            <li>B) loginctl enable-linger $USER</li>
+                            <li>C) podman generate systemd</li>
+                            <li>D) All of the above</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: D) All of the above</strong><br>
+                            Need ALL steps: generate systemd unit, move to ~/.config/systemd/user/, 
+                            enable service, AND enable linger. Without linger, user services only run 
+                            when logged in. <code>loginctl enable-linger $USER</code> is often forgotten!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-box-title">🎓 You're Ready!</div>
+                    <p>You've completed all 17 chapters of RHCSA preparation. Remember:<br>
+                    • Practice on real RHEL 9 systems<br>
+                    • Time yourself on practice exams<br>
+                    • Verify configurations survive reboot<br>
+                    • Use man pages during practice<br>
+                    • Focus on exam objectives<br>
+                    <br>Good luck on your RHCSA exam! 🚀</p>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter16.html" class="nav-button prev">Chapter 16: Run Containers</a>
+                <a href="../index.html" class="nav-button next">Back to Home</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

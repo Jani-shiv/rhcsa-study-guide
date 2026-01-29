@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 12: Analyze System Logs - RHCSA Guide</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">DevOps ni Diary</span>
+            </div>
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search chapters...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../index.html#chapters" class="nav-link">Chapters</a>
+                <a href="https://youtube.com/@DevOpsniDiary" target="_blank" class="nav-link">YouTube</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="chapter-page">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">All Chapters</h3>
+            <ul class="sidebar-nav">
+                <li><a href="chapter1.html">Ch 1: Access Systems</a></li>
+                <li><a href="chapter2.html">Ch 2: Manage Files</a></li>
+                <li><a href="chapter3.html">Ch 3: Users & Groups</a></li>
+                <li><a href="chapter4.html">Ch 4: File Access</a></li>
+                <li><a href="chapter5.html">Ch 5: SELinux</a></li>
+                <li><a href="chapter6.html">Ch 6: Performance</a></li>
+                <li><a href="chapter7.html">Ch 7: Schedule Tasks</a></li>
+                <li><a href="chapter8.html">Ch 8: Software Packages</a></li>
+                <li><a href="chapter9.html">Ch 9: Basic Storage</a></li>
+                <li><a href="chapter10.html">Ch 10: Storage Stack</a></li>
+                <li><a href="chapter11.html">Ch 11: Services & Boot</a></li>
+                <li><a href="chapter12.html" class="active">Ch 12: Logs</a></li>
+                <li><a href="chapter13.html">Ch 13: Networking</a></li>
+                <li><a href="chapter14.html">Ch 14: Network Storage</a></li>
+                <li><a href="chapter15.html">Ch 15: Network Security</a></li>
+                <li><a href="chapter16.html">Ch 16: Containers</a></li>
+                <li><a href="chapter17.html">Ch 17: Review</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="chapter-header">
+                <div class="chapter-meta">
+                    <span class="meta-badge">Chapter 12</span>
+                    <span class="meta-badge">⏱️ 50 min read</span>
+                    <span class="meta-badge">📚 Intermediate</span>
+                </div>
+                <h1>Analyze System Logs</h1>
+                <p class="chapter-intro">
+                    Master system logging with journalctl and rsyslog. Learn to query systemd journal, configure 
+                    persistent logging, analyze boot logs, and manage traditional syslog files.
+                </p>
+            </div>
+
+            <div class="table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#introduction">Introduction to Logging</a></li>
+                    <li><a href="#journalctl">journalctl - systemd Journal</a></li>
+                    <li><a href="#persistent">Persistent Journal</a></li>
+                    <li><a href="#rsyslog">rsyslog - Traditional Logging</a></li>
+                    <li><a href="#logrotate">Log Rotation</a></li>
+                    <li><a href="#practice">Practice Questions</a></li>
+                </ul>
+            </div>
+
+            <section id="introduction" class="content-section">
+                <h2>🎯 Introduction to Logging</h2>
+                <p>
+                    RHEL 9 uses two logging systems: systemd-journald (binary journal) and rsyslog (text files). 
+                    Both work together to provide comprehensive system logging.
+                </p>
+
+                <h3>Logging Systems</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">System</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Format</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Location</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Tool</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">systemd-journald</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Binary</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/run/log/journal (volatile)</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">journalctl</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">rsyslog</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Text</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/var/log/*</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">less, grep, tail</td>
+                    </tr>
+                </table>
+
+                <h3>Common Log Files (rsyslog)</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">File</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Contents</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/var/log/messages</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">General system messages</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/var/log/secure</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Authentication/authorization logs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/var/log/audit/audit.log</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SELinux audit events</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/var/log/cron</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Cron job execution</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/var/log/boot.log</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">System boot messages</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">/var/log/maillog</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Mail server logs</td>
+                    </tr>
+                </table>
+
+                <h3>Log Priority Levels</h3>
+                <pre><code># From highest to lowest priority:
+0 emerg    # System unusable
+1 alert    # Immediate action required
+2 crit     # Critical conditions
+3 err      # Error conditions
+4 warning  # Warning conditions
+5 notice   # Normal but significant
+6 info     # Informational messages
+7 debug    # Debug messages</code></pre>
+            </section>
+
+            <section id="journalctl" class="content-section">
+                <h2>📜 journalctl - systemd Journal</h2>
+
+                <h3>Basic journalctl Commands</h3>
+                <pre><code># View all journal entries (oldest first)
+journalctl
+
+# View in reverse (newest first)
+journalctl -r
+
+# Follow live logs (like tail -f)
+journalctl -f
+
+# Show only kernel messages
+journalctl -k
+# or
+journalctl --dmesg
+
+# Show N most recent entries
+journalctl -n 50
+
+# No paging (output all at once)
+journalctl --no-pager</code></pre>
+
+                <h3>Filtering by Time</h3>
+                <pre><code># Show logs since last boot
+journalctl -b
+
+# Show logs from previous boot
+journalctl -b -1
+
+# List all boots
+journalctl --list-boots
+
+# Since specific time
+journalctl --since "2025-01-13 10:00:00"
+journalctl --since "1 hour ago"
+journalctl --since yesterday
+journalctl --since today
+
+# Until specific time
+journalctl --until "2025-01-13 12:00:00"
+
+# Between times
+journalctl --since "2025-01-13 09:00" --until "2025-01-13 17:00"</code></pre>
+
+                <h3>Filtering by Service/Unit</h3>
+                <pre><code># Show logs for specific service
+journalctl -u sshd
+journalctl -u httpd.service
+
+# Multiple units
+journalctl -u sshd -u httpd
+
+# Since last boot for service
+journalctl -u sshd -b
+
+# Follow service logs
+journalctl -u httpd -f</code></pre>
+
+                <h3>Filtering by Priority</h3>
+                <pre><code># Show only errors and above (emerg, alert, crit, err)
+journalctl -p err
+
+# Show warnings and above
+journalctl -p warning
+
+# Show specific priority
+journalctl -p 3  # err level
+
+# Priority range
+journalctl -p err -p warning</code></pre>
+
+                <h3>Filtering by Process/User</h3>
+                <pre><code># Filter by PID
+journalctl _PID=1234
+
+# Filter by user ID
+journalctl _UID=1000
+
+# Filter by executable
+journalctl _COMM=sshd
+
+# Filter by systemd unit
+journalctl _SYSTEMD_UNIT=httpd.service</code></pre>
+
+                <h3>Output Formats</h3>
+                <pre><code># Detailed output (default)
+journalctl -o verbose
+
+# Short format (syslog style)
+journalctl -o short
+
+# JSON format
+journalctl -o json
+
+# JSON pretty-print
+journalctl -o json-pretty
+
+# Export format (for backup)
+journalctl -o export
+
+# Show messages only
+journalctl -o cat</code></pre>
+
+                <h3>Combining Filters</h3>
+                <pre><code># Service logs since last boot, errors only
+journalctl -u sshd -b -p err
+
+# Recent httpd errors
+journalctl -u httpd -p err -n 20
+
+# Today's authentication logs
+journalctl -u sshd --since today -o short-precise</code></pre>
+
+                <h3>Disk Usage</h3>
+                <pre><code># Show journal disk usage
+journalctl --disk-usage
+
+# Output example:
+Archived and active journals take up 512.0M in the file system.
+
+# Verify journal files
+journalctl --verify</code></pre>
+
+                <div class="procedure">
+                    <h4>Procedure: Troubleshooting Service Failure</h4>
+                    <ol>
+                        <li>Check service status:
+                            <pre><code>systemctl status httpd</code></pre>
+                        </li>
+                        <li>View service logs:
+                            <pre><code>journalctl -u httpd -n 50</code></pre>
+                        </li>
+                        <li>Check for errors since last boot:
+                            <pre><code>journalctl -u httpd -b -p err</code></pre>
+                        </li>
+                        <li>Follow logs while restarting:
+                            <pre><code># Terminal 1:
+journalctl -u httpd -f
+
+# Terminal 2:
+sudo systemctl restart httpd</code></pre>
+                        </li>
+                        <li>Check timestamps for specific error:
+                            <pre><code>journalctl -u httpd --since "5 minutes ago" -o short-precise</code></pre>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="persistent" class="content-section">
+                <h2>💾 Persistent Journal Storage</h2>
+
+                <p>
+                    By default, systemd journal is stored in /run/log/journal (lost on reboot). 
+                    Enable persistent storage to keep logs across reboots.
+                </p>
+
+                <h3>Enable Persistent Journal</h3>
+                <pre><code># Create directory for persistent journal
+sudo mkdir -p /var/log/journal
+
+# Set ownership and permissions
+sudo chown root:systemd-journal /var/log/journal
+sudo chmod 2755 /var/log/journal
+
+# Restart journald to use new location
+sudo systemctl restart systemd-journald
+
+# Or configure in /etc/systemd/journald.conf:
+sudo vi /etc/systemd/journald.conf
+
+[Journal]
+Storage=persistent
+SystemMaxUse=500M
+SystemKeepFree=1G
+MaxRetentionSec=1month
+
+# Restart journald
+sudo systemctl restart systemd-journald</code></pre>
+
+                <h3>Journal Configuration</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Setting</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Storage=persistent</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Store in /var/log/journal</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Storage=volatile</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Store in /run/log/journal (default)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">SystemMaxUse=</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Max disk space for journal</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">MaxRetentionSec=</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Max age of journal entries</td>
+                    </tr>
+                </table>
+
+                <h3>Managing Journal Size</h3>
+                <pre><code># Manually rotate journal
+sudo journalctl --rotate
+
+# Vacuum by size (keep only 500M)
+sudo journalctl --vacuum-size=500M
+
+# Vacuum by time (keep only 2 weeks)
+sudo journalctl --vacuum-time=2weeks
+
+# Vacuum by file count
+sudo journalctl --vacuum-files=5
+
+# Check space after vacuum
+journalctl --disk-usage</code></pre>
+
+                <div class="info-box note">
+                    <div class="info-box-title">📘 Journal Location</div>
+                    <p><strong>/run/log/journal:</strong> Volatile (RAM-based, lost on reboot)<br>
+                    <strong>/var/log/journal:</strong> Persistent (disk-based, survives reboot)<br>
+                    If /var/log/journal exists, it's used automatically.</p>
+                </div>
+            </section>
+
+            <section id="rsyslog" class="content-section">
+                <h2>📋 rsyslog - Traditional Logging</h2>
+
+                <p>
+                    rsyslog receives logs from journald and writes them to text files in /var/log/.
+                </p>
+
+                <h3>rsyslog Configuration</h3>
+                <pre><code># Main config file
+/etc/rsyslog.conf
+
+# Additional configs
+/etc/rsyslog.d/*.conf
+
+# Example configuration format:
+facility.priority    action
+
+# Examples:
+*.info;mail.none;authpriv.none;cron.none    /var/log/messages
+authpriv.*                                   /var/log/secure
+mail.*                                       /var/log/maillog
+cron.*                                       /var/log/cron</code></pre>
+
+                <h3>Facilities and Priorities</h3>
+                <pre><code># Facilities:
+auth, authpriv  # Security/authentication
+cron            # Cron daemon
+daemon          # System daemons
+kern            # Kernel messages
+mail            # Mail system
+user            # User-level messages
+local0-local7   # Custom applications
+
+# Priority selectors:
+*          # All priorities
+none       # No priorities
+.priority  # This priority and above
+.=priority # Exactly this priority
+.!priority # Not this priority</code></pre>
+
+                <h3>Viewing Traditional Logs</h3>
+                <pre><code># View messages log
+sudo less /var/log/messages
+sudo tail -f /var/log/messages
+
+# View authentication logs
+sudo tail -f /var/log/secure
+
+# Search for pattern
+sudo grep "Failed password" /var/log/secure
+
+# Last 20 lines
+sudo tail -20 /var/log/messages
+
+# Follow multiple logs
+sudo tail -f /var/log/messages /var/log/secure</code></pre>
+
+                <h3>Custom rsyslog Rule</h3>
+                <pre><code># Create custom log for httpd
+sudo vi /etc/rsyslog.d/httpd.conf
+
+# Add:
+if $programname == 'httpd' then /var/log/httpd-custom.log
+& stop
+
+# Restart rsyslog
+sudo systemctl restart rsyslog
+
+# Verify
+logger -t httpd "Test message"
+sudo tail /var/log/httpd-custom.log</code></pre>
+
+                <h3>Remote Logging</h3>
+                <pre><code># Configure client to send logs to remote server
+sudo vi /etc/rsyslog.conf
+
+# Add (UDP):
+*.* @192.168.1.100:514
+
+# Or (TCP):
+*.* @@192.168.1.100:514
+
+# Restart
+sudo systemctl restart rsyslog</code></pre>
+            </section>
+
+            <section id="logrotate" class="content-section">
+                <h2>🔄 Log Rotation</h2>
+
+                <p>
+                    logrotate manages log file rotation to prevent filling disk space.
+                </p>
+
+                <h3>logrotate Configuration</h3>
+                <pre><code># Main config
+/etc/logrotate.conf
+
+# Service-specific configs
+/etc/logrotate.d/
+
+# Example config for custom log
+sudo vi /etc/logrotate.d/myapp
+
+/var/log/myapp/*.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 root root
+    sharedscripts
+    postrotate
+        systemctl reload myapp > /dev/null 2>&1 || true
+    endscript
+}</code></pre>
+
+                <h3>logrotate Directives</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                    <tr style="background-color: var(--bg-secondary);">
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Directive</th>
+                        <th style="padding: 0.75rem; border: 1px solid var(--border-color);">Description</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">daily/weekly/monthly</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Rotation frequency</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">rotate N</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Keep N rotated logs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">compress</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Compress rotated logs with gzip</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">delaycompress</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Compress on next rotation</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">missingok</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Don't error if log missing</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">notifempty</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Don't rotate if empty</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">create MODE OWNER GROUP</td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">Create new log file</td>
+                    </tr>
+                </table>
+
+                <h3>Manual Rotation</h3>
+                <pre><code># Test rotation (dry run)
+sudo logrotate -d /etc/logrotate.d/myapp
+
+# Force rotation
+sudo logrotate -f /etc/logrotate.d/myapp
+
+# Rotate all logs
+sudo logrotate /etc/logrotate.conf
+
+# Check rotation status
+cat /var/lib/logrotate/logrotate.status</code></pre>
+            </section>
+
+            <section id="practice" class="content-section">
+                <div class="quiz-section">
+                    <h2>📝 Practice Questions</h2>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 1: What command shows logs since the last boot?</h4>
+                        <ul class="quiz-options">
+                            <li>A) journalctl --boot</li>
+                            <li>B) journalctl -b</li>
+                            <li>C) Both A and B</li>
+                            <li>D) journalctl --since boot</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Both A and B</strong><br>
+                            <code>journalctl -b</code> and <code>journalctl --boot</code> are equivalent. 
+                            Use <code>-b -1</code> for previous boot, <code>-b -2</code> for two boots ago. 
+                            <code>--list-boots</code> shows all available boots.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: How do you enable persistent journal storage?</h4>
+                        <ul class="quiz-options">
+                            <li>A) Create /var/log/journal directory</li>
+                            <li>B) Set Storage=persistent in journald.conf</li>
+                            <li>C) Both A and B</li>
+                            <li>D) Edit /etc/fstab</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Both A and B</strong><br>
+                            Either method works: create /var/log/journal (automatic) or set Storage=persistent 
+                            in /etc/systemd/journald.conf. Directory method is simpler. Don't forget to restart 
+                            systemd-journald after changes.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: Which log file contains authentication failures?</h4>
+                        <ul class="quiz-options">
+                            <li>A) /var/log/messages</li>
+                            <li>B) /var/log/secure</li>
+                            <li>C) /var/log/auth.log</li>
+                            <li>D) /var/log/faillog</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B) /var/log/secure</strong><br>
+                            /var/log/secure contains authentication and authorization logs (SSH logins, sudo usage, etc.). 
+                            Use <code>grep "Failed password" /var/log/secure</code> to find failed login attempts. 
+                            Or use journalctl: <code>journalctl -u sshd</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What command follows live journal logs like "tail -f"?</h4>
+                        <ul class="quiz-options">
+                            <li>A) journalctl -f</li>
+                            <li>B) journalctl --follow</li>
+                            <li>C) Both A and B</li>
+                            <li>D) journalctl -tail</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Both A and B</strong><br>
+                            <code>journalctl -f</code> and <code>journalctl --follow</code> both work. 
+                            Combine with -u for specific service: <code>journalctl -u httpd -f</code>. 
+                            Press Ctrl+C to stop following.
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: How do you limit journal to 500MB?</h4>
+                        <ul class="quiz-options">
+                            <li>A) journalctl --vacuum-size=500M</li>
+                            <li>B) Set SystemMaxUse=500M in journald.conf</li>
+                            <li>C) Both A and B</li>
+                            <li>D) logrotate -s 500M</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: C) Both A and B</strong><br>
+                            <code>--vacuum-size</code> immediately cleans up. SystemMaxUse in /etc/systemd/journald.conf 
+                            sets permanent limit. Can also use <code>--vacuum-time=2weeks</code> to delete old entries. 
+                            Check current size: <code>journalctl --disk-usage</code>
+                        </div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 6: What priority shows only errors and worse?</h4>
+                        <ul class="quiz-options">
+                            <li>A) journalctl -p warning</li>
+                            <li>B) journalctl -p err</li>
+                            <li>C) journalctl -p crit</li>
+                            <li>D) journalctl -p 3</li>
+                        </ul>
+                        <div class="quiz-answer">
+                            <strong>Answer: B or D (both correct)</strong><br>
+                            <code>-p err</code> shows errors and above (emerg, alert, crit, err). Priority 3 = err. 
+                            <code>-p warning</code> includes warnings (less strict). <code>-p crit</code> only critical and above 
+                            (more strict). Priorities: 0=emerg, 1=alert, 2=crit, 3=err, 4=warning, 5=notice, 6=info, 7=debug.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="chapter-navigation">
+                <a href="chapter11.html" class="nav-button prev">Chapter 11: Services & Boot</a>
+                <a href="chapter13.html" class="nav-button next">Chapter 13: Configure Networking</a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DevOps ni Diary</h3>
+                    <p>Your complete guide to mastering RHCSA certification.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DevOps ni Diary. Educational resource for RHCSA certification preparation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
