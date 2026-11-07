@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📺 DevOps ni Diary on YouTube
+    url: https://youtube.com/@DevOpsniDiary
+    about: Watch full video tutorials, labs, and walkthroughs for RHCSA.
+  - name: 💬 General Questions & Discussion
+    url: https://github.com/Jani-shiv/rhcsa-study-guide/discussions
+    about: Ask questions or discuss study strategies with fellow learners.

@@ -276,6 +276,10 @@ xdg-open index.html
 
 Contributions make the open-source community an amazing place to learn and create! Any contributions you make are **greatly appreciated**.
 
+Please review our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting pull requests.
+
+We are also committed to digital accessibility — see our [Accessibility Statement](ACCESSIBILITY.md) and [Security Policy](SECURITY.md).
+
 ### How to Contribute
 
 1. **Fork** the repository
@@ -297,6 +301,7 @@ Contributions make the open-source community an amazing place to learn and creat
 
 - 📝 Fix typos or improve explanations
 - 🎨 Enhance UI/UX design
+- ♿ Improve accessibility and keyboard navigation
 - 🐛 Report and fix bugs
 - 💡 Add more practical examples
 - 🌐 Translate content to other languages

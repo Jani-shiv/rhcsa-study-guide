@@ -1,0 +1,40 @@
+name: "Feature Request / Content Improvement"
+description: "Suggest a new lab exercise, practice quiz, or UI improvement"
+title: "[FEATURE]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping expand and enhance the RHCSA Study Guide!
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: "Feature Type"
+      options:
+        - "New Hands-on Lab Exercise"
+        - "Practice Questions / Exam Tips"
+        - "New Topic / Chapter Section"
+        - "Interactive UI / Navigation Feature"
+        - "Other"
+    validations:
+      required: true
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: "Proposed Feature or Content"
+      placeholder: "A clear and concise description of what you would like to see added..."
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: "Why is this needed / How does this help RHCSA learners?"
+      placeholder: "Explain the context, learning value, or problem this solves..."
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: "Additional Context or References (optional)"
+      placeholder: "Add any mockups, links to Red Hat docs, or related resources."

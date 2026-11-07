@@ -1,0 +1,33 @@
+name: "Accessibility Barrier Report"
+description: "Report an accessibility barrier encountered while using the RHCSA Study Guide"
+title: "[A11Y]: "
+labels: ["accessibility", "a11y"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We are committed to making this study guide accessible to everyone. Thank you for reporting barriers so we can address them promptly!
+  - type: input
+    id: page-url
+    attributes:
+      label: "Affected Page or Chapter"
+      placeholder: "e.g., Chapter 10 or Mobile Navigation menu"
+    validations:
+      required: true
+  - type: textarea
+    id: barrier-description
+    attributes:
+      label: "Describe the Accessibility Barrier"
+      placeholder: "What was difficult to read, navigate, or operate?"
+    validations:
+      required: true
+  - type: input
+    id: assistive-tech
+    attributes:
+      label: "Assistive Technology & Browser Used"
+      placeholder: "e.g., NVDA with Firefox on Windows, or VoiceOver with Safari on iOS"
+  - type: textarea
+    id: suggested-fix
+    attributes:
+      label: "Suggested Remediation (optional)"
+      placeholder: "If you know of a solution or ARIA/HTML improvement, share it here."
