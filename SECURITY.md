@@ -30,3 +30,4 @@ If you discover a security vulnerability or exploit:
 - **Acknowledgment**: You will receive an initial response acknowledging your report within 48 to 72 hours.
 - **Investigation**: We will investigate the validity and severity of the report.
 - **Resolution**: Once confirmed, a fix will be developed and released to the `main` branch promptly, with credit given to the reporter (unless anonymity is requested).
+

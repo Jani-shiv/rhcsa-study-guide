@@ -35,3 +35,4 @@ Please delete options that are not relevant:
 - [ ] I have commented complex commands or explanations where necessary.
 - [ ] My changes generate no new warnings or console errors.
 - [ ] I have read and agree to the [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
+
