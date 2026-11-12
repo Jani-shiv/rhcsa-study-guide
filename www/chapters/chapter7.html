@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 7: Schedule Future Tasks - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
-    <!-- Vercel Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+  <script type="module" crossorigin src="/assets/script-uyo8zlGx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/script-Bd6Bx7if.css">
 </head>
 <body>
     <nav class="navbar">
@@ -281,16 +284,16 @@ HOME=/home/student
 
                 <h3>Redirecting Cron Output</h3>
                 <pre><code># Discard all output
-0 2 * * * /usr/local/bin/quiet-task.sh > /dev/null 2>&1
+0 2 * * * /usr/local/bin/quiet-task.sh &gt; /dev/null 2&gt;&amp;1
 
 # Log output to file
-0 2 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1
+0 2 * * * /usr/local/bin/backup.sh &gt;&gt; /var/log/backup.log 2&gt;&amp;1
 
 # Send errors only
-0 2 * * * /usr/local/bin/task.sh > /dev/null
+0 2 * * * /usr/local/bin/task.sh &gt; /dev/null
 
 # Separate stdout and stderr
-0 2 * * * /usr/local/bin/task.sh >> /var/log/task.log 2>> /var/log/task-error.log</code></pre>
+0 2 * * * /usr/local/bin/task.sh &gt;&gt; /var/log/task.log 2&gt;&gt; /var/log/task-error.log</code></pre>
 
                 <div class="procedure">
                     <h4>Procedure: Creating a Daily Backup Cron Job</h4>
@@ -315,7 +318,7 @@ sudo chmod +x /usr/local/bin/daily-backup.sh</code></pre>
                         </li>
                         <li>Add cron job (runs at 2 AM daily):
                             <pre><code># Daily backup at 2 AM
-0 2 * * * /usr/local/bin/daily-backup.sh >> /var/log/backup.log 2>&1</code></pre>
+0 2 * * * /usr/local/bin/daily-backup.sh &gt;&gt; /var/log/backup.log 2&gt;&amp;1</code></pre>
                         </li>
                         <li>Verify crontab:
                             <pre><code>sudo crontab -l</code></pre>
@@ -558,42 +561,42 @@ sudo systemctl status atd</code></pre>
                 <h3>Scheduling Jobs with At</h3>
                 <pre><code># Run job at specific time
 at 10:00 PM
-> /usr/local/bin/backup.sh
-> <Ctrl+D>
+&gt; /usr/local/bin/backup.sh
+&gt; &lt;Ctrl+D&gt;
 
 # Run job tomorrow at 9 AM
 at 9am tomorrow
-> echo "Daily report" | mail -s "Report" admin@example.com
-> <Ctrl+D>
+&gt; echo "Daily report" | mail -s "Report" admin@example.com
+&gt; &lt;Ctrl+D&gt;
 
 # Run job at specific date and time
 at 2:30 PM December 25
-> /usr/local/bin/christmas-task.sh
-> <Ctrl+D>
+&gt; /usr/local/bin/christmas-task.sh
+&gt; &lt;Ctrl+D&gt;
 
 # Run job in 30 minutes
 at now + 30 minutes
-> /usr/local/bin/quick-task.sh
-> <Ctrl+D>
+&gt; /usr/local/bin/quick-task.sh
+&gt; &lt;Ctrl+D&gt;
 
 # Run job in 2 hours
 at now + 2 hours
-> systemctl restart httpd
-> <Ctrl+D>
+&gt; systemctl restart httpd
+&gt; &lt;Ctrl+D&gt;
 
 # Run job next week
 at 10am next week
-> /usr/local/bin/weekly-report.sh
-> <Ctrl+D>
+&gt; /usr/local/bin/weekly-report.sh
+&gt; &lt;Ctrl+D&gt;
 
 # Run job from file
 at 2am tomorrow -f /usr/local/bin/script.sh
 
 # Run job using here document
-at now + 5 minutes <<EOF
-echo "Task started at \$(date)" >> /var/log/tasks.log
+at now + 5 minutes &lt;&lt;EOF
+echo "Task started at $(date)" &gt;&gt; /var/log/tasks.log
 /usr/local/bin/my-task.sh
-echo "Task completed at \$(date)" >> /var/log/tasks.log
+echo "Task completed at $(date)" &gt;&gt; /var/log/tasks.log
 EOF</code></pre>
 
                 <h3>At Time Specifications</h3>
@@ -652,8 +655,8 @@ sudo atrm $(atq -u username | cut -f1)</code></pre>
                 <p>Similar to at, but runs only when system load is low:</p>
                 <pre><code># Run when load average drops below 1.5 (default)
 batch
-> /usr/local/bin/resource-intensive-task.sh
-> <Ctrl+D>
+&gt; /usr/local/bin/resource-intensive-task.sh
+&gt; &lt;Ctrl+D&gt;
 
 # Batch jobs appear in atq
 atq</code></pre>
@@ -674,8 +677,8 @@ echo "admin" | sudo tee -a /etc/at.allow
                     <ol>
                         <li>Schedule reboot for 2 AM:
                             <pre><code>sudo at 2am tomorrow
-at> systemctl reboot
-at> <Ctrl+D>
+at&gt; systemctl reboot
+at&gt; &lt;Ctrl+D&gt;
 job 3 at Fri Nov 15 02:00:00 2025</code></pre>
                         </li>
                         <li>Verify scheduled job:
@@ -879,6 +882,6 @@ ls -l /var/spool/anacron/</code></pre>
         </div>
     </footer>
 
-    <script src="../script.js"></script>
 </body>
 </html>
+

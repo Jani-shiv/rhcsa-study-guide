@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 8: Manage Software Packages - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
-    <!-- Vercel Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <title>Chapter 8: Manage Software Packages - RHCSA Guide</title>
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+  <script type="module" crossorigin src="/assets/script-uyo8zlGx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/script-Bd6Bx7if.css">
 </head>
 <body>
     <nav class="navbar">
@@ -397,7 +400,7 @@ priority=10</code></pre>
 sudo rpm --import https://example.com/RPM-GPG-KEY
 
 # List imported keys
-rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'
+rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --&gt; %{summary}\n'
 
 # Verify package signature
 rpm --checksig package.rpm
@@ -797,7 +800,6 @@ rpm2cpio package.rpm | cpio -idmv ./usr/bin/command</code></pre>
             </div>
         </div>
     </footer>
-
-    <script src="../script.js"></script>
+
 </body>
 </html>

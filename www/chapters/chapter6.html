@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 6: Tune System Performance - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
-    <!-- Vercel Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <title>Chapter 6: Tune System Performance - RHCSA Guide</title>
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+  <script type="module" crossorigin src="/assets/script-uyo8zlGx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/script-Bd6Bx7if.css">
 </head>
 <body>
     <nav class="navbar">
@@ -181,7 +184,7 @@ q       # Quit
 top -u student      # Show only student's processes
 top -d 5            # Update every 5 seconds (default is 3)
 top -n 3            # Run 3 iterations then exit
-top -b > top.log    # Batch mode for logging</code></pre>
+top -b &gt; top.log    # Batch mode for logging</code></pre>
 
                 <h3>uptime - System Load</h3>
                 <pre><code># Check how long system has been running and load average
@@ -191,7 +194,7 @@ uptime
 # Interpreting load average:
 # - Numbers represent 1, 5, and 15-minute averages
 # - On 4-core system: load of 4.0 = 100% utilization
-# - Load > number of cores = system overloaded</code></pre>
+# - Load &gt; number of cores = system overloaded</code></pre>
 
                 <h3>free - Memory Usage</h3>
                 <pre><code># Display memory usage
@@ -294,7 +297,7 @@ nice -n 10 ./my_program
 sudo nice -n -10 ./important_program
 
 # Start background process with low priority
-nice -n 15 ./backup_script.sh &
+nice -n 15 ./backup_script.sh &amp;
 
 # Check the nice value
 ps -o pid,ni,cmd -p $(pgrep my_program)</code></pre>
@@ -321,7 +324,7 @@ ps -o pid,ni,cmd -p 1234</code></pre>
 
                 <h3>Practical Examples</h3>
                 <pre><code># Run backup with low priority so it doesn't slow down system
-nice -n 19 tar -czf /backups/home.tar.gz /home &
+nice -n 19 tar -czf /backups/home.tar.gz /home &amp;
 
 # Run database maintenance with slightly elevated priority
 sudo nice -n -5 /usr/bin/mysql_optimize
@@ -487,7 +490,7 @@ tuned-adm verify</code></pre>
                         <div class="quiz-answer">
                             <strong>Answer: B) System is at 100% CPU utilization</strong><br>
                             Load average represents processes waiting for CPU. On a 4-core system, a load of 4.0 means 
-                            all cores are fully utilized. Load > number of cores indicates overloading.
+                            all cores are fully utilized. Load &gt; number of cores indicates overloading.
                         </div>
                     </div>
 
@@ -573,7 +576,6 @@ tuned-adm verify</code></pre>
             </div>
         </div>
     </footer>
-
-    <script src="../script.js"></script>
+
 </body>
 </html>

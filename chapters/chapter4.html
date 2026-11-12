@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 4: Control Access to Files - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/style.css">
     <!-- Vercel Web Analytics -->
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
-    <script defer src="/_vercel/insights/script.js"></script>
+    <script type="module" defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -371,7 +371,7 @@ ls -l /usr/bin/passwd
                     <div class="info-box-title">⚠️ Security Warning</div>
                     <p>SUID on executables owned by root is a significant security risk if the program is vulnerable. 
                     Regularly audit SUID files:</p>
-                    <pre><code>sudo find / -perm -4000 -type f -ls 2>/dev/null</code></pre>
+                    <pre><code>sudo find / -perm -4000 -type f -ls 2&gt;/dev/null</code></pre>
                 </div>
 
                 <h3>2. SGID (Set Group ID) - Bit 2</h3>
@@ -529,7 +529,7 @@ umask u=rwx,g=rx,o=</code></pre>
                 <p>To make umask settings permanent, add them to shell configuration files:</p>
 
                 <pre><code># For individual user (add to ~/.bashrc or ~/.bash_profile)
-echo "umask 0027" >> ~/.bashrc
+echo "umask 0027" &gt;&gt; ~/.bashrc
 
 # For all users (add to /etc/bashrc or /etc/profile)
 sudo vi /etc/bashrc
@@ -654,7 +654,7 @@ setfacl -m m::rwx file.txt</code></pre>
 getfacl file1.txt | setfacl --set-file=- file2.txt
 
 # Backup ACLs to file
-getfacl -R /project > project_acls.txt
+getfacl -R /project &gt; project_acls.txt
 
 # Restore ACLs from backup
 setfacl --restore=project_acls.txt
@@ -833,6 +833,6 @@ setfacl -m u:alice:r,u:bob:r /var/log/application.log</code></pre>
         </div>
     </footer>
 
-    <script type="module" src="../script.js"></script>
+    <script type="module" src="/script.js"></script>
 </body>
 </html>

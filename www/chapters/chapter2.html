@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 2: Manage Files from the Command Line - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
-    <!-- Vercel Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <title>Chapter 2: Manage Files from the Command Line - RHCSA Guide</title>
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+  <script type="module" crossorigin src="/assets/script-uyo8zlGx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/script-Bd6Bx7if.css">
 </head>
 <body>
     <nav class="navbar">
@@ -433,7 +436,7 @@ ln -s /var/log ~/logs</code></pre>
                     <h4>Procedure: Creating and Verifying Links</h4>
                     <ol>
                         <li>Create original file:
-                            <pre><code>echo "Original content" > original.txt</code></pre>
+                            <pre><code>echo "Original content" &gt; original.txt</code></pre>
                         </li>
                         <li>Create hard link:
                             <pre><code>ln original.txt hardlink.txt</code></pre>
@@ -445,7 +448,7 @@ ln -s /var/log ~/logs</code></pre>
                             <pre><code>ls -li *.txt</code></pre>
                         </li>
                         <li>Test by modifying original:
-                            <pre><code>echo "Modified" >> original.txt
+                            <pre><code>echo "Modified" &gt;&gt; original.txt
 cat hardlink.txt
 cat symlink.txt</code></pre>
                         </li>
@@ -554,7 +557,6 @@ cat symlink.txt</code></pre>
             </div>
         </div>
     </footer>
-
-    <script src="../script.js"></script>
+
 </body>
 </html>

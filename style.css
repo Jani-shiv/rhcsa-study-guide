@@ -1610,6 +1610,46 @@ pre code {
   }
 }
 
+/* ===============================================
+   ANIMATIONS
+   =============================================== */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.6s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-links.active {
+  animation: slide-down 0.3s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
 /* Utilities */
 .hidden { display: none !important; }
 .text-center { text-align: center; }

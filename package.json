@@ -1,19 +1,27 @@
 {
   "name": "rhcsa-study-guide",
   "version": "1.0.0",
-  "description": "<div align=\"center\">",
-  "main": "script.js",
+  "description": "Complete RHCSA (RH199) Study Guide - DevOps ni Diary",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "sync:capacitor": "npm run build && npx cap sync android"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Jani-shiv/rhcsa-study-guide.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "rhcsa",
+    "rhel",
+    "linux",
+    "study-guide",
+    "certification"
+  ],
+  "author": "DevOps ni Diary",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/Jani-shiv/rhcsa-study-guide/issues"
   },
@@ -23,5 +31,8 @@
     "@capacitor/cli": "^8.0.2",
     "@capacitor/core": "^8.0.2",
     "@vercel/analytics": "^2.0.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
   }
 }

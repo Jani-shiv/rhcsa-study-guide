@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 14: Mount Network Storage - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
-    <!-- Vercel Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <title>Chapter 14: Mount Network Storage - RHCSA Guide</title>
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+  <script type="module" crossorigin src="/assets/script-uyo8zlGx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/script-Bd6Bx7if.css">
 </head>
 <body>
     <nav class="navbar">
@@ -390,7 +393,7 @@ mount | grep autofs</code></pre>
 # key  options  location
 
 docs     -rw  nfsserver:/exports/documentation
-home     -rw  nfsserver:/home/&
+home     -rw  nfsserver:/home/&amp;
 tools    -ro  nfsserver:/opt/tools</code></pre>
 
                 <div class="info-box note">
@@ -412,8 +415,8 @@ tools    -ro  nfsserver:/opt/tools</code></pre>
                 <pre><code># Create map for home directories
 sudo vi /etc/auto.home
 
-# Wildcard entry (&amp; substitutes the key)
-*  -rw,soft  nfsserver:/home/&amp;
+# Wildcard entry (&amp;amp; substitutes the key)
+*  -rw,soft  nfsserver:/home/&amp;amp;
 
 # Add to master map
 sudo vi /etc/auto.master
@@ -429,11 +432,11 @@ cd /home/alice   # Mounts nfsserver:/home/alice</code></pre>
                 <h3>Wildcard Examples</h3>
                 <pre><code># Multi-user shares
 sudo vi /etc/auto.users
-*  -rw  nfsserver:/users/&amp;
+*  -rw  nfsserver:/users/&amp;amp;
 
 # Department shares
 sudo vi /etc/auto.dept
-*  -rw  fileserver:/departments/&amp;
+*  -rw  fileserver:/departments/&amp;amp;
 
 # Access:
 ls /mnt/users/bob      # Mounts /users/bob
@@ -443,7 +446,7 @@ ls /mnt/dept/sales     # Mounts /departments/sales</code></pre>
                 <pre><code># Multi-level structure
 sudo vi /etc/auto.projects
 
-*  -rw  projectserver:/projects/&amp;/current
+*  -rw  projectserver:/projects/&amp;amp;/current
 
 # Creates structure:
 /mnt/projects/alpha  → projectserver:/projects/alpha/current
@@ -454,7 +457,7 @@ sudo vi /etc/auto.projects
                     <ol>
                         <li>Create map file with wildcard:
                             <pre><code>sudo vi /etc/auto.home
-*  -rw,soft,_netdev  server.example.com:/home/&amp;</code></pre>
+*  -rw,soft,_netdev  server.example.com:/home/&amp;amp;</code></pre>
                         </li>
                         <li>Add to master map:
                             <pre><code>sudo vi /etc/auto.master
@@ -627,7 +630,6 @@ sudo umount -l /mnt/auto/*</code></pre>
             </div>
         </div>
     </footer>
-
-    <script src="../script.js"></script>
+
 </body>
 </html>

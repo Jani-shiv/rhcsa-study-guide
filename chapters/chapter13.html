@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 13: Configure Networking - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/style.css">
     <!-- Vercel Web Analytics -->
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
-    <script defer src="/_vercel/insights/script.js"></script>
+    <script type="module" defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -625,7 +625,7 @@ tracepath google.com</code></pre>
                         <ul class="quiz-options">
                             <li>A) hostname server1.example.com</li>
                             <li>B) hostnamectl set-hostname server1.example.com</li>
-                            <li>C) echo "server1" > /etc/hostname</li>
+                            <li>C) echo "server1" &gt; /etc/hostname</li>
                             <li>D) Both B and C</li>
                         </ul>
                         <div class="quiz-answer">
@@ -673,7 +673,7 @@ tracepath google.com</code></pre>
                         <ul class="quiz-options">
                             <li>A) nmcli con mod ens33 ipv4.dns 8.8.4.4</li>
                             <li>B) nmcli con mod ens33 +ipv4.dns 8.8.4.4</li>
-                            <li>C) echo "nameserver 8.8.4.4" >> /etc/resolv.conf</li>
+                            <li>C) echo "nameserver 8.8.4.4" &gt;&gt; /etc/resolv.conf</li>
                             <li>D) nmcli con add dns 8.8.4.4</li>
                         </ul>
                         <div class="quiz-answer">
@@ -723,6 +723,6 @@ tracepath google.com</code></pre>
         </div>
     </footer>
 
-    <script type="module" src="../script.js"></script>
+    <script type="module" src="/script.js"></script>
 </body>
 </html>

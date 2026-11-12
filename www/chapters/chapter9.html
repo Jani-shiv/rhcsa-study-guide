@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 9: Manage Basic Storage - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
-    <!-- Vercel Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <title>Chapter 9: Manage Basic Storage - RHCSA Guide</title>
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+  <script type="module" crossorigin src="/assets/script-uyo8zlGx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/script-Bd6Bx7if.css">
 </head>
 <body>
     <nav class="navbar">
@@ -135,7 +138,7 @@
                 <div class="info-box note">
                     <div class="info-box-title">📘 MBR vs GPT</div>
                     <p><strong>MBR:</strong> Legacy, max 2TB disks, 4 primary partitions<br>
-                    <strong>GPT:</strong> Modern, supports >2TB disks, up to 128 partitions, more reliable</p>
+                    <strong>GPT:</strong> Modern, supports &gt;2TB disks, up to 128 partitions, more reliable</p>
                 </div>
             </section>
 
@@ -198,7 +201,7 @@ Hex code: 8e
 Command: w</code></pre>
 
                 <h3>Partitioning with parted (GPT)</h3>
-                <p>Use <code>parted</code> for GPT partition tables (modern, >2TB disks):</p>
+                <p>Use <code>parted</code> for GPT partition tables (modern, &gt;2TB disks):</p>
                 <pre><code># Start parted in interactive mode
 sudo parted /dev/sdb
 
@@ -518,7 +521,7 @@ sudo swapon -p 10 /dev/sdb2
                     <div class="info-box-title">💡 Swap Size Recommendations</div>
                     <p><strong>RAM ≤ 2GB:</strong> 2x RAM<br>
                     <strong>RAM 2-8GB:</strong> Same as RAM<br>
-                    <strong>RAM >8GB:</strong> At least 4GB, or 0.5x RAM<br>
+                    <strong>RAM &gt;8GB:</strong> At least 4GB, or 0.5x RAM<br>
                     <strong>For hibernation:</strong> RAM size + 0.5GB</p>
                 </div>
             </section>
@@ -532,7 +535,7 @@ sudo swapon -p 10 /dev/sdb2
 
                 <h3>fstab Format</h3>
                 <pre><code># /etc/fstab
-# <device>  <mount point>  <type>  <options>  <dump>  <pass>
+# &lt;device&gt;  &lt;mount point&gt;  &lt;type&gt;  &lt;options&gt;  &lt;dump&gt;  &lt;pass&gt;
 
 UUID=xxx-xxx   /data         xfs     defaults   0       2
 LABEL=backup   /backup       ext4    defaults   0       2
@@ -654,7 +657,7 @@ sudo systemctl enable --now data.mount</code></pre>
                         </ul>
                         <div class="quiz-answer">
                             <strong>Answer: B) GPT</strong><br>
-                            GPT (GUID Partition Table) supports disks >2TB and up to 128 partitions. MBR is limited 
+                            GPT (GUID Partition Table) supports disks &gt;2TB and up to 128 partitions. MBR is limited 
                             to 2TB disks and 4 primary partitions. Use 'parted' for GPT partitions.
                         </div>
                     </div>
@@ -742,7 +745,6 @@ sudo systemctl enable --now data.mount</code></pre>
             </div>
         </div>
     </footer>
-
-    <script src="../script.js"></script>
+
 </body>
 </html>

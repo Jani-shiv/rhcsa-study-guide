@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 17: Comprehensive Review - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
-    <!-- Vercel Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <title>Chapter 17: Comprehensive Review - RHCSA Guide</title>
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+  <script type="module" crossorigin src="/assets/script-uyo8zlGx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/script-Bd6Bx7if.css">
 </head>
 <body>
     <nav class="navbar">
@@ -87,7 +90,7 @@
                 <h3>1. Understand and Use Essential Tools</h3>
                 <ul style="line-height: 1.8;">
                     <li>✅ Access shell prompt and execute commands</li>
-                    <li>✅ Use I/O redirection (>, >>, <, |, 2>&1)</li>
+                    <li>✅ Use I/O redirection (&gt;, &gt;&gt;, &lt;, |, 2&gt;1)</li>
                     <li>✅ Use grep and regular expressions</li>
                     <li>✅ Access remote systems using SSH</li>
                     <li>✅ Log in and switch users (su, sudo)</li>
@@ -194,7 +197,7 @@
                 <h2>📚 Essential Command Reference</h2>
 
                 <h3>File Management</h3>
-                <pre><code># Navigation & listing
+                <pre><code># Navigation &amp; listing
 ls -lah, cd, pwd, tree
 
 # File operations
@@ -202,7 +205,7 @@ cp -r, mv, rm -rf, mkdir -p, touch
 ln -s source link  # symbolic link
 ln source link     # hard link
 
-# Search & find
+# Search &amp; find
 find /path -name "*.txt" -type f -size +10M
 locate filename
 which command
@@ -353,7 +356,7 @@ firewall-cmd --set-default-zone=public
 firewall-cmd --list-all
 firewall-cmd --reload
 
-# Services & ports
+# Services &amp; ports
 firewall-cmd --permanent --add-service=http
 firewall-cmd --permanent --add-port=8080/tcp
 firewall-cmd --permanent --remove-service=http
@@ -473,7 +476,7 @@ sudo dnf install -y httpd
 sudo systemctl enable --now httpd
 
 # Create test page
-echo "&lt;h1&gt;Test Page&lt;/h1&gt;" | sudo tee /var/www/html/index.html
+echo "&amp;lt;h1&amp;gt;Test Page&amp;lt;/h1&amp;gt;" | sudo tee /var/www/html/index.html
 
 # SELinux (if needed)
 sudo restorecon -Rv /var/www/html
@@ -891,7 +894,6 @@ loginctl show-user $USER | grep Linger</code></pre>
             </div>
         </div>
     </footer>
-
-    <script src="../script.js"></script>
+
 </body>
 </html>

@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 16: Run Containers - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
-    <!-- Vercel Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <title>Chapter 16: Run Containers - RHCSA Guide</title>
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+  <script type="module" crossorigin src="/assets/script-uyo8zlGx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/script-Bd6Bx7if.css">
 </head>
 <body>
     <nav class="navbar">
@@ -458,7 +461,7 @@ podman volume prune</code></pre>
                     <ol>
                         <li>Create content directory:
                             <pre><code>mkdir -p ~/webdata
-echo "&lt;h1&gt;Hello Podman&lt;/h1&gt;" > ~/webdata/index.html</code></pre>
+echo "&amp;lt;h1&amp;gt;Hello Podman&amp;lt;/h1&amp;gt;" &gt; ~/webdata/index.html</code></pre>
                         </li>
                         <li>Run nginx with bind mount:
                             <pre><code>podman run -d --name myweb \
@@ -469,7 +472,7 @@ echo "&lt;h1&gt;Hello Podman&lt;/h1&gt;" > ~/webdata/index.html</code></pre>
                             <pre><code>curl http://localhost:8080</code></pre>
                         </li>
                         <li>Update content (container sees changes):
-                            <pre><code>echo "&lt;h1&gt;Updated!&lt;/h1&gt;" > ~/webdata/index.html
+                            <pre><code>echo "&amp;lt;h1&amp;gt;Updated!&amp;lt;/h1&amp;gt;" &gt; ~/webdata/index.html
 curl http://localhost:8080</code></pre>
                         </li>
                         <li>Remove container (data persists):
@@ -734,7 +737,6 @@ systemctl --user status container-myapp.service</code></pre>
             </div>
         </div>
     </footer>
-
-    <script src="../script.js"></script>
+
 </body>
 </html>

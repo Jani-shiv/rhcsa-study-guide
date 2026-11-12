@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 12: Analyze System Logs - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/style.css">
     <!-- Vercel Web Analytics -->
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
-    <script defer src="/_vercel/insights/script.js"></script>
+    <script type="module" defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -450,7 +450,7 @@ sudo vi /etc/rsyslog.d/httpd.conf
 
 # Add:
 if $programname == 'httpd' then /var/log/httpd-custom.log
-& stop
+&amp; stop
 
 # Restart rsyslog
 sudo systemctl restart rsyslog
@@ -500,7 +500,7 @@ sudo vi /etc/logrotate.d/myapp
     create 0640 root root
     sharedscripts
     postrotate
-        systemctl reload myapp > /dev/null 2>&1 || true
+        systemctl reload myapp &gt; /dev/null 2&gt;&amp;1 || true
     endscript
 }</code></pre>
 
@@ -677,6 +677,6 @@ cat /var/lib/logrotate/logrotate.status</code></pre>
         </div>
     </footer>
 
-    <script type="module" src="../script.js"></script>
+    <script type="module" src="/script.js"></script>
 </body>
 </html>

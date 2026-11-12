@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 11: Manage Services & Boot Process - RHCSA Guide</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="/style.css">
     <!-- Vercel Web Analytics -->
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
-    <script defer src="/_vercel/insights/script.js"></script>
+    <script type="module" defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -398,7 +398,7 @@ systemd-analyze blame
 systemd-analyze critical-chain
 
 # Visualize boot (create SVG)
-systemd-analyze plot > boot.svg</code></pre>
+systemd-analyze plot &gt; boot.svg</code></pre>
 
                 <h3>GRUB2 Boot Menu</h3>
                 <pre><code># GRUB2 configuration
@@ -685,6 +685,6 @@ reboot -f</code></pre>
         </div>
     </footer>
 
-    <script type="module" src="../script.js"></script>
+    <script type="module" src="/script.js"></script>
 </body>
 </html>
